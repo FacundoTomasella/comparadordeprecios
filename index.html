@@ -13,44 +13,52 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 1rem;
+            background: #F6F6F6;
+            color: #182026;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 2rem 1.5rem;
         }
 
         .header {
             text-align: center;
-            color: white;
-            padding: 2rem 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
         }
 
         .header h1 {
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(2rem, 5vw, 2.5rem);
             font-weight: 700;
+            color: #182026;
             margin-bottom: 0.5rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         .header p {
             font-size: 1.1rem;
-            opacity: 0.95;
+            color: #5C7080;
+        }
+
+        .search-filter-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         .search-box {
+            flex: 1;
+            min-width: 250px;
             background: white;
-            border-radius: 50px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #D3D8DE;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .search-box input {
@@ -58,110 +66,72 @@
             border: none;
             outline: none;
             font-size: 1rem;
-            color: #333;
+            color: #182026;
+            background: transparent;
         }
 
         .search-box input::placeholder {
-            color: #999;
+            color: #A7B6C2;
         }
 
-        .search-icon {
-            color: #667eea;
-            font-size: 1.2rem;
-        }
-
-        .categories {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .categories::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .categories::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 10px;
-        }
-
-        .category-chip {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-
-        .category-chip:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .category-chip.active {
+        .category-select {
             background: white;
-            color: #667eea;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid #D3D8DE;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            color: #182026;
+            cursor: pointer;
+            min-width: 200px;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
         .product-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 12px;
+            border: 1px solid #E1E8ED;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 8px 24px rgba(24, 32, 38, 0.1);
+            transform: translateY(-2px);
         }
 
         .product-header {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 1.5rem;
-            border-bottom: 3px solid #e9ecef;
+            border-bottom: 1px solid #F5F8FA;
         }
 
-        .product-category {
+        .category-badge {
             display: inline-block;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+            background: #EBF1F5;
+            color: #5C7080;
             padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+            border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
         }
 
         .product-name {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: #212529;
+            color: #182026;
             margin-bottom: 0.25rem;
         }
 
         .product-brand {
             font-size: 0.9rem;
-            color: #6c757d;
+            color: #738694;
             font-weight: 500;
         }
 
@@ -169,115 +139,108 @@
             padding: 1.5rem;
         }
 
-        .price-comparison {
+        .price-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .price-item {
+        .price-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: #F5F8FA;
+            border-radius: 8px;
             transition: all 0.2s;
         }
 
-        .price-item:hover {
-            background: #e9ecef;
+        .price-row:hover {
+            background: #EBF1F5;
         }
 
-        .price-item.best {
+        .price-row.best {
             background: #d9ead3;
-            border: 2px solid #93c47d;
+            border: 1px solid #93c47d;
         }
 
-        .price-item.best .provider-name {
-            font-weight: 700;
-            color: #274e13;
-        }
-
-        .price-item.best::before {
-            content: "⭐";
-            margin-right: 0.5rem;
-        }
-
-        .provider-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .price-row.best:hover {
+            background: #cde2bb;
         }
 
         .provider-name {
             font-weight: 600;
-            color: #495057;
+            color: #182026;
             font-size: 0.95rem;
         }
 
-        .price-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #212529;
+        .price-row.best .provider-name {
+            color: #274e13;
         }
 
-        .price-item.best .price-value {
+        .price-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #182026;
+        }
+
+        .price-row.best .price-value {
             color: #274e13;
         }
 
         .buy-link {
-            margin-top: 1rem;
             text-align: center;
+            padding-top: 0.5rem;
         }
 
-        .buy-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 2rem;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
+        .buy-btn {
+            color: #182026;
+            text-decoration: underline;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
         }
 
-        .buy-button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        .buy-btn:hover {
+            color: #4574E8;
+        }
+
+        .savings-info {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #F5F8FA;
         }
 
         .savings-badge {
             display: inline-block;
-            background: #fff3cd;
-            color: #856404;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            background: #FEF5E7;
+            color: #9A6E3A;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
             font-size: 0.85rem;
             font-weight: 600;
-            margin-top: 1rem;
         }
 
         .loading {
             text-align: center;
-            color: white;
-            padding: 3rem;
-            font-size: 1.2rem;
+            padding: 4rem 2rem;
+            color: #5C7080;
         }
 
         .loading-spinner {
             display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top-color: white;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #EBF1F5;
+            border-top-color: #4574E8;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
             margin-bottom: 1rem;
         }
 
@@ -287,22 +250,28 @@
 
         .no-results {
             text-align: center;
-            color: white;
-            padding: 3rem;
-            font-size: 1.1rem;
+            padding: 4rem 2rem;
+            color: #5C7080;
+        }
+
+        .no-results h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #182026;
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
+            .container {
+                padding: 1rem;
             }
 
             .header {
-                padding: 1.5rem 0.5rem;
+                margin-bottom: 2rem;
+                padding: 1rem 0;
             }
 
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
 
             .products-grid {
@@ -310,32 +279,23 @@
                 gap: 1rem;
             }
 
-            .product-card {
-                border-radius: 15px;
+            .search-filter-row {
+                flex-direction: column;
+                gap: 0.75rem;
             }
 
-            .search-box {
-                padding: 0.75rem 1.25rem;
+            .search-box,
+            .category-select {
+                width: 100%;
+                min-width: unset;
             }
 
-            .categories {
-                gap: 0.5rem;
-            }
-
-            .category-chip {
-                padding: 0.65rem 1.25rem;
-                font-size: 0.85rem;
-            }
-
-            .product-header {
+            .product-header,
+            .product-body {
                 padding: 1.25rem;
             }
 
-            .product-name {
-                font-size: 1.15rem;
-            }
-
-            .price-item {
+            .price-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
@@ -350,16 +310,19 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛒 Comparador de Precios</h1>
-            <p>Encuentra el mejor precio para tus productos</p>
+            <h1>Comparador de Precios</h1>
+            <p>Encuentra el mejor precio para tus productos favoritos</p>
         </div>
 
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Buscar productos...">
+        <div class="search-filter-row">
+            <div class="search-box">
+                <span style="font-size: 1.2rem; color: #738694;">🔍</span>
+                <input type="text" id="searchInput" placeholder="Buscar productos...">
+            </div>
+            <select class="category-select" id="categoryFilter">
+                <option value="Todas">Todas las categorías</option>
+            </select>
         </div>
-
-        <div class="categories" id="categories"></div>
 
         <div class="products-grid" id="productsGrid">
             <div class="loading">
@@ -388,27 +351,24 @@
                 console.error('Error:', error);
                 document.getElementById('productsGrid').innerHTML = `
                     <div class="no-results">
-                        <p>⚠️ Error al cargar los datos</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Verifica que la hoja de Google esté pública</p>
+                        <h3>Error al cargar datos</h3>
+                        <p>Verifica que tu hoja de Google esté pública</p>
                     </div>
                 `;
             }
         }
 
         function processData(workbook) {
-            // Asumiendo que los datos están en la primera hoja
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
             
-            // Headers en la primera fila: CATEGORIA, PRODUCTO, MARCA, PROVEEDOR, PRECIO, URL
-            const headers = data[0];
+            // Headers: CATEGORIA, PRODUCTO, MARCA, PROVEEDOR, PRECIO, URL
             const products = {};
 
-            // Procesar cada fila
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                if (!row[0] || !row[1]) continue; // Saltar filas vacías
+                if (!row[0] || !row[1]) continue;
 
                 const categoria = row[0];
                 const producto = row[1];
@@ -419,7 +379,6 @@
 
                 if (isNaN(precio)) continue;
 
-                // Agrupar por producto
                 const key = `${categoria}_${producto}_${marca}`;
                 
                 if (!products[key]) {
@@ -438,7 +397,6 @@
                 });
             }
 
-            // Convertir a array y encontrar mejor precio
             allProducts = Object.values(products).map(p => {
                 const precios = p.proveedores.map(pr => pr.precio);
                 const minPrecio = Math.min(...precios);
@@ -453,39 +411,26 @@
                 return { ...p, minPrecio, maxPrecio, ahorro };
             });
 
-            renderCategories();
+            populateCategories();
             renderProducts();
         }
 
-        function renderCategories() {
+        function populateCategories() {
             const categories = ['Todas', ...new Set(allProducts.map(p => p.categoria))];
-            const container = document.getElementById('categories');
+            const select = document.getElementById('categoryFilter');
             
-            container.innerHTML = categories.map(cat => `
-                <button class="category-chip ${cat === currentCategory ? 'active' : ''}" 
-                        onclick="filterByCategory('${cat}')">
-                    ${cat}
-                </button>
-            `).join('');
+            select.innerHTML = categories.map(cat => 
+                `<option value="${cat}">${cat}</option>`
+            ).join('');
         }
 
-        function filterByCategory(category) {
-            currentCategory = category;
-            renderCategories();
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const container = document.getElementById('productsGrid');
-            
+        function filterProducts() {
             let filtered = allProducts;
 
-            // Filtrar por categoría
             if (currentCategory !== 'Todas') {
                 filtered = filtered.filter(p => p.categoria === currentCategory);
             }
 
-            // Filtrar por búsqueda
             if (searchTerm) {
                 filtered = filtered.filter(p => 
                     p.producto.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -493,10 +438,18 @@
                 );
             }
 
+            return filtered;
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('productsGrid');
+            const filtered = filterProducts();
+
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="no-results">
-                        <p>No se encontraron productos</p>
+                        <h3>No se encontraron productos</h3>
+                        <p>Intenta con otra búsqueda</p>
                     </div>
                 `;
                 return;
@@ -508,31 +461,31 @@
                 return `
                     <div class="product-card">
                         <div class="product-header">
-                            <div class="product-category">${product.categoria}</div>
+                            <div class="category-badge">${product.categoria}</div>
                             <div class="product-name">${product.producto}</div>
                             ${product.marca ? `<div class="product-brand">${product.marca}</div>` : ''}
                         </div>
                         <div class="product-body">
-                            <div class="price-comparison">
+                            <div class="price-list">
                                 ${product.proveedores.map(prov => `
-                                    <div class="price-item ${prov.isBest ? 'best' : ''}">
-                                        <div class="provider-info">
-                                            <span class="provider-name">${prov.proveedor}</span>
-                                        </div>
-                                        <div class="price-value">$${prov.precio.toFixed(2)}</div>
+                                    <div class="price-row ${prov.isBest ? 'best' : ''}">
+                                        <span class="provider-name">${prov.isBest ? '★ ' : ''}${prov.proveedor}</span>
+                                        <span class="price-value">$${prov.precio.toFixed(2)}</span>
                                     </div>
                                 `).join('')}
                             </div>
-                            ${product.ahorro > 0 ? `
-                                <div class="savings-badge">
-                                    💰 Ahorra hasta $${product.ahorro.toFixed(2)}
-                                </div>
-                            ` : ''}
                             ${bestProvider.url ? `
                                 <div class="buy-link">
-                                    <a href="${bestProvider.url}" target="_blank" class="buy-button">
-                                        🛒 Comprar en ${bestProvider.proveedor}
+                                    <a href="${bestProvider.url}" target="_blank" class="buy-btn">
+                                        Comprar en ${bestProvider.proveedor}
                                     </a>
+                                </div>
+                            ` : ''}
+                            ${product.ahorro > 0.5 ? `
+                                <div class="savings-info">
+                                    <span class="savings-badge">
+                                        💰 Ahorrás $${product.ahorro.toFixed(2)}
+                                    </span>
                                 </div>
                             ` : ''}
                         </div>
@@ -541,17 +494,18 @@
             }).join('');
         }
 
-        // Búsqueda en tiempo real
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchTerm = e.target.value;
             renderProducts();
         });
 
-        // Cargar datos al iniciar
-        loadData();
+        document.getElementById('categoryFilter').addEventListener('change', (e) => {
+            currentCategory = e.target.value;
+            renderProducts();
+        });
 
-        // Actualizar cada 5 minutos
-        setInterval(loadData, 300000);
+        loadData();
+        setInterval(loadData, 300000); // Actualiza cada 5 minutos
     </script>
 </body>
 </html>
