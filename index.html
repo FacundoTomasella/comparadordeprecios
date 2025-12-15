@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Precios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .nav {
+            display: flex;
+            overflow-x: auto;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .nav::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .nav button {
+            flex: 0 0 auto;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav button:hover {
+            background: #f0f0f0;
+        }
+
+        .nav button.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            background: #f8f9ff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .about {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            line-height: 1.6;
+        }
+
+        .about h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .table-header {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        thead {
+            background: #f8f9ff;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .winner {
+            background: #d4edda !important;
+        }
+
+        .winner td:first-child::before {
+            content: "👑 ";
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #28a745;
+        }
+
+        .btn-buy {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-buy:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.7rem 0.5rem;
+            }
+
+            .nav button {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛒 Comparador de Precios</h1>
+        <p>Encuentra los mejores precios en un solo lugar</p>
+    </div>
+
+    <nav class="nav" id="nav"></nav>
+
+    <div class="container" id="content"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        const SHEET_ID = '1cdLUKAFrRUFL2yJgatb7qJH2dO1Hyk1xoPS0um_pwoI';
+        let allData = {};
+        let currentSection = 'acerca-de';
+
+        const categoryIcons = {
+            'Setup': '⚙️',
+            'Acerca de': '📋',
+            'Carniceria': '🥩',
+            'Verduleria': '🥬',
+            'Fiambres y Lacteos': '🧀',
+            'Higuiene': '🧼',
+            'Almacen': '🏪',
+            'Dietetica': '🥗',
+            'Mascotas': '🐾'
+        };
+
+        async function loadExcelFile() {
+            try {
+                const response = await fetch('Comparador de Precios 5.xlsx');
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                processWorkbook(workbook);
+            } catch (error) {
+                console.log('No se pudo cargar el archivo local, intentando con Google Sheets...');
+                loadFromGoogleSheets();
+            }
+        }
+
+        async function loadFromGoogleSheets() {
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+                const response = await fetch(url);
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                processWorkbook(workbook);
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="about">
+                        <h2>⚠️ Error al cargar datos</h2>
+                        <p>No se pudieron cargar los datos automáticamente. Por favor, verifica que la hoja de Google esté pública.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function processWorkbook(workbook) {
+            allData = {};
+            const nav = document.getElementById('nav');
+            nav.innerHTML = '';
+
+            workbook.SheetNames.forEach((sheetName, index) => {
+                const sheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                
+                allData[sheetName] = data;
+
+                const button = document.createElement('button');
+                const icon = categoryIcons[sheetName] || '📦';
+                button.textContent = `${icon} ${sheetName}`;
+                button.onclick = () => showSection(sheetName);
+                
+                if (index === 0 || sheetName === 'Acerca de') {
+                    button.classList.add('active');
+                    currentSection = sheetName;
+                }
+                
+                nav.appendChild(button);
+            });
+
+            renderContent();
+        }
+
+        function showSection(sectionName) {
+            currentSection = sectionName;
+            
+            const buttons = document.querySelectorAll('.nav button');
+            buttons.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderContent() {
+            const content = document.getElementById('content');
+            const data = allData[currentSection];
+            
+            if (!data) {
+                content.innerHTML = '<div class="loading">Cargando...</div>';
+                return;
+            }
+
+            if (currentSection === 'Setup' || currentSection === 'Acerca de' || currentSection.toLowerCase().includes('acerca')) {
+                renderAboutSection(data);
+            } else {
+                renderTableSection(data, currentSection);
+            }
+        }
+
+        function renderAboutSection(data) {
+            const content = document.getElementById('content');
+            let html = '<div class="about"><h2>📋 Acerca de Este Comparador</h2>';
+            
+            data.forEach(row => {
+                if (row[0]) {
+                    html += `<p>${row[0]}</p>`;
+                }
+            });
+            
+            html += `
+                <br>
+                <h3>¿Cómo funciona?</h3>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; line-height: 2;">
+                    <li>Navega por las categorías usando el menú superior</li>
+                    <li>Revisa la tabla comparativa de precios</li>
+                    <li>El producto ganador (menor precio) está destacado en verde con 👑</li>
+                    <li>Haz clic en "Comprar" para ir directo al sitio del vendedor</li>
+                </ul>
+                <br>
+                <p style="color: #667eea; font-weight: 600;">💡 Consejo: Desliza las tablas horizontalmente en móvil para ver toda la información</p>
+            </div>`;
+            
+            content.innerHTML = html;
+        }
+
+        function renderTableSection(data, categoryName) {
+            const content = document.getElementById('content');
+            
+            if (data.length < 2) {
+                content.innerHTML = `
+                    <div class="about">
+                        <h2>No hay datos disponibles para ${categoryName}</h2>
+                    </div>
+                `;
+                return;
+            }
+
+            const icon = categoryIcons[categoryName] || '📦';
+            let html = `
+                <div class="table-wrapper">
+                    <div class="table-header">${icon} ${categoryName}</div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr>
+            `;
+
+            // Headers
+            const headers = data[0];
+            headers.forEach(header => {
+                if (header) html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            // Rows
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row[0]) continue;
+
+                // Encontrar columnas de precios (asumiendo que son numéricas)
+                const prices = [];
+                for (let j = 1; j < row.length - 1; j++) {
+                    const val = parseFloat(String(row[j]).replace(/[^0-9.-]/g, ''));
+                    if (!isNaN(val) && val > 0) {
+                        prices.push({ index: j, value: val });
+                    }
+                }
+
+                const minPrice = prices.length > 0 ? Math.min(...prices.map(p => p.value)) : null;
+                const hasWinner = minPrice !== null;
+
+                html += `<tr${hasWinner ? ' class="winner"' : ''}>`;
+                
+                for (let j = 0; j < row.length; j++) {
+                    const cell = row[j];
+                    const cellValue = parseFloat(String(cell).replace(/[^0-9.-]/g, ''));
+                    const isPrice = !isNaN(cellValue) && cellValue > 0 && j > 0 && j < row.length - 1;
+                    const isMinPrice = isPrice && cellValue === minPrice;
+                    
+                    if (j === row.length - 1 && cell && cell.toString().startsWith('http')) {
+                        html += `<td><a href="${cell}" class="btn-buy" target="_blank">Comprar</a></td>`;
+                    } else if (isPrice) {
+                        html += `<td${isMinPrice ? ' class="price"' : ''}>$${cellValue.toFixed(2)}</td>`;
+                    } else {
+                        html += `<td>${cell || '-'}</td>`;
+                    }
+                }
+                
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div></div>';
+            content.innerHTML = html;
+        }
+
+        // Cargar datos al iniciar
+        loadFromGoogleSheets();
+
+        // Recargar cada 5 minutos
+        setInterval(loadFromGoogleSheets, 300000);
+    </script>
+</body>
+</html>
+
+
