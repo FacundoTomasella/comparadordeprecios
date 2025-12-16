@@ -5,47 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#131722">
     
+    <!-- SEO & FAVICON -->
+    <title>TradingChango | ¡Tradeá los Precios, Maximizá el Carrito!</title>
+    <meta name="description" content="Comparador de precios de supermercados en tiempo real. Encontrá la mejor oferta en Coto, Carrefour, Día y Jumbo.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+    
     <!-- No Caché -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <title>TradingChango</title>
-    
-    <!-- Fuentes TradingView Style -->
+    <!-- Fuentes & Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
-            /* MODO OSCURO (Default - TradingView Dark) */
-            --bg-app: #131722;
-            --bg-card: #1e222d;
-            --bg-nav: #1e222d;
-            --text-main: #d1d4dc;
-            --text-muted: #787b86;
-            --border: #2a2e39;
-            --accent: #2962ff; /* Azul TradingView */
+            /* MODO OSCURO (Default) */
+            --bg-app: #000000;       /* Negro puro */
+            --bg-card: #121212;      /* Gris muy oscuro */
+            --bg-nav: #121212;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --accent: #2962ff;       /* Azul TradingView */
+            --footer-highlight: #448aff; /* Color footer noche */
             
-            /* LÓGICA CONSUMIDOR: Verde = Baja precio / Rojo = Sube precio */
-            --color-good: #089981; /* Verde */
-            --color-bad: #f23645;  /* Rojo */
-            
-            --star-gold: #f2a900;
+            /* LÓGICA CONSUMIDOR */
+            --color-good: #00e676;   /* Verde brillante */
+            --color-bad: #ff5252;    /* Rojo brillante */
+            --star-gold: #ffcc00;
         }
 
         body.warm-mode {
-            /* MODO CÁLIDO (TradingView Light - Blanco Limpio) */
-            --bg-app: #ffffff;
-            --bg-card: #ffffff;
+            /* MODO CÁLIDO (Blanco Puro) */
+            --bg-app: #ffffff;       /* Blanco puro */
+            --bg-card: #f9f9f9;      /* Gris muy claro */
             --bg-nav: #ffffff;
-            --text-main: #131722;
-            --text-muted: #787b86;
-            --border: #e0e3eb;
+            --text-main: #000000;    /* Negro puro */
+            --text-muted: #666666;
+            --border: #e0e0e0;
             --accent: #2962ff;
+            --footer-highlight: #d32f2f; /* Color footer día */
             
-            --color-good: #089981;
-            --color-bad: #f23645;
+            --color-good: #008000;   /* Verde oscuro */
+            --color-bad: #d32f2f;    /* Rojo oscuro */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -55,38 +59,54 @@
             font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; 
             padding-bottom: 90px; 
             transition: background 0.3s, color 0.3s;
+            display: flex; flex-direction: column; align-items: center; /* Centrado Desktop */
+        }
+
+        /* CONTENEDOR CENTRAL (App Style en Desktop) */
+        .app-container {
+            width: 100%;
+            max-width: 600px; /* Ancho máximo estilo Comparatasas */
+            min-height: 100vh;
+            background: var(--bg-app);
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            position: relative;
         }
 
         /* HEADER */
         header {
             position: sticky; top: 0; z-index: 50;
             background: var(--bg-app);
-            border-bottom: 1px solid var(--border); padding: 12px 16px;
+            border-bottom: 1px solid var(--border); padding: 15px 20px;
         }
 
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
+        .logo-link { text-decoration: none; color: inherit; }
         .logo { 
-            font-weight: 700; font-size: 18px; letter-spacing: -0.5px; 
-            display: flex; align-items: center; gap: 8px; color: var(--text-main);
+            font-weight: 800; font-size: 20px; letter-spacing: -0.5px; 
+            display: flex; align-items: center; gap: 10px; color: var(--text-main);
         }
-        .logo-icon { position: relative; display: flex; align-items: center; }
-        .logo-icon .fa-cart-shopping { font-size: 16px; }
-        .logo-icon .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -6px; }
+        .logo-icon { 
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; background: rgba(41, 98, 255, 0.1); 
+            border-radius: 8px; color: var(--accent);
+        }
+        .logo-icon .fa-chart-simple { font-size: 14px; position: absolute; bottom: 6px; right: 4px; }
         
-        .theme-btn { background: none; border: none; color: var(--text-main); font-size: 18px; cursor: pointer; }
+        .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
 
         /* BUSCADOR */
         .search-container { position: relative; }
         #searchInput {
             width: 100%; background: var(--bg-card); 
             border: 1px solid var(--border);
-            color: var(--text-main); padding: 10px 12px 10px 38px; border-radius: 4px;
-            font-size: 14px; font-family: 'Inter', sans-serif;
+            color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px;
+            font-size: 15px; font-family: 'Inter', sans-serif;
             transition: border-color 0.2s;
         }
         #searchInput:focus { border-color: var(--accent); outline: none; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
         /* LISTA TICKERS */
         .ticker-list { padding: 0; }
@@ -95,95 +115,112 @@
             border-bottom: 1px solid var(--border);
             cursor: pointer; 
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; position: relative;
-            background: var(--bg-card);
+            padding: 16px 20px; position: relative;
+            background: var(--bg-app);
+            transition: background 0.2s;
         }
+        .ticker-card:active { background: var(--bg-card); }
         
         .ticker-info {
             flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px;
         }
 
-        .t-left { display: flex; flex-direction: column; gap: 2px; }
-        .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 15px; }
-        .t-name { font-size: 12px; color: var(--text-muted); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .t-left { display: flex; flex-direction: column; gap: 3px; }
+        .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
+        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         
         .t-right { text-align: right; }
-        .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 15px; }
-        .t-change { font-family: 'Roboto Mono'; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
+        .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
+        .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         
-        /* CAMBIOS DE PRECIO (INVERTIDO: Sube=Malo, Baja=Bueno) */
-        .trend-up { color: var(--bg-card); background: var(--color-bad); }   /* Rojo: Inflación */
-        .trend-down { color: var(--bg-card); background: var(--color-good); } /* Verde: Oferta */
-        .trend-neutral { color: var(--text-muted); background: transparent; }
+        /* CAMBIOS DE PRECIO */
+        .trend-up { color: var(--bg-app); background: var(--color-bad); }   
+        .trend-down { color: var(--bg-app); background: var(--color-good); } 
+        .trend-neutral { color: var(--text-muted); background: transparent; border: 1px solid var(--border); }
 
         /* ESTRELLA */
         .fav-btn {
-            width: 30px; height: 30px; display: flex; align-items: center; justify-content: flex-end;
-            font-size: 16px; color: var(--border); z-index: 10; transition: 0.2s;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end;
+            font-size: 20px; color: var(--border); z-index: 10; transition: 0.2s;
         }
         .fav-btn.active { color: var(--star-gold); }
 
         /* DETALLE (ORDER BOOK) */
         .order-book { 
             display: none; background: var(--bg-card); 
-            padding: 0 16px 16px 16px; border-bottom: 1px solid var(--border); 
+            padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); 
         }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
         
         .ob-header { 
             display: flex; justify-content: space-between; 
-            font-size: 10px; text-transform: uppercase; color: var(--text-muted); 
-            padding: 10px 0 5px 0; border-bottom: 1px solid var(--border); margin-bottom: 5px;
+            font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;
+            padding: 12px 0 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 5px;
         }
 
         .ob-row { 
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; 
-            text-decoration: none; color: inherit; /* Para el link */
+            padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 14px; 
         }
         .ob-row:last-child { border: none; }
         
-        .ob-store { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .ob-store { font-weight: 500; display: flex; align-items: center; gap: 10px; color: var(--text-main); cursor: default; }
         
         /* PUNTOS DE COLOR */
-        .dot { width: 8px; height: 8px; border-radius: 2px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
         
-        .ob-val { font-family: 'Roboto Mono'; font-size: 13px; }
+        /* PRECIO INTERNO CON LINK */
+        .price-link { 
+            text-decoration: none; color: var(--text-main); 
+            font-family: 'Roboto Mono'; font-size: 14px; 
+            padding: 4px 8px; border-radius: 4px; 
+            transition: 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .price-link:hover { background: rgba(41, 98, 255, 0.1); color: var(--accent); }
         
         .best-val { color: var(--color-good); font-weight: 700; } 
-        .no-price { color: var(--text-muted); font-style: italic; opacity: 0.5; font-size: 11px; }
+        
+        /* TACHADO PARA SIN PRECIO */
+        .no-price { 
+            color: var(--text-muted); font-style: italic; opacity: 0.6; 
+            text-decoration: line-through; font-size: 12px; pointer-events: none;
+        }
 
         /* LINK ICON */
-        .link-indicator { font-size: 10px; color: var(--text-muted); margin-left: 5px; opacity: 0; transition: 0.2s; }
-        .ob-row:hover .link-indicator { opacity: 1; color: var(--accent); }
+        .fa-up-right-from-square { font-size: 10px; opacity: 0.5; }
 
         /* FOOTER */
         .app-footer {
-            text-align: center; padding: 20px; font-size: 11px; 
+            text-align: center; padding: 30px 20px; font-size: 12px; 
             color: var(--text-muted); border-top: 1px solid var(--border);
             background: var(--bg-app); margin-bottom: 60px;
         }
-        .app-footer a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        .dev-link { 
+            color: var(--footer-highlight); text-decoration: none; 
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px dotted var(--footer-highlight);
+        }
 
         /* NAVBAR INFERIOR */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%;
+            position: absolute; bottom: 0; width: 100%; max-width: 600px;
             background: var(--bg-nav); border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; padding: 12px 0;
-            z-index: 100;
+            z-index: 100; position: fixed; /* Fixed relative to viewport */
         }
         
         .nav-item {
             background: none; border: none; color: var(--text-muted);
             display: flex; flex-direction: column; align-items: center;
-            font-size: 10px; gap: 4px; cursor: pointer; width: 25%;
+            font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500;
         }
-        .nav-item i { font-size: 18px; }
-        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 18px; margin-bottom: 2px; }
+        .nav-item.active { color: var(--text-main); font-weight: 700; }
+        .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; }
 
         /* ESTADOS */
-        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 13px; }
-        .loader { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+        .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; letter-spacing: 1px; }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -191,47 +228,51 @@
 </head>
 <body>
 
-    <header>
-        <div class="top-row">
-            <div class="logo">
-                <span class="logo-icon">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                </span>
-                TradingChango
+    <div class="app-container">
+        <header>
+            <div class="top-row">
+                <a href="https://facundotomasella.github.io/comparadordeprecios/" class="logo-link">
+                    <div class="logo">
+                        <span class="logo-icon">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </span>
+                        TradingChango
+                    </div>
+                </a>
+                <button class="theme-btn" onclick="toggleTheme()">
+                    <i class="fa-solid fa-sun" id="themeIcon"></i>
+                </button>
             </div>
-            <button class="theme-btn" onclick="toggleTheme()">
-                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="BUSCAR TICKER...">
+            </div>
+        </header>
+
+        <div id="loader">CONECTANDO A MERCADO...</div>
+
+        <div class="ticker-list" id="tickerList"></div>
+
+        <footer class="app-footer">
+            Desarrollado por <a href="#" target="_blank" class="dev-link">Facundo Tomasella</a>
+        </footer>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="setTab('carnes', this)">
+                <i class="fa-solid fa-drumstick-bite"></i> Carnes
             </button>
-        </div>
-        <div class="search-container">
-            <i class="fa-solid fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Buscar activo...">
-        </div>
-    </header>
-
-    <div id="loader">CONECTANDO A MERCADO...</div>
-
-    <div class="ticker-list" id="tickerList"></div>
-
-    <footer class="app-footer">
-        Desarrollado por <a href="#" target="_blank">Facundo Tomasella</a>
-    </footer>
-
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="setTab('carnes', this)">
-            <i class="fa-solid fa-drumstick-bite"></i> Carnes
-        </button>
-        <button class="nav-item" onclick="setTab('verdu', this)">
-            <i class="fa-solid fa-carrot"></i> Verdu
-        </button>
-        <button class="nav-item" onclick="setTab('varios', this)">
-            <i class="fa-solid fa-layer-group"></i> Varios
-        </button>
-        <button class="nav-item" onclick="setTab('favs', this)">
-            <i class="fa-solid fa-star"></i> Favoritos
-        </button>
-    </nav>
+            <button class="nav-item" onclick="setTab('verdu', this)">
+                <i class="fa-solid fa-carrot"></i> Verdu
+            </button>
+            <button class="nav-item" onclick="setTab('varios', this)">
+                <i class="fa-solid fa-layer-group"></i> Varios
+            </button>
+            <button class="nav-item" onclick="setTab('favs', this)">
+                <i class="fa-solid fa-star"></i> Favoritos
+            </button>
+        </nav>
+    </div>
 
     <script>
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
@@ -239,7 +280,7 @@
         const GROUPS = {
             'carnes': ['Carnes'],
             'verdu': ['Verdu'],
-            'varios': ['Varios'] // Hojas Varios incluye todas las demás
+            'varios': ['Varios']
         };
 
         const STORES = [
@@ -265,7 +306,7 @@
                     });
                 });
                 
-                // Set initial theme icon
+                // Tema inicial
                 updateThemeIcon();
                 document.getElementById('loader').style.display = 'none';
                 renderView();
@@ -283,7 +324,10 @@
 
             if (currentTab === 'favs') {
                 if (favorites.length === 0) {
-                    container.innerHTML = `<div class="empty-state">Tu Watchlist está vacía.<br>Marca con ⭐ para seguir precios.</div>`;
+                    container.innerHTML = `<div class="empty-state">
+                        <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br><br>
+                        Tu Portfolio está vacío.<br>Agrega productos para seguirlos.
+                    </div>`;
                     return;
                 }
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
@@ -294,7 +338,7 @@
 
             if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             const limit = term ? 50 : 20; 
-            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos.</div>'; return; }
+            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos en este mercado.</div>'; return; }
 
             dataToShow.slice(0, limit).forEach(item => {
                 const stats = getStats(item.p, item.h);
@@ -305,28 +349,36 @@
                 const starIcon = isFav ? 'fa-solid fa-star' : 'fa-regular fa-star';
 
                 const card = document.createElement('div');
-                // IMPORTANTE: item.u son los Links, item.p los precios
+                // IMPORTANTE: Pasamos links (item.u)
                 const detailHtml = renderOrderBook(item.p, item.u, stats.min);
 
                 card.innerHTML = `
                     <div class="ticker-card">
                         <div class="ticker-info" onclick="toggleDetail('${item.id}')">
-                            <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
+                            <div class="t-left">
+                                <span class="t-symbol">${item.ticker}</span>
+                                <span class="t-name">${item.n}</span>
+                            </div>
                             <div class="t-right">
                                 <span class="t-price">$${format(stats.min)}</span><br>
                                 <span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span>
                             </div>
                         </div>
-                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)"><i class="${starIcon}"></i></div>
+                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
+                            <i class="${starIcon}"></i>
+                        </div>
                     </div>
-                    <div id="detail-${item.id}" class="order-book">${detailHtml}</div>
+                    <div id="detail-${item.id}" class="order-book">
+                        <div class="ob-header"><span>Market</span><span>Precio</span></div>
+                        ${detailHtml}
+                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
         function renderOrderBook(prices, links, best) {
-            let html = '<div class="ob-header"><span>Market</span><span>Precio</span></div>';
+            let html = '';
             
             STORES.forEach((store, i) => {
                 const p = prices[i];
@@ -336,32 +388,33 @@
                 if (i === 0) url = "https://www.cotodigital.com.ar/sitios/cdigi/nuevositio";
 
                 let val = `$${format(p)}`;
-                let styleClass = "ob-val";
+                let styleClass = "price-link";
                 let dotColor = store.color;
-                let clickEvent = `onclick="window.open('${url}', '_blank')"`;
-                let cursor = "cursor: pointer;";
+                
+                // Configuración de link activo/inactivo
+                let href = `href="${url}" target="_blank"`;
+                let cursor = "";
 
                 if (!p || p === 0) { 
                     val = "SIN PRECIO"; 
                     styleClass += " no-price"; 
                     dotColor = "#444"; 
-                    clickEvent = ""; // No click si no hay precio
-                    cursor = "cursor: default;";
+                    href = ""; // Sin link
                 }
                 else if (p === best) { 
                     styleClass += " best-val"; 
                 }
 
                 html += `
-                    <a href="${p > 0 ? url : '#'}" target="_blank" class="ob-row" style="${cursor} ${p === 0 ? 'pointer-events:none;' : ''}">
+                    <div class="ob-row">
                         <div class="ob-store">
                             <div class="dot" style="background:${dotColor}"></div> 
                             ${store.name}
                         </div>
-                        <div class="${styleClass}">
-                            ${val} <i class="fa-solid fa-arrow-up-right-from-square link-indicator"></i>
-                        </div>
-                    </a>
+                        <a ${href} class="${styleClass}">
+                            ${val} ${p > 0 ? '<i class="fa-solid fa-arrow-up-right-from-square"></i>' : ''}
+                        </a>
+                    </div>
                 `;
             });
             return html;
@@ -377,17 +430,17 @@
 
             let diff = 0;
             let trendClass = "trend-neutral";
-            let icon = "";
+            let icon = "-";
 
             if (priceYesterday > 0) {
                 diff = ((minToday - priceYesterday) / priceYesterday) * 100;
                 
                 if (diff > 0) { 
-                    trendClass = "trend-up"; // Rojo (Subió)
+                    trendClass = "trend-up"; // Rojo (Subió - Malo)
                     icon = "▲"; 
                 } 
                 else if (diff < 0) { 
-                    trendClass = "trend-down"; // Verde (Bajó)
+                    trendClass = "trend-down"; // Verde (Bajó - Bueno)
                     icon = "▼"; 
                 }
             } 
@@ -425,9 +478,9 @@
         function updateThemeIcon() {
             const icon = document.getElementById('themeIcon');
             if (document.body.classList.contains('warm-mode')) {
-                icon.className = 'fa-solid fa-moon'; // Icono luna en modo claro
+                icon.className = 'fa-solid fa-moon'; 
             } else {
-                icon.className = 'fa-solid fa-sun'; // Icono sol en modo oscuro
+                icon.className = 'fa-solid fa-sun'; 
             }
         }
 
