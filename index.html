@@ -26,8 +26,9 @@
             --border: #2a2a2a;
             --accent: #ff3b30; 
             
-            --bull-green: #00ff88;
-            --bear-red: #ff3b30;
+            /* COLORES TRADING (Estricto) */
+            --bull-green: #00ff88; /* Subida */
+            --bear-red: #ff3b30;   /* Bajada */
             --star-gold: #ffcc00;
         }
 
@@ -49,7 +50,7 @@
         
         body { 
             background-color: var(--bg-app); color: var(--text-main); 
-            font-family: 'Inter', sans-serif; padding-bottom: 80px; 
+            font-family: 'Inter', sans-serif; padding-bottom: 90px; 
             transition: background 0.3s;
         }
 
@@ -82,20 +83,19 @@
         .ticker-card {
             border-bottom: 1px solid var(--border);
             cursor: pointer; 
-            display: flex; /* Flexbox para alinear */
+            display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 15px;
             position: relative;
         }
         
-        /* CONTENIDO IZQUIERDO (Info) */
         .ticker-info {
-            flex-grow: 1; /* Ocupa todo el espacio posible */
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-right: 15px; /* Espacio para no pegarse a la estrella */
+            padding-right: 15px;
         }
 
         .t-left { display: flex; flex-direction: column; }
@@ -106,14 +106,15 @@
         .t-price { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
         
-        .up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); }
-        .down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }
+        /* ESTILOS DE TENDENCIA (TRADING REAL) */
+        .trend-up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); } /* Verde: Flecha Arriba */
+        .trend-down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }   /* Rojo: Flecha Abajo */
 
-        /* ESTRELLA A LA DERECHA */
+        /* ESTRELLA (DERECHA) */
         .fav-btn {
             width: 40px; height: 40px;
             display: flex; align-items: center; justify-content: flex-end;
-            font-size: 18px; color: var(--border); /* Apagada por defecto */
+            font-size: 18px; color: var(--border);
             z-index: 10;
             transition: 0.2s;
         }
@@ -129,9 +130,16 @@
         .dot { width: 6px; height: 6px; border-radius: 50%; }
         .ob-val { font-family: 'Roboto Mono'; }
         
-        /* Solo color verde, sin texto extra */
         .best-val { color: var(--bull-green); font-weight: 700; } 
-        .no-stock { color: var(--bear-red); text-decoration: line-through; opacity: 0.5; }
+        .no-price { color: var(--text-muted); font-style: italic; opacity: 0.7; }
+
+        /* FOOTER */
+        .app-footer {
+            text-align: center; padding: 20px; font-size: 11px; 
+            color: var(--text-muted); border-top: 1px solid var(--border);
+            background: var(--bg-app); margin-bottom: 60px; /* Para que no lo tape el nav */
+        }
+        .app-footer a { color: var(--accent); text-decoration: none; font-weight: 700; }
 
         /* NAVBAR INFERIOR */
         .bottom-nav {
@@ -171,12 +179,17 @@
         </div>
     </header>
 
-    <div id="loader">CARGANDO MERCADO...</div>
+    <div id="loader">CONECTANDO A MERCADO...</div>
 
     <div class="ticker-list" id="tickerList"></div>
 
+    <!-- FOOTER PERMANENTE -->
+    <footer class="app-footer">
+        Desarrollado por <a href="#" target="_blank">Facundo Tomasella</a>
+    </footer>
+
     <nav class="bottom-nav">
-        <!-- ORDEN SOLICITADO: Carnes, Verdu, Varios, Favoritos -->
+        <!-- ORDEN: Carnes, Verdu, Varios, Favoritos -->
         <button class="nav-item active" onclick="setTab('carnes', this)">
             <i class="fa-solid fa-drumstick-bite"></i> Carnes
         </button>
@@ -197,8 +210,6 @@
         // ==========================================
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
         
-        // AGRUPACIÓN DE CATEGORÍAS (NUCLEADAS)
-        // Ajusta los nombres de la derecha según están escritos EXACTAMENTE en tu Excel
         const GROUPS = {
             'carnes': ['Carniceria'],
             'verdu': ['Verduleria'],
@@ -213,11 +224,10 @@
             { id: 4, name: "EXTRA", color: "#ff9800" }
         ];
 
-        // Estado
         let DB = {};
         let flatList = [];
         let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [];
-        let currentTab = 'carnes'; // Empezamos mostrando Carnes por defecto
+        let currentTab = 'carnes'; 
 
         // ==========================================
         // 2. INICIALIZACIÓN
@@ -227,11 +237,10 @@
                 const res = await fetch(DATA_URL + '?t=' + Date.now());
                 DB = await res.json();
                 
-                // Procesar Datos
                 Object.keys(DB).forEach(cat => {
                     DB[cat].forEach((item, idx) => {
                         item.cat = cat;
-                        item.id = generateID(cat, idx); // ID único para favoritos
+                        item.id = generateID(cat, idx);
                         item.ticker = generateTicker(item.n);
                         flatList.push(item);
                     });
@@ -242,7 +251,7 @@
 
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerText = "ERROR DE CONEXIÓN";
+                document.getElementById('loader').innerText = "SIN DATOS";
             }
         }
 
@@ -255,25 +264,22 @@
             
             container.innerHTML = '';
 
-            // Filtrado Principal
             let dataToShow = [];
 
             if (currentTab === 'favs') {
                 if (favorites.length === 0) {
                     container.innerHTML = `<div class="empty-state">
                         <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br>
-                        Toca la estrella en los productos<br>para seguirlos aquí.
+                        Agrega productos a tu Watchlist.
                     </div>`;
                     return;
                 }
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
             } else {
-                // Filtrar por Grupo (Super, Frescos, etc)
                 const allowedCats = GROUPS[currentTab] || [];
                 dataToShow = flatList.filter(i => allowedCats.includes(i.cat));
             }
 
-            // Filtrado Buscador (Sobre lo ya filtrado)
             if (term) {
                 dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             }
@@ -287,7 +293,7 @@
 
             dataToShow.slice(0, limit).forEach(item => {
                 const stats = getStats(item.p);
-                if (stats.min === 0) return; // Ocultar sin stock
+                if (stats.min === 0) return; 
 
                 const isFav = favorites.includes(item.id);
                 const starClass = isFav ? 'active' : '';
@@ -303,7 +309,7 @@
                             </div>
                             <div class="t-right">
                                 <span class="t-price">$${format(stats.min)}</span><br>
-                                <span class="t-change ${stats.trend}">${stats.icon} ${stats.spread}%</span>
+                                <span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span>
                             </div>
                         </div>
                         <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
@@ -327,10 +333,13 @@
                 let dotColor = store.color;
 
                 if (p === 0) { 
-                    val = "SIN STOCK"; styleClass += " no-stock"; dotColor = "#333"; 
+                    val = "SIN PRECIO"; 
+                    styleClass += " no-price"; 
+                    dotColor = "#333"; 
                 }
                 else if (p === best) { 
-                    styleClass += " best-val"; dotColor = "#00ff88"; // Solo color verde, sin texto extra
+                    styleClass += " best-val"; 
+                    dotColor = "#00ff88"; 
                 }
 
                 html += `
@@ -344,7 +353,7 @@
         }
 
         // ==========================================
-        // 4. LÓGICA DE NEGOCIO
+        // 4. LÓGICA DE NEGOCIO (ESTILO ACCIONES)
         // ==========================================
         
         function getStats(prices) {
@@ -354,21 +363,41 @@
             const min = Math.min(...valid);
             const avg = valid.reduce((a,b)=>a+b,0) / valid.length;
             
-            let diff = ((avg - min) / avg) * 100;
+            // Calculamos Diferencia: (Actual - Promedio) / Promedio
+            // Ejemplo: Min 80, Prom 100 -> -20% (Abajo)
+            // Ejemplo: Min 120, Prom 100 -> +20% (Arriba)
+            let diff = ((min - avg) / avg) * 100;
             
-            let trend = "up"; // Verde
-            let icon = "▼";   // Flecha abajo
+            // LÓGICA TRADING ESTRICTA
+            // Flecha Arriba = Precio más alto que el promedio = VERDE
+            // Flecha Abajo = Precio más bajo que el promedio = ROJO
+            // (Si el precio baja es "Bearish" = Rojo)
+            
+            let trendClass = "";
+            let icon = "";
 
-            if (diff < 2) {
-                trend = "down"; // Rojo
-                icon = "▶";
+            if (diff >= 0) {
+                // Precio ARRIBA (Mayor al promedio) -> VERDE
+                trendClass = "trend-up";
+                icon = "▲";
+                // Agregamos el + si es positivo
+                diff = Math.abs(diff); 
+            } else {
+                // Precio ABAJO (Menor al promedio) -> ROJO
+                trendClass = "trend-down";
+                icon = "▼";
+                // Quitamos el menos para mostrar solo el número con la flecha
+                diff = Math.abs(diff); 
             }
 
-            return { min, spread: diff.toFixed(1), trend, icon };
+            // Nota: En trading, Verde suele ser Subida y Rojo Bajada.
+            // Si el precio es barato (bajó), acá se verá ROJO con flecha ABAJO.
+            // Tal como pediste.
+
+            return { min, spread: diff.toFixed(1), trendClass, icon };
         }
 
         function toggleFav(id, btn) {
-            // Animación simple de click
             btn.style.transform = "scale(1.2)";
             setTimeout(() => btn.style.transform = "scale(1)", 200);
 
