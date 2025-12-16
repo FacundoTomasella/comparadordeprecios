@@ -10,17 +10,10 @@
     <title>Precios.App</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        :root {
-            --bg-app: #0d0d0d; --bg-card: #161616; --bg-nav: #1a1a1a;
-            --text-main: #e0e0e0; --text-muted: #6b6b6b; --border: #2a2a2a;
-            --accent: #ff3b30; --bull-green: #00ff88; --bear-red: #ff3b30; --star-gold: #ffcc00;
-        }
-        body.warm-mode {
-            --bg-app: #f5f5f0; --bg-card: #ffffff; --bg-nav: #ebebeb;
-            --text-main: #333333; --text-muted: #888888; --border: #dcdcdc; --accent: #d32f2f;
-            --bull-green: #008000; --bear-red: #d32f2f;
-        }
+        :root { --bg-app:#0d0d0d; --bg-card:#161616; --bg-nav:#1a1a1a; --text-main:#e0e0e0; --text-muted:#6b6b6b; --border:#2a2a2a; --accent:#ff3b30; --bull-green:#00ff88; --bear-red:#ff3b30; --star-gold:#ffcc00; }
+        body.warm-mode { --bg-app:#f5f5f0; --bg-card:#ffffff; --bg-nav:#ebebeb; --text-main:#333333; --text-muted:#888888; --border:#dcdcdc; --accent:#d32f2f; --bull-green:#008000; --bear-red:#d32f2f; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s; }
         header { position: sticky; top: 0; z-index: 50; background: rgba(13,13,13,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 10px 15px; }
@@ -30,11 +23,11 @@
         .logo i { color: var(--accent); }
         .theme-btn { background: none; border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 40px; border-radius: 8px; font-size: 14px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         .search-container { position: relative; }
-        
-        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 15px; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 15px; position: relative; }
         .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
+        .t-left { display: flex; flex-direction: column; }
         .t-symbol { font-family: 'Roboto Mono'; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
         .t-name { font-size: 12px; color: var(--text-muted); max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .t-right { text-align: right; }
@@ -44,7 +37,6 @@
         .down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 18px; color: var(--border); z-index: 10; transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
-        
         .order-book { display: none; background: var(--bg-card); padding: 10px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: fadeIn 0.2s; }
         .ob-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
@@ -54,16 +46,13 @@
         .ob-val { font-family: 'Roboto Mono'; }
         .best-val { color: var(--bull-green); font-weight: 700; }
         .no-price { color: var(--text-muted); font-style: italic; opacity: 0.7; }
-        
         .app-footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--bg-app); margin-bottom: 60px; }
         .app-footer a { color: var(--accent); text-decoration: none; font-weight: 700; }
-        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(10px); }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 4px; cursor: pointer; width: 25%; }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 700; }
         .nav-item.active i { color: var(--accent); }
-        
         .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 14px; }
         .loader { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -99,14 +88,12 @@
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
         
         const GROUPS = {
-            'carnes': ['Carniceria'],
-            'verdu': ['Verduleria'],
-            'varios': ['Almacen', 'Higuiene', 'Fiambres y Lacteos', 'Dietetica', 'Mascotas']
+            'carnes': ['Carnes'],
+            'verdu': ['Verdu'],
+            'varios': ['Varios']
         };
 
-        // QUITADO "EXTRA". Solo mostramos los 4 principales visualmente.
-        // Si hay un precio en la columna 5 del JSON (indice 4), no se mostrará como columna con nombre
-        // PERO se usará para el cálculo del mínimo.
+        // SOLO 4 PROVEEDORES ACTIVOS
         const STORES = [
             { id: 0, name: "COTO", color: "#f44336" },
             { id: 1, name: "CARREFOUR", color: "#2196f3" },
@@ -158,7 +145,7 @@
             if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos.</div>'; return; }
 
             dataToShow.slice(0, limit).forEach(item => {
-                const stats = getStats(item.p);
+                const stats = getStats(item.p, item.h);
                 if (stats.min === 0) return; 
                 const isFav = favorites.includes(item.id);
                 const starClass = isFav ? 'active' : '';
@@ -181,11 +168,8 @@
 
         function renderOrderBook(prices, best) {
             let html = '';
-            // Iteramos solo los primeros 4 precios (Supermercados)
-            // Si quieres mostrar la Dietética/Alternativo, hay que agregar un STORE más.
-            // Por ahora solo muestro los 4 Big Players.
             STORES.forEach((store, i) => {
-                const p = prices[i]; // El índice del precio coincide con el índice del store
+                const p = prices[i];
                 let val = `$${format(p)}`;
                 let styleClass = "ob-val";
                 let dotColor = store.color;
@@ -193,35 +177,37 @@
                 else if (p === best) { styleClass += " best-val"; dotColor = "#00ff88"; }
                 html += `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${dotColor}"></div> ${store.name}</div><div class="${styleClass}">${val}</div></div>`;
             });
-            // Si hay un 5to precio (Alternativo) y tiene valor, lo mostramos como "OTRO"
-            if(prices[4] > 0) {
-                 let val = `$${format(prices[4])}`;
-                 let styleClass = "ob-val";
-                 if(prices[4] === best) styleClass += " best-val";
-                 html += `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:#ff9800"></div> ALTERNATIVO</div><div class="${styleClass}">${val}</div></div>`;
-            }
             return html;
         }
 
-        function getStats(prices) {
-            // Filtramos todos los precios válidos (incluido el alternativo)
-            const valid = prices.filter(p => p > 0);
-            if (valid.length === 0) return { min: 0 };
-            const min = Math.min(...valid);
-            const avg = valid.reduce((a,b)=>a+b,0) / valid.length;
-            let diff = ((min - avg) / avg) * 100;
+        function getStats(pricesToday, pricesYesterday) {
+            // SOLO consideramos los primeros 4 precios (índices 0,1,2,3)
+            const valid = pricesToday.slice(0, 4).filter(p => p > 0);
             
-            // LOGICA BURSÁTIL:
-            // Precio Alto (Mayor al promedio) -> VERDE (Up)
-            // Precio Bajo (Menor al promedio) -> ROJO (Down)
-            let trendClass = "";
-            let icon = "";
-            if (diff >= 0) {
-                trendClass = "up"; icon = "▲"; // Subió
-            } else {
-                trendClass = "down"; icon = "▼"; // Bajó
-            }
-            return { min, spread: Math.abs(diff).toFixed(2), trendClass, icon };
+            if (valid.length === 0) return { min: 0 };
+            const minToday = Math.min(...valid);
+            
+            // Buscar cuál tienda tiene el mínimo hoy
+            const bestIndex = pricesToday.indexOf(minToday);
+            
+            // Buscar precio de ayer de esa tienda
+            const priceYesterday = (pricesYesterday && pricesYesterday[bestIndex]) ? pricesYesterday[bestIndex] : 0;
+
+            let diff = 0;
+            let trendClass = "neutral";
+            let icon = "-";
+
+            if (priceYesterday > 0) {
+                diff = ((minToday - priceYesterday) / priceYesterday) * 100;
+                if (diff > 0) { trendClass = "up"; icon = "▲"; } // Subió (Verde)
+                else if (diff < 0) { trendClass = "down"; icon = "▼"; } // Bajó (Rojo)
+            } 
+
+            // Lógica Trading: Verde = Subida, Rojo = Bajada.
+            if (diff > 0) { trendClass = "up"; } 
+            if (diff < 0) { trendClass = "down"; } 
+
+            return { min: minToday, spread: Math.abs(diff).toFixed(1), trendClass, icon };
         }
 
         function toggleFav(id, btn) {
@@ -259,3 +245,4 @@
     </script>
 </body>
 </html>
+
