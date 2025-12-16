@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#131722">
+    <meta name="theme-color" content="#ffffff">
     
     <!-- SEO & FAVICON -->
     <title>TradingChango | ¡Tradeá los Precios, Maximizá el Carrito!</title>
@@ -16,40 +16,41 @@
     <meta http-equiv="Expires" content="0" />
 
     <!-- Fuentes & Iconos -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
-            /* MODO OSCURO (Default) */
-            --bg-app: #000000;       /* Negro puro */
-            --bg-card: #121212;      /* Gris muy oscuro */
+            /* MODO DÍA (Default - Blanco Puro) */
+            --bg-app: #ffffff;
+            --bg-card: #f9f9f9;
+            --bg-nav: #ffffff;
+            --text-main: #131722;
+            --text-muted: #787b86;
+            --border: #e0e3eb;
+            
+            /* ACENTO AMARILLO (Trading/Gold) */
+            --accent: #ffcf00; 
+            --accent-text: #000000; /* Texto sobre amarillo */
+            
+            /* LÓGICA PRECIOS */
+            --color-good: #00a650;   /* Verde Ahorro */
+            --color-bad: #f23645;    /* Rojo Gasto */
+            --star-gold: #f2a900;
+            
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode {
+            /* MODO OSCURO (Negro Profundo) */
+            --bg-app: #000000;
+            --bg-card: #121212;
             --bg-nav: #121212;
             --text-main: #ffffff;
             --text-muted: #888888;
             --border: #2a2a2a;
-            --accent: #2962ff;       /* Azul TradingView */
-            --footer-highlight: #448aff; /* Color footer noche */
             
-            /* LÓGICA CONSUMIDOR */
-            --color-good: #00e676;   /* Verde brillante */
-            --color-bad: #ff5252;    /* Rojo brillante */
-            --star-gold: #ffcc00;
-        }
-
-        body.warm-mode {
-            /* MODO CÁLIDO (Blanco Puro) */
-            --bg-app: #ffffff;       /* Blanco puro */
-            --bg-card: #f9f9f9;      /* Gris muy claro */
-            --bg-nav: #ffffff;
-            --text-main: #000000;    /* Negro puro */
-            --text-muted: #666666;
-            --border: #e0e0e0;
-            --accent: #2962ff;
-            --footer-highlight: #d32f2f; /* Color footer día */
-            
-            --color-good: #008000;   /* Verde oscuro */
-            --color-bad: #d32f2f;    /* Rojo oscuro */
+            --shadow: none;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -84,17 +85,30 @@
         
         .logo-link { text-decoration: none; color: inherit; }
         .logo { 
-            font-weight: 800; font-size: 20px; letter-spacing: -0.5px; 
+            font-weight: 800; font-size: 19px; letter-spacing: -0.5px; 
             display: flex; align-items: center; gap: 10px; color: var(--text-main);
         }
+        
+        /* LOGO PERSONALIZADO (CARRITO + VELA) */
         .logo-icon { 
             position: relative; display: flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; background: rgba(41, 98, 255, 0.1); 
-            border-radius: 8px; color: var(--accent);
+            width: 36px; height: 36px; background: var(--accent); 
+            border-radius: 8px; color: var(--accent-text);
         }
-        .logo-icon .fa-chart-simple { font-size: 14px; position: absolute; bottom: 6px; right: 4px; }
+        .logo-icon .fa-cart-shopping { font-size: 16px; transform: translateX(-2px); }
+        /* Simulación de Vela Japonesa */
+        .candle-stick {
+            position: absolute; right: 6px; bottom: 8px;
+            width: 4px; height: 12px; background: var(--color-good);
+            border-radius: 1px;
+        }
+        .candle-wick {
+            position: absolute; right: 7px; bottom: 6px;
+            width: 2px; height: 16px; background: var(--color-good);
+        }
         
-        .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
+        .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; transition: 0.2s; }
+        .theme-btn:active { transform: rotate(30deg); }
 
         /* BUSCADOR */
         .search-container { position: relative; }
@@ -105,7 +119,7 @@
             font-size: 15px; font-family: 'Inter', sans-serif;
             transition: border-color 0.2s;
         }
-        #searchInput:focus { border-color: var(--accent); outline: none; }
+        #searchInput:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
         /* LISTA TICKERS */
@@ -131,12 +145,12 @@
         
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
-        .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         
         /* CAMBIOS DE PRECIO */
-        .trend-up { color: var(--bg-app); background: var(--color-bad); }   
-        .trend-down { color: var(--bg-app); background: var(--color-good); } 
-        .trend-neutral { color: var(--text-muted); background: transparent; border: 1px solid var(--border); }
+        .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+        .trend-up { color: white; background: var(--color-bad); }   
+        .trend-down { color: white; background: var(--color-good); } 
+        .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
 
         /* ESTRELLA */
         .fav-btn {
@@ -149,64 +163,67 @@
         .order-book { 
             display: none; background: var(--bg-card); 
             padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); 
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.02);
         }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
         
         .ob-header { 
             display: flex; justify-content: space-between; 
-            font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;
+            font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;
             padding: 12px 0 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 5px;
         }
 
         .ob-row { 
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 14px; 
+            padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; 
         }
         .ob-row:last-child { border: none; }
         
-        .ob-store { font-weight: 500; display: flex; align-items: center; gap: 10px; color: var(--text-main); cursor: default; }
+        /* Nombre Supermercado (NO Clickeable) */
+        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); cursor: default; }
         
-        /* PUNTOS DE COLOR */
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         
-        /* PRECIO INTERNO CON LINK */
+        /* PRECIO (Clickeable) */
         .price-link { 
             text-decoration: none; color: var(--text-main); 
-            font-family: 'Roboto Mono'; font-size: 14px; 
-            padding: 4px 8px; border-radius: 4px; 
-            transition: 0.2s; display: flex; align-items: center; gap: 6px;
+            font-family: 'Roboto Mono'; font-size: 15px; 
+            padding: 6px 10px; border-radius: 6px; 
+            background: rgba(0,0,0,0.03); border: 1px solid transparent;
+            transition: 0.2s; display: flex; align-items: center; gap: 8px;
         }
-        .price-link:hover { background: rgba(41, 98, 255, 0.1); color: var(--accent); }
+        .price-link:hover { background: rgba(255, 204, 0, 0.2); border-color: var(--accent); color: #000; }
+        body.dark-mode .price-link:hover { color: #fff; }
         
-        .best-val { color: var(--color-good); font-weight: 700; } 
+        .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         
         /* TACHADO PARA SIN PRECIO */
         .no-price { 
             color: var(--text-muted); font-style: italic; opacity: 0.6; 
-            text-decoration: line-through; font-size: 12px; pointer-events: none;
+            text-decoration: line-through; font-size: 12px; pointer-events: none; background: transparent;
         }
 
         /* LINK ICON */
-        .fa-up-right-from-square { font-size: 10px; opacity: 0.5; }
+        .fa-up-right-from-square { font-size: 11px; opacity: 0.6; }
 
         /* FOOTER */
         .app-footer {
-            text-align: center; padding: 30px 20px; font-size: 12px; 
+            text-align: center; padding: 40px 20px; font-size: 12px; 
             color: var(--text-muted); border-top: 1px solid var(--border);
             background: var(--bg-app); margin-bottom: 60px;
         }
         .dev-link { 
-            color: var(--footer-highlight); text-decoration: none; 
+            color: var(--accent); text-decoration: none; 
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-            border-bottom: 1px dotted var(--footer-highlight);
+            background: rgba(255,204,0,0.1); padding: 4px 8px; border-radius: 4px;
         }
 
-        /* NAVBAR INFERIOR */
+        /* NAVBAR INFERIOR (Amarillo Activo) */
         .bottom-nav {
             position: absolute; bottom: 0; width: 100%; max-width: 600px;
             background: var(--bg-nav); border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; padding: 12px 0;
-            z-index: 100; position: fixed; /* Fixed relative to viewport */
+            z-index: 100; position: fixed; 
         }
         
         .nav-item {
@@ -214,9 +231,9 @@
             display: flex; flex-direction: column; align-items: center;
             font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500;
         }
-        .nav-item i { font-size: 18px; margin-bottom: 2px; }
-        .nav-item.active { color: var(--text-main); font-weight: 700; }
-        .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; }
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--text-main); font-weight: 800; }
+        .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; filter: drop-shadow(0 2px 4px rgba(255, 200, 0, 0.4)); }
 
         /* ESTADOS */
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
@@ -231,22 +248,24 @@
     <div class="app-container">
         <header>
             <div class="top-row">
-                <a href="https://facundotomasella.github.io/comparadordeprecios/" class="logo-link">
+                <!-- CAMBIO AQUÍ: El link ahora apunta a tu dominio -->
+                <a href="https://tradingchango.com.ar" class="logo-link">
                     <div class="logo">
-                        <span class="logo-icon">
+                        <div class="logo-icon">
+                            <span class="candle-wick"></span>
+                            <span class="candle-stick"></span>
                             <i class="fa-solid fa-cart-shopping"></i>
-                            <i class="fa-solid fa-chart-simple"></i>
-                        </span>
-                        TradingChango
+                        </div>
+                        TradingChango.com.ar
                     </div>
                 </a>
                 <button class="theme-btn" onclick="toggleTheme()">
-                    <i class="fa-solid fa-sun" id="themeIcon"></i>
+                    <i class="fa-solid fa-moon" id="themeIcon"></i>
                 </button>
             </div>
             <div class="search-container">
                 <i class="fa-solid fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="BUSCAR TICKER...">
+                <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
             </div>
         </header>
 
@@ -255,7 +274,7 @@
         <div class="ticker-list" id="tickerList"></div>
 
         <footer class="app-footer">
-            Desarrollado por <a href="#" target="_blank" class="dev-link">Facundo Tomasella</a>
+            Desarrollado por <a href="#" class="dev-link">Facundo Tomasella</a>
         </footer>
 
         <nav class="bottom-nav">
@@ -284,10 +303,10 @@
         };
 
         const STORES = [
-            { id: 0, name: "COTO", color: "#ff3b30" },      // Rojo
-            { id: 1, name: "CARREFOUR", color: "#2962ff" }, // Azul
-            { id: 2, name: "DIA", color: "#ff3b30" },       // Rojo
-            { id: 3, name: "JUMBO", color: "#00c853" }      // Verde
+            { id: 0, name: "COTO", color: "#ff3b30", home: "https://www.cotodigital.com.ar/sitios/cdigi/nuevositio" },      
+            { id: 1, name: "CARREFOUR", color: "#2962ff", home: "https://www.carrefour.com.ar" }, 
+            { id: 2, name: "DIA", color: "#ff3b30", home: "https://diaonline.supermercadosdia.com.ar" },       
+            { id: 3, name: "JUMBO", color: "#00c853", home: "https://www.jumbo.com.ar" }      
         ];
 
         let DB = {}, flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes';
@@ -306,8 +325,14 @@
                     });
                 });
                 
-                // Tema inicial
+                // Tema inicial (Default es Light/Cálido ahora)
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
                 updateThemeIcon();
+                
                 document.getElementById('loader').style.display = 'none';
                 renderView();
             } catch (e) {
@@ -325,7 +350,7 @@
             if (currentTab === 'favs') {
                 if (favorites.length === 0) {
                     container.innerHTML = `<div class="empty-state">
-                        <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br><br>
+                        <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px; color:var(--accent);"></i><br><br>
                         Tu Portfolio está vacío.<br>Agrega productos para seguirlos.
                     </div>`;
                     return;
@@ -349,29 +374,20 @@
                 const starIcon = isFav ? 'fa-solid fa-star' : 'fa-regular fa-star';
 
                 const card = document.createElement('div');
-                // IMPORTANTE: Pasamos links (item.u)
                 const detailHtml = renderOrderBook(item.p, item.u, stats.min);
 
                 card.innerHTML = `
                     <div class="ticker-card">
                         <div class="ticker-info" onclick="toggleDetail('${item.id}')">
-                            <div class="t-left">
-                                <span class="t-symbol">${item.ticker}</span>
-                                <span class="t-name">${item.n}</span>
-                            </div>
+                            <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
                             <div class="t-right">
                                 <span class="t-price">$${format(stats.min)}</span><br>
                                 <span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span>
                             </div>
                         </div>
-                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
-                            <i class="${starIcon}"></i>
-                        </div>
+                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)"><i class="${starIcon}"></i></div>
                     </div>
-                    <div id="detail-${item.id}" class="order-book">
-                        <div class="ob-header"><span>Market</span><span>Precio</span></div>
-                        ${detailHtml}
-                    </div>
+                    <div id="detail-${item.id}" class="order-book">${detailHtml}</div>
                 `;
                 container.appendChild(card);
             });
@@ -382,24 +398,26 @@
             
             STORES.forEach((store, i) => {
                 const p = prices[i];
-                let url = (links && links[i]) ? links[i] : "#";
+                let rawLink = (links && links[i]) ? links[i] : "";
                 
-                // Excepción Coto: Siempre home
-                if (i === 0) url = "https://www.cotodigital.com.ar/sitios/cdigi/nuevositio";
+                // Si el link específico existe y es válido, úsalo. Si no, usa el Home.
+                let targetUrl = (rawLink && rawLink.startsWith("http")) ? rawLink : store.home;
+                
+                // Excepción Coto: Siempre Home
+                if (i === 0) targetUrl = store.home;
 
                 let val = `$${format(p)}`;
                 let styleClass = "price-link";
                 let dotColor = store.color;
                 
-                // Configuración de link activo/inactivo
-                let href = `href="${url}" target="_blank"`;
+                let href = `href="${targetUrl}" target="_blank"`;
                 let cursor = "";
 
                 if (!p || p === 0) { 
                     val = "SIN PRECIO"; 
                     styleClass += " no-price"; 
                     dotColor = "#444"; 
-                    href = ""; // Sin link
+                    href = "";
                 }
                 else if (p === best) { 
                     styleClass += " best-val"; 
@@ -435,12 +453,13 @@
             if (priceYesterday > 0) {
                 diff = ((minToday - priceYesterday) / priceYesterday) * 100;
                 
+                // LÓGICA CONSUMIDOR:
                 if (diff > 0) { 
-                    trendClass = "trend-up"; // Rojo (Subió - Malo)
+                    trendClass = "trend-up";   // Rojo (Malo, subió)
                     icon = "▲"; 
                 } 
                 else if (diff < 0) { 
-                    trendClass = "trend-down"; // Verde (Bajó - Bueno)
+                    trendClass = "trend-down"; // Verde (Bueno, bajó)
                     icon = "▼"; 
                 }
             } 
@@ -454,7 +473,7 @@
             else { favorites.push(id); }
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
             if (currentTab === 'favs') renderView();
-            else renderView(); // Refrescar para pintar la estrella
+            else renderView(); 
         }
 
         function setTab(tabName, btn) {
@@ -471,16 +490,17 @@
         }
 
         function toggleTheme() { 
-            document.body.classList.toggle('warm-mode');
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             updateThemeIcon();
         }
 
         function updateThemeIcon() {
             const icon = document.getElementById('themeIcon');
-            if (document.body.classList.contains('warm-mode')) {
-                icon.className = 'fa-solid fa-moon'; 
-            } else {
+            if (document.body.classList.contains('dark-mode')) {
                 icon.className = 'fa-solid fa-sun'; 
+            } else {
+                icon.className = 'fa-solid fa-moon'; 
             }
         }
 
