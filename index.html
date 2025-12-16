@@ -3,134 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Evitar caché viejo -->
+    <meta name="theme-color" content="#121212">
+    
+    <!-- Evitar caché -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
     <title>Comparador de Precios</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #00a650;
-            --bg: #f4f4f4;
-            --white: #ffffff;
-            --text: #333;
-            --border: #e0e0e0;
+            /* PALETA MODO OSCURO (Estilo Comparatasas) */
+            --bg-body: #121212;       /* Fondo principal muy oscuro */
+            --bg-card: #1e1e1e;       /* Fondo de tarjetas/tablas */
+            --bg-hover: #2c2c2c;      /* Color al pasar el mouse */
+            --primary: #00e676;       /* Verde Neón para ganadores/acciones */
+            --text-main: #e0e0e0;     /* Texto principal blanco suave */
+            --text-muted: #a0a0a0;    /* Texto secundario gris */
+            --border: #333333;        /* Bordes sutiles */
+            
+            /* Colores Marcas (Versiones más vibrantes para fondo oscuro) */
+            --coto: #ff5252;
+            --carr: #448aff;
+            --dia: #ff5252;
+            --jumbo: #69f0ae;
+            --extra: #ffab40;
         }
 
-        body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            display: flex; flex-direction: column; 
+            min-height: 100vh;
+        }
 
         /* HEADER */
         .app-header {
-            background: var(--primary); padding: 15px; position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            background: var(--bg-card); 
+            padding: 15px 20px; 
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
         }
         
-        .search-box { position: relative; max-width: 600px; margin: 0 auto; }
+        .search-box { 
+            position: relative; width: 100%; max-width: 600px; 
+        }
         
         #searchInput {
-            width: 100%; padding: 12px 15px 12px 45px; box-sizing: border-box;
-            border-radius: 25px; border: none; background: var(--white);
-            font-size: 16px; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%; padding: 14px 20px 14px 50px; box-sizing: border-box;
+            border-radius: 12px; border: 1px solid var(--border); 
+            background: #252525; 
+            color: white; font-size: 16px; outline: none; 
+            transition: all 0.3s ease;
         }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+        #searchInput:focus { 
+            border-color: var(--primary); 
+            background: #2a2a2a; 
+            box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.1); 
+        }
+        #searchInput::placeholder { color: #666; }
+        
+        .search-icon { 
+            position: absolute; left: 18px; top: 50%; 
+            transform: translateY(-50%); color: #888; font-size: 18px; 
+        }
 
-        /* TABS CENTRADAS */
+        /* TABS (Categorías) */
         .tabs-wrapper {
-            background: var(--white); padding: 12px 0; border-bottom: 1px solid var(--border);
-            position: sticky; top: 60px; z-index: 90;
+            background: var(--bg-body); /* Se funde con el fondo */
+            padding: 15px 0; 
+            position: sticky; top: 70px; z-index: 90;
         }
         
         .tabs-container {
-            display: flex; justify-content: center; /* CENTRADO */
-            flex-wrap: wrap; gap: 8px; padding: 0 10px;
-            max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: center; flex-wrap: wrap; 
+            gap: 10px; padding: 0 10px; max-width: 1200px; margin: 0 auto;
         }
 
         .tab-btn {
-            padding: 8px 16px; background: #f0f0f0; border: none; border-radius: 20px;
-            font-size: 14px; font-weight: 500; color: #555; cursor: pointer;
-            transition: all 0.2s ease;
+            padding: 8px 16px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border); 
+            border-radius: 8px;
+            font-size: 14px; font-weight: 500; color: var(--text-muted); 
+            cursor: pointer; transition: all 0.2s ease;
         }
-        .tab-btn.active { background: #333; color: var(--white); font-weight: 700; transform: scale(1.05); }
+        
+        .tab-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .tab-btn.active { 
+            background: var(--text-main); 
+            color: var(--bg-body); 
+            border-color: var(--text-main); 
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
 
         /* CONTENIDO PRINCIPAL */
-        .main-content { flex: 1; padding: 20px 10px; max-width: 1100px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .main-content { 
+            flex: 1; padding: 20px 15px; 
+            max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; 
+        }
 
-        /* TABLA */
+        /* TABLA CARD */
         .card-table {
-            background: var(--white); border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;
+            background: var(--bg-card); 
+            border-radius: 16px;
             border: 1px solid var(--border);
+            overflow: hidden; /* Para las esquinas redondeadas */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
         .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
 
-        th, td { padding: 14px 10px; text-align: center; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        th, td { 
+            padding: 16px 12px; 
+            text-align: center; 
+            border-bottom: 1px solid var(--border); 
+            vertical-align: middle; 
+        }
 
-        /* Encabezados */
+        /* ENCABEZADOS */
         thead th {
-            background: #fafafa; position: sticky; top: 0; z-index: 50;
-            font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700;
+            background: #252525; 
+            position: sticky; top: 0; z-index: 50;
+            font-size: 11px; text-transform: uppercase; 
+            color: var(--text-muted); font-weight: 700; letter-spacing: 1px;
         }
 
-        /* Columna Producto Fija */
+        /* COLUMNA PRODUCTO (Fija a la izquierda) */
         tbody td:first-child, thead th:first-child {
-            position: sticky; left: 0; background: var(--white); z-index: 60;
-            text-align: left; border-right: 2px solid #f5f5f5;
-            min-width: 160px; max-width: 220px;
-            font-weight: 500; font-size: 14px; line-height: 1.4;
+            position: sticky; left: 0; z-index: 60;
+            background: var(--bg-card); /* Mismo color que la tarjeta */
+            text-align: left; 
+            border-right: 1px solid var(--border);
+            min-width: 160px; max-width: 240px;
+            font-weight: 600; font-size: 14px; color: var(--text-main);
+            line-height: 1.4;
         }
-        thead th:first-child { background: #fafafa; z-index: 70; }
+        thead th:first-child { background: #252525; z-index: 70; }
 
         /* PRECIOS */
-        .price-cell { font-size: 15px; color: #555; font-family: monospace; letter-spacing: -0.5px; }
-        
-        .winner {
-            background: #e8f5e9; color: #1b5e20; font-weight: 800; font-size: 16px;
-            padding: 6px 10px; border-radius: 8px; border: 1px solid #c8e6c9; display: inline-block;
+        .price-cell { 
+            font-size: 15px; color: var(--text-muted); 
+            font-family: 'Inter', sans-serif; font-weight: 400; 
         }
         
-        .no-stock { color: #ddd; font-size: 24px; font-weight: 300; line-height: 0; vertical-align: middle; }
+        .winner {
+            color: var(--primary); 
+            font-weight: 700; font-size: 16px;
+            background: rgba(0, 230, 118, 0.1); /* Verde transparente */
+            padding: 6px 10px; border-radius: 6px; 
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            display: inline-block;
+        }
+        
+        .no-stock { color: #444; font-size: 20px; font-weight: 300; }
+
+        /* HOVER EN FILAS */
+        tbody tr:hover td { background-color: var(--bg-hover); }
+        tbody tr:hover td:first-child { background-color: var(--bg-hover); }
 
         /* PAGINACIÓN */
         .pagination {
             display: flex; justify-content: center; align-items: center; gap: 15px;
-            padding: 20px; background: var(--white); border-top: 1px solid var(--border);
+            padding: 20px; background: var(--bg-card); border-top: 1px solid var(--border);
         }
         .page-btn {
-            padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 6px;
-            cursor: pointer; font-size: 14px; color: #555;
+            padding: 8px 16px; 
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            cursor: pointer; font-size: 14px; color: var(--text-main);
+            transition: 0.2s;
         }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f9f9f9; }
-        .page-info { font-size: 14px; color: #666; font-weight: 500; }
+        .page-btn:hover:not(:disabled) { border-color: var(--text-main); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .page-info { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 
         /* FOOTER */
         .app-footer {
-            background: #222; color: #aaa; text-align: center; padding: 20px;
-            font-size: 13px; margin-top: auto;
+            background: var(--bg-card); color: #555; text-align: center; padding: 30px;
+            font-size: 13px; margin-top: auto; border-top: 1px solid var(--border);
         }
-        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
-        .app-footer a:hover { text-decoration: underline; }
+        .app-footer a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        .app-footer a:hover { color: var(--primary); }
 
         /* LOADER */
-        #loader { text-align: center; padding: 60px; display: none; }
+        #loader { text-align: center; padding: 80px; display: none; }
         .spinner {
-            width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
-            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto;
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); 
+            border-top: 3px solid var(--primary);
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* RESPONSIVE */
         @media (max-width: 600px) {
-            .tabs-container { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+            .tabs-container { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
+            .tabs-wrapper { padding: 10px 0; }
             .main-content { padding: 10px 0; }
-            .card-table { border-radius: 0; border-left: none; border-right: none; }
+            .card-table { border-radius: 0; border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+            /* Ajuste de buscador en móvil */
+            .search-box { padding: 0 15px; }
         }
 
     </style>
@@ -145,13 +226,15 @@
     </div>
 
     <div class="tabs-wrapper">
-        <div class="tabs-container" id="tabsContainer"></div>
+        <div class="tabs-container" id="tabsContainer">
+            <!-- Botones JS -->
+        </div>
     </div>
 
     <div class="main-content">
         <div id="loader">
             <div class="spinner"></div>
-            <div>Actualizando precios...</div>
+            <div style="color:#888; font-size:14px; letter-spacing:1px; text-transform:uppercase;">Cargando...</div>
         </div>
 
         <div class="card-table">
@@ -165,48 +248,46 @@
             <!-- CONTROLES DE PAGINACIÓN -->
             <div class="pagination" id="paginationControls" style="display:none;">
                 <button class="page-btn" onclick="prevPage()">Anterior</button>
-                <span class="page-info" id="pageInfo">Página 1</span>
+                <span class="page-info" id="pageInfo">1 / 1</span>
                 <button class="page-btn" onclick="nextPage()">Siguiente</button>
             </div>
             
-            <div id="emptyState" style="text-align:center; padding:40px; color:#999; display:none;">
-                No se encontraron productos
+            <div id="emptyState" style="text-align:center; padding:60px 20px; color:#555; display:none;">
+                No se encontraron productos con ese nombre.
             </div>
         </div>
     </div>
 
     <!-- FOOTER -->
     <footer class="app-footer">
-        Desarrollado por <a href="#" target="_blank">Tu Nombre / Marca</a>
+        Desarrollado por <a href="#" target="_blank">Facundo Tomasella</a>
     </footer>
 
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN
+        // 1. CONFIGURACIÓN (NO TOCAR SI YA FUNCIONA)
         // ==========================================
-        // URL DEL JSON EN GITHUB (ESTO ES LO QUE LO HACE RÁPIDO)
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
 
-        // PESTAÑAS (Deben coincidir con tu Excel)
         const CATEGORIAS = [
             "Carniceria", "Verduleria", "Fiambres y Lacteos", 
             "Higuiene", "Almacen", "Dietetica", "Mascotas"
         ];
 
-        // ENCABEZADOS DE LA TABLA (Visual)
+        // Definimos los nombres y colores para la vista Oscura
         const COLUMNAS = [
-            { id: 0, name: "Coto", color: "#d32f2f" },
-            { id: 1, name: "Carrefour", color: "#1976d2" },
-            { id: 2, name: "Día", color: "#d32f2f" },
-            { id: 3, name: "Jumbo", color: "#388e3c" },
-            { id: 4, name: "Extra", color: "#f57c00" }
+            { id: 0, name: "Coto", color: "var(--coto)" },
+            { id: 1, name: "Carrefour", color: "var(--carr)" },
+            { id: 2, name: "Día", color: "var(--dia)" },
+            { id: 3, name: "Jumbo", color: "var(--jumbo)" },
+            { id: 4, name: "Extra", color: "var(--extra)" }
         ];
 
-        // VARIABLES DE ESTADO
-        let DB = {};            // Base de datos completa
-        let currentList = [];   // Lista actual filtrada (por categoría o búsqueda)
-        let currentPage = 1;    // Página actual
-        const ITEMS_PER_PAGE = 10; // Productos por página
+        // ESTADO
+        let DB = {};            
+        let currentList = [];   
+        let currentPage = 1;    
+        const ITEMS_PER_PAGE = 10; 
 
         // ==========================================
         // 2. INICIALIZACIÓN
@@ -215,6 +296,8 @@
             const loader = document.getElementById('loader');
             const tabs = document.getElementById('tabsContainer');
             
+            loader.style.display = 'block';
+
             try {
                 // Descarga única del JSON
                 const response = await fetch(DATA_URL + '?t=' + Date.now());
@@ -229,21 +312,16 @@
                     const btn = document.createElement('button');
                     btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
                     
-                    // Emojis decorativos
-                    let emoji = "📦";
-                    if(cat.includes("Carniceria")) emoji = "🥩";
-                    if(cat.includes("Verduleria")) emoji = "🥦";
-                    if(cat.includes("Fiambres")) emoji = "🧀";
-                    if(cat.includes("Higuiene")) emoji = "🧼";
-                    if(cat.includes("Almacen")) emoji = "🥫";
-                    if(cat.includes("Dietetica")) emoji = "🌾";
-                    if(cat.includes("Mascotas")) emoji = "🐶";
+                    // Limpieza de nombre para mostrar (Quitar acentos si el JSON viene sin ellos pero mostrar con)
+                    let displayName = cat;
+                    if(cat.includes("Higuiene")) displayName = "Higiene"; // Corrección visual
+                    if(cat.includes("Lacteos")) displayName = "Lácteos";
 
-                    btn.innerText = `${emoji} ${cat}`;
+                    btn.innerText = displayName;
                     btn.onclick = () => {
                         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
-                        // Resetear búsqueda y página al cambiar categoría
+                        // Resetear búsqueda
                         document.getElementById('searchInput').value = '';
                         loadCategory(cat);
                     };
@@ -255,15 +333,15 @@
 
             } catch (error) {
                 console.error(error);
-                loader.innerHTML = '<div style="color:red">Error cargando datos. Verifica el script de Google.</div>';
+                loader.innerHTML = '<div style="color:#ef5350">Error de conexión. Verifica el script de Google.</div>';
             }
         }
 
-        // Cargar datos de una categoría en memoria
         function loadCategory(catName) {
+            // Obtener datos crudos
             const rawData = DB[catName] || [];
-            currentList = rawData; // Sin filtros al inicio
-            currentPage = 1;       // Volver a página 1
+            currentList = rawData; 
+            currentPage = 1;       
             renderPage();
         }
 
@@ -284,11 +362,10 @@
             headHtml += `</tr>`;
             thead.innerHTML = headHtml;
 
-            // 2. Calcular Paginación
+            // 2. Cálculos Paginación
             const totalItems = currentList.length;
             const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
             
-            // Validar límites
             if (currentPage < 1) currentPage = 1;
             if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
@@ -302,10 +379,13 @@
             if (itemsToShow.length === 0) {
                 emptyState.style.display = 'block';
                 pagination.style.display = 'none';
+                // En modo vacío, ocultamos la tabla también para que quede limpio
+                thead.style.display = 'none';
                 return;
             } else {
                 emptyState.style.display = 'none';
                 pagination.style.display = 'flex';
+                thead.style.display = 'table-header-group';
             }
 
             const fragment = document.createDocumentFragment();
@@ -316,7 +396,7 @@
                 // Nombre
                 let html = `<td>${item.n}</td>`;
 
-                // Calcular Mínimo (Precios están en item.p array: [0, 1, 2, 3, 4])
+                // Calcular Mínimo
                 let minPrice = Infinity;
                 item.p.forEach(p => {
                     if (p > 0 && p < minPrice) minPrice = p;
@@ -326,13 +406,11 @@
                 item.p.forEach(price => {
                     if (price > 0) {
                         if (price === minPrice) {
-                            // Ganador (Verde)
                             html += `<td><span class="winner">$${formatNumber(price)}</span></td>`;
                         } else {
                             html += `<td><span class="price-cell">$${formatNumber(price)}</span></td>`;
                         }
                     } else {
-                        // Sin Stock (Guion grande)
                         html += `<td><span class="no-stock">-</span></td>`;
                     }
                 });
@@ -343,18 +421,19 @@
 
             tbody.appendChild(fragment);
 
-            // 4. Actualizar Controles Paginación
-            document.getElementById('pageInfo').innerText = `Página ${currentPage} de ${totalPages || 1}`;
+            // 4. Actualizar Controles
+            document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages || 1}`;
             document.querySelectorAll('.page-btn')[0].disabled = (currentPage === 1);
             document.querySelectorAll('.page-btn')[1].disabled = (currentPage === totalPages || totalPages === 0);
         }
 
-        // Funciones de botones Anterior/Siguiente
+        // Funciones Navegación
         function prevPage() {
             if (currentPage > 1) {
                 currentPage--;
                 renderPage();
-                document.querySelector('.table-scroll').scrollTop = 0; // Subir al inicio
+                // Scroll suave arriba
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -363,7 +442,7 @@
             if (currentPage < totalPages) {
                 currentPage++;
                 renderPage();
-                document.querySelector('.table-scroll').scrollTop = 0;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -373,41 +452,36 @@
         document.getElementById('searchInput').addEventListener('keyup', (e) => {
             const term = e.target.value.toLowerCase();
             
-            // Determinar en qué categoría estamos (buscando el botón activo)
-            // O mejor: buscar en la categoría actual activa en la UI
+            // Buscar la categoría activa
             const activeBtn = document.querySelector('.tab-btn.active');
             let catName = CATEGORIAS[0];
+            
+            // Truco para matchear nombre visual con nombre real (por si cambiamos Higuiene por Higiene)
             if (activeBtn) {
-                // Quitamos el emoji para obtener el nombre limpio de la categoría
-                catName = activeBtn.innerText.substring(3).trim(); 
-                // Fix: Asegurar que coincida con las claves del JSON (a veces el emoji ocupa 2 chars)
-                const found = CATEGORIAS.find(c => activeBtn.innerText.includes(c));
+                const visualName = activeBtn.innerText;
+                // Mapeo inverso simple o búsqueda directa
+                const found = CATEGORIAS.find(c => visualName.includes(c) || (c === "Higuiene" && visualName === "Higiene"));
                 if(found) catName = found;
             }
 
             const rawData = DB[catName] || [];
 
-            // Filtrar
             if (term === "") {
                 currentList = rawData;
             } else {
                 currentList = rawData.filter(item => item.n.toLowerCase().includes(term));
             }
 
-            currentPage = 1; // Resetear a página 1 al buscar
+            currentPage = 1; 
             renderPage();
         });
 
-        // Formato Moneda
         function formatNumber(num) {
             return new Intl.NumberFormat('es-AR', { minimumFractionDigits: 0 }).format(num);
         }
 
-        // Arrancar
         init();
-
     </script>
 </body>
 </html>
-
 
