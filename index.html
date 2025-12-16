@@ -24,7 +24,7 @@
             --text-main: #e0e0e0;
             --text-muted: #6b6b6b;
             --border: #2a2a2a;
-            --accent: #ff3b30; /* Rojo Trading */
+            --accent: #ff3b30; 
             
             --bull-green: #00ff88;
             --bear-red: #ff3b30;
@@ -68,12 +68,12 @@
         .theme-btn { background: none; border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
 
         /* BUSCADOR */
-        .search-container { position: relative; }
         #searchInput {
             width: 100%; background: var(--bg-card); border: 1px solid var(--border);
             color: var(--text-main); padding: 12px 12px 12px 40px; border-radius: 8px;
             font-size: 14px; font-family: 'Roboto Mono', monospace; text-transform: uppercase;
         }
+        .search-container { position: relative; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
         /* LISTA TICKERS */
@@ -81,26 +81,26 @@
 
         .ticker-card {
             border-bottom: 1px solid var(--border);
-            cursor: pointer; position: relative;
+            cursor: pointer; 
+            display: flex; /* Flexbox para alinear */
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            position: relative;
         }
         
-        /* FAVORITE STAR */
-        .fav-btn {
-            position: absolute; left: 0; top: 0; bottom: 0; width: 50px;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10; font-size: 16px; color: var(--text-muted);
-            transition: 0.2s;
-        }
-        .fav-btn.active { color: var(--star-gold); }
-
-        .ticker-content {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 15px 15px 50px; /* Padding left para la estrella */
+        /* CONTENIDO IZQUIERDO (Info) */
+        .ticker-info {
+            flex-grow: 1; /* Ocupa todo el espacio posible */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 15px; /* Espacio para no pegarse a la estrella */
         }
 
         .t-left { display: flex; flex-direction: column; }
         .t-symbol { font-family: 'Roboto Mono'; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-        .t-name { font-size: 12px; color: var(--text-muted); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .t-name { font-size: 12px; color: var(--text-muted); max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; }
@@ -108,6 +108,16 @@
         
         .up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); }
         .down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }
+
+        /* ESTRELLA A LA DERECHA */
+        .fav-btn {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: flex-end;
+            font-size: 18px; color: var(--border); /* Apagada por defecto */
+            z-index: 10;
+            transition: 0.2s;
+        }
+        .fav-btn.active { color: var(--star-gold); }
 
         /* DETALLE (ORDER BOOK) */
         .order-book { display: none; background: var(--bg-card); padding: 10px 20px 20px 20px; border-bottom: 1px solid var(--border); }
@@ -118,7 +128,10 @@
         .ob-store { font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; }
         .ob-val { font-family: 'Roboto Mono'; }
-        .best-val { color: var(--bull-green); font-weight: 700; }
+        
+        /* Solo color verde, sin texto extra */
+        .best-val { color: var(--bull-green); font-weight: 700; } 
+        .no-stock { color: var(--bear-red); text-decoration: line-through; opacity: 0.5; }
 
         /* NAVBAR INFERIOR */
         .bottom-nav {
@@ -154,26 +167,27 @@
         </div>
         <div class="search-container">
             <i class="fa-solid fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="BUSCAR TICKER O PRODUCTO...">
+            <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
         </div>
     </header>
 
-    <div id="loader">SINCRONIZANDO MERCADO...</div>
+    <div id="loader">CARGANDO MERCADO...</div>
 
     <div class="ticker-list" id="tickerList"></div>
 
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="setTab('favs', this)">
+        <!-- ORDEN SOLICITADO: Carnes, Verdu, Varios, Favoritos -->
+        <button class="nav-item active" onclick="setTab('carnes', this)">
+            <i class="fa-solid fa-drumstick-bite"></i> Carnes
+        </button>
+        <button class="nav-item" onclick="setTab('verdu', this)">
+            <i class="fa-solid fa-carrot"></i> Verdu
+        </button>
+        <button class="nav-item" onclick="setTab('varios', this)">
+            <i class="fa-solid fa-layer-group"></i> Varios
+        </button>
+        <button class="nav-item" onclick="setTab('favs', this)">
             <i class="fa-solid fa-star"></i> Favoritos
-        </button>
-        <button class="nav-item" onclick="setTab('super', this)">
-            <i class="fa-solid fa-cart-shopping"></i> Super
-        </button>
-        <button class="nav-item" onclick="setTab('frescos', this)">
-            <i class="fa-solid fa-drumstick-bite"></i> Frescos
-        </button>
-        <button class="nav-item" onclick="setTab('especial', this)">
-            <i class="fa-solid fa-leaf"></i> Especial
         </button>
     </nav>
 
@@ -184,10 +198,11 @@
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
         
         // AGRUPACIÓN DE CATEGORÍAS (NUCLEADAS)
+        // Ajusta los nombres de la derecha según están escritos EXACTAMENTE en tu Excel
         const GROUPS = {
-            'super': ['Almacen', 'Higuiene', 'Fiambres y Lacteos'],
-            'frescos': ['Carniceria', 'Verduleria'],
-            'especial': ['Dietetica', 'Mascotas']
+            'carnes': ['Carniceria'],
+            'verdu': ['Verduleria'],
+            'varios': ['Almacen', 'Higuiene', 'Fiambres y Lacteos', 'Dietetica', 'Mascotas']
         };
 
         const STORES = [
@@ -202,7 +217,7 @@
         let DB = {};
         let flatList = [];
         let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [];
-        let currentTab = 'favs';
+        let currentTab = 'carnes'; // Empezamos mostrando Carnes por defecto
 
         // ==========================================
         // 2. INICIALIZACIÓN
@@ -222,15 +237,12 @@
                     });
                 });
 
-                // Mezclar aleatoriamente para que no sea aburrido al inicio
-                flatList.sort(() => Math.random() - 0.5);
-
                 document.getElementById('loader').style.display = 'none';
                 renderView();
 
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerText = "OFFLINE - REINTENTAR";
+                document.getElementById('loader').innerText = "ERROR DE CONEXIÓN";
             }
         }
 
@@ -250,7 +262,7 @@
                 if (favorites.length === 0) {
                     container.innerHTML = `<div class="empty-state">
                         <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br>
-                        Aún no tienes favoritos.<br>Toca la estrella en los productos para seguirlos aquí.
+                        Toca la estrella en los productos<br>para seguirlos aquí.
                     </div>`;
                     return;
                 }
@@ -263,15 +275,13 @@
 
             // Filtrado Buscador (Sobre lo ya filtrado)
             if (term) {
-                // Si busca algo, buscamos en TODA la base de datos, no solo en la pestaña actual
                 dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             }
 
-            // Límite de renderizado para performance (lazy load sería mejor, pero esto sirve)
             const limit = term ? 50 : 20; 
             
             if (dataToShow.length === 0) {
-                container.innerHTML = '<div class="empty-state">No se encontraron activos.</div>';
+                container.innerHTML = '<div class="empty-state">Sin activos en esta categoría.</div>';
                 return;
             }
 
@@ -286,10 +296,7 @@
                 const card = document.createElement('div');
                 card.innerHTML = `
                     <div class="ticker-card">
-                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
-                            <i class="${starIcon}"></i>
-                        </div>
-                        <div class="ticker-content" onclick="toggleDetail('${item.id}')">
+                        <div class="ticker-info" onclick="toggleDetail('${item.id}')">
                             <div class="t-left">
                                 <span class="t-symbol">${item.ticker}</span>
                                 <span class="t-name">${item.n}</span>
@@ -298,6 +305,9 @@
                                 <span class="t-price">$${format(stats.min)}</span><br>
                                 <span class="t-change ${stats.trend}">${stats.icon} ${stats.spread}%</span>
                             </div>
+                        </div>
+                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
+                            <i class="${starIcon}"></i>
                         </div>
                     </div>
                     <div id="detail-${item.id}" class="order-book">
@@ -316,8 +326,12 @@
                 let styleClass = "ob-val";
                 let dotColor = store.color;
 
-                if (p === 0) { val = "SIN STOCK"; styleClass += " no-stock"; dotColor = "#333"; }
-                else if (p === best) { val += " (BUY)"; styleClass += " best-val"; dotColor = "#00ff88"; }
+                if (p === 0) { 
+                    val = "SIN STOCK"; styleClass += " no-stock"; dotColor = "#333"; 
+                }
+                else if (p === best) { 
+                    styleClass += " best-val"; dotColor = "#00ff88"; // Solo color verde, sin texto extra
+                }
 
                 html += `
                     <div class="ob-row">
@@ -340,15 +354,13 @@
             const min = Math.min(...valid);
             const avg = valid.reduce((a,b)=>a+b,0) / valid.length;
             
-            // Calculamos % respecto al promedio del mercado (Volatilidad)
             let diff = ((avg - min) / avg) * 100;
             
-            // Lógica Trading Inversa: Precio bajo es "Bullish" (Bueno)
             let trend = "up"; // Verde
-            let icon = "▼";   // Cayó el precio (bueno)
+            let icon = "▼";   // Flecha abajo
 
             if (diff < 2) {
-                trend = "down"; // Rojo/Neutro
+                trend = "down"; // Rojo
                 icon = "▶";
             }
 
@@ -356,9 +368,10 @@
         }
 
         function toggleFav(id, btn) {
-            // Evitar que el click se propague al acordeón
-            event.stopPropagation();
-            
+            // Animación simple de click
+            btn.style.transform = "scale(1.2)";
+            setTimeout(() => btn.style.transform = "scale(1)", 200);
+
             if (favorites.includes(id)) {
                 favorites = favorites.filter(f => f !== id);
                 btn.classList.remove('active');
@@ -369,30 +382,22 @@
                 btn.innerHTML = '<i class="fa-solid fa-star"></i>';
             }
             
-            // Guardar en celular
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
             
-            // Si estamos en tab favoritos, recargar para quitar
             if (currentTab === 'favs') renderView();
         }
 
         function setTab(tabName, btn) {
             currentTab = tabName;
-            
-            // UI
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
-            // Scroll top
             window.scrollTo(0,0);
             document.getElementById('searchInput').value = '';
-            
             renderView();
         }
 
         function toggleDetail(id) {
             const el = document.getElementById(`detail-${id}`);
-            // Cerrar otros
             document.querySelectorAll('.order-book.open').forEach(ob => {
                 if (ob.id !== `detail-${id}`) ob.classList.remove('open');
             });
@@ -406,14 +411,9 @@
         // ==========================================
         // 5. UTILIDADES
         // ==========================================
-        function generateID(cat, idx) {
-            // ID único basado en categoría e índice para persistencia
-            return `${cat.substring(0,3)}-${idx}`;
-        }
+        function generateID(cat, idx) { return `${cat.substring(0,3)}-${idx}`; }
 
         function generateTicker(name) {
-            // Genera algo tipo BTC, AAPL
-            // Toma las primeras letras de palabras clave
             const clean = name.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, " ");
             const parts = clean.split(" ").filter(w => w.length > 2);
             if (parts.length >= 2) return (parts[0].substring(0,2) + parts[1].substring(0,2));
@@ -424,7 +424,6 @@
             return new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(num);
         }
 
-        // Búsqueda en tiempo real
         document.getElementById('searchInput').addEventListener('keyup', renderView);
 
         // Arrancar
@@ -433,3 +432,4 @@
     </script>
 </body>
 </html>
+
