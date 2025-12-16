@@ -3,485 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#121212">
+    <meta name="theme-color" content="#0d0d0d">
     
-    <!-- Evitar caché -->
+    <!-- Caché Control -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+
+    <title>Market Prices</title>
     
-    <title>Comparador de Precios</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <!-- Fuentes: Inter para texto, Roboto Mono para números (estilo financiero) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
-            /* PALETA MODO OSCURO (Estilo Comparatasas) */
-            --bg-body: #121212;       /* Fondo principal muy oscuro */
-            --bg-card: #1e1e1e;       /* Fondo de tarjetas/tablas */
-            --bg-hover: #2c2c2c;      /* Color al pasar el mouse */
-            --primary: #00e676;       /* Verde Neón para ganadores/acciones */
-            --text-main: #e0e0e0;     /* Texto principal blanco suave */
-            --text-muted: #a0a0a0;    /* Texto secundario gris */
-            --border: #333333;        /* Bordes sutiles */
+            /* MODO TRADER (OSCURO - Estilo tu foto) */
+            --bg-app: #0d0d0d;
+            --bg-card: #161616;
+            --bg-nav: #1a1a1a;
+            --text-main: #e0e0e0;
+            --text-muted: #6b6b6b;
+            --border: #2a2a2a;
             
-            /* Colores Marcas (Versiones más vibrantes para fondo oscuro) */
-            --coto: #ff5252;
-            --carr: #448aff;
-            --dia: #ff5252;
-            --jumbo: #69f0ae;
-            --extra: #ffab40;
+            --bull-green: #00ff88; /* Subida / Buen precio */
+            --bear-red: #ff3b30;   /* Bajada / Mal precio */
+            
+            --accent: #ff3b30; /* Color de marca principal (Rojo trading) */
+            --nav-active: #ffffff;
+            --nav-inactive: #555555;
         }
 
+        /* MODO CÁLIDO (WARM) */
+        body.warm-mode {
+            --bg-app: #fdf6e3; /* Crema solarizado */
+            --bg-card: #eee8d5;
+            --bg-nav: #e4dec7;
+            --text-main: #3b352b;
+            --text-muted: #93a1a1;
+            --border: #d3cbb7;
+            
+            --bull-green: #2aa198;
+            --bear-red: #dc322f;
+            
+            --accent: #b58900;
+            --nav-active: #3b352b;
+            --nav-inactive: #93a1a1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
         body { 
-            margin: 0; padding: 0; 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-body); 
+            background-color: var(--bg-app); 
             color: var(--text-main); 
-            display: flex; flex-direction: column; 
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif; 
+            padding-bottom: 80px; /* Espacio para navbar */
+            transition: background 0.3s ease;
         }
 
         /* HEADER */
-        .app-header {
-            background: var(--bg-card); 
-            padding: 15px 20px; 
-            position: sticky; top: 0; z-index: 100;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-        }
-        
-        .search-box { 
-            position: relative; width: 100%; max-width: 600px; 
-        }
-        
-        #searchInput {
-            width: 100%; padding: 14px 20px 14px 50px; box-sizing: border-box;
-            border-radius: 12px; border: 1px solid var(--border); 
-            background: #252525; 
-            color: white; font-size: 16px; outline: none; 
-            transition: all 0.3s ease;
-        }
-        #searchInput:focus { 
-            border-color: var(--primary); 
-            background: #2a2a2a; 
-            box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.1); 
-        }
-        #searchInput::placeholder { color: #666; }
-        
-        .search-icon { 
-            position: absolute; left: 18px; top: 50%; 
-            transform: translateY(-50%); color: #888; font-size: 18px; 
-        }
-
-        /* TABS (Categorías) */
-        .tabs-wrapper {
-            background: var(--bg-body); /* Se funde con el fondo */
-            padding: 15px 0; 
-            position: sticky; top: 70px; z-index: 90;
-        }
-        
-        .tabs-container {
-            display: flex; justify-content: center; flex-wrap: wrap; 
-            gap: 10px; padding: 0 10px; max-width: 1200px; margin: 0 auto;
-        }
-
-        .tab-btn {
-            padding: 8px 16px; 
-            background: var(--bg-card); 
-            border: 1px solid var(--border); 
-            border-radius: 8px;
-            font-size: 14px; font-weight: 500; color: var(--text-muted); 
-            cursor: pointer; transition: all 0.2s ease;
-        }
-        
-        .tab-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-        
-        .tab-btn.active { 
-            background: var(--text-main); 
-            color: var(--bg-body); 
-            border-color: var(--text-main); 
-            font-weight: 700;
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
-        }
-
-        /* CONTENIDO PRINCIPAL */
-        .main-content { 
-            flex: 1; padding: 20px 15px; 
-            max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; 
-        }
-
-        /* TABLA CARD */
-        .card-table {
-            background: var(--bg-card); 
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden; /* Para las esquinas redondeadas */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-
-        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-
-        th, td { 
-            padding: 16px 12px; 
-            text-align: center; 
-            border-bottom: 1px solid var(--border); 
-            vertical-align: middle; 
-        }
-
-        /* ENCABEZADOS */
-        thead th {
-            background: #252525; 
+        header {
             position: sticky; top: 0; z-index: 50;
-            font-size: 11px; text-transform: uppercase; 
-            color: var(--text-muted); font-weight: 700; letter-spacing: 1px;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 15px;
+        }
+        body.warm-mode header { background: rgba(253, 246, 227, 0.95); }
+
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: var(--accent); }
+        
+        .theme-toggle { 
+            background: none; border: 1px solid var(--border); 
+            color: var(--text-main); padding: 5px 10px; border-radius: 8px; cursor: pointer;
         }
 
-        /* COLUMNA PRODUCTO (Fija a la izquierda) */
-        tbody td:first-child, thead th:first-child {
-            position: sticky; left: 0; z-index: 60;
-            background: var(--bg-card); /* Mismo color que la tarjeta */
-            text-align: left; 
-            border-right: 1px solid var(--border);
-            min-width: 160px; max-width: 240px;
-            font-weight: 600; font-size: 14px; color: var(--text-main);
-            line-height: 1.4;
+        /* BUSCADOR ESTILO TICKER */
+        .search-container { position: relative; }
+        #searchInput {
+            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--text-main); padding: 10px 10px 10px 35px; border-radius: 6px;
+            font-family: 'Roboto Mono', monospace; font-size: 14px; text-transform: uppercase;
         }
-        thead th:first-child { background: #252525; z-index: 70; }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 12px; }
 
-        /* PRECIOS */
-        .price-cell { 
-            font-size: 15px; color: var(--text-muted); 
-            font-family: 'Inter', sans-serif; font-weight: 400; 
+        /* LISTA DE ACTIVOS (PRODUCTOS) */
+        .market-list { padding: 0; }
+
+        .ticker-card {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ticker-card:active { background-color: var(--bg-card); }
+
+        /* VISTA RESUMEN (Cerrado) */
+        .ticker-summary {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px;
+        }
+
+        .ticker-info { display: flex; align-items: center; gap: 12px; }
+        .ticker-symbol {
+            width: 40px; height: 40px; 
+            background: var(--bg-card); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .ticker-name-col { display: flex; flex-direction: column; }
+        .ticker-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+        .ticker-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+
+        .ticker-price-col { text-align: right; }
+        .last-price { 
+            font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; 
+            color: var(--text-main); display: block; 
+        }
+        .change-pill {
+            font-family: 'Roboto Mono', monospace; font-size: 11px; font-weight: 600;
+            padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;
+        }
+        .change-up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); }
+        .change-down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }
+
+        /* DETALLES EXPANDIBLES (Libro de Órdenes) */
+        .order-book {
+            display: none; /* Oculto por defecto */
+            background: var(--bg-card);
+            padding: 10px 15px 20px 15px;
+            border-bottom: 1px solid var(--border);
+            animation: slideDown 0.3s ease-out;
+        }
+        .order-book.open { display: block; }
+
+        .ob-header { 
+            font-size: 10px; text-transform: uppercase; color: var(--text-muted); 
+            display: flex; justify-content: space-between; margin-bottom: 8px; padding: 0 5px;
         }
         
-        .winner {
-            color: var(--primary); 
-            font-weight: 700; font-size: 16px;
-            background: rgba(0, 230, 118, 0.1); /* Verde transparente */
-            padding: 6px 10px; border-radius: 6px; 
-            border: 1px solid rgba(0, 230, 118, 0.3);
-            display: inline-block;
+        .ob-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 5px; border-bottom: 1px dashed var(--border);
         }
+        .ob-row:last-child { border-bottom: none; }
+
+        .ob-market { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
         
-        .no-stock { color: #444; font-size: 20px; font-weight: 300; }
+        .ob-price { font-family: 'Roboto Mono', monospace; font-size: 14px; }
+        .ob-price.best { color: var(--bull-green); font-weight: 700; }
+        .ob-price.bad { color: var(--text-muted); }
+        .ob-price.no-stock { color: var(--bear-red); text-decoration: line-through; opacity: 0.5; }
 
-        /* HOVER EN FILAS */
-        tbody tr:hover td { background-color: var(--bg-hover); }
-        tbody tr:hover td:first-child { background-color: var(--bg-hover); }
+        .link-btn { font-size: 12px; text-decoration: none; color: var(--text-muted); margin-left: 10px; }
 
-        /* PAGINACIÓN */
-        .pagination {
-            display: flex; justify-content: center; align-items: center; gap: 15px;
-            padding: 20px; background: var(--bg-card); border-top: 1px solid var(--border);
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--bg-nav); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 10px 0;
+            z-index: 100; backdrop-filter: blur(10px);
         }
-        .page-btn {
-            padding: 8px 16px; 
-            background: transparent; border: 1px solid var(--border); border-radius: 6px;
-            cursor: pointer; font-size: 14px; color: var(--text-main);
-            transition: 0.2s;
-        }
-        .page-btn:hover:not(:disabled) { border-color: var(--text-main); }
-        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .page-info { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        body.warm-mode .bottom-nav { background: rgba(228, 222, 199, 0.95); }
 
-        /* FOOTER */
-        .app-footer {
-            background: var(--bg-card); color: #555; text-align: center; padding: 30px;
-            font-size: 13px; margin-top: auto; border-top: 1px solid var(--border);
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--nav-inactive); background: none; border: none; font-size: 10px;
+            gap: 4px; cursor: pointer; width: 100%;
         }
-        .app-footer a { color: var(--text-muted); text-decoration: none; font-weight: 600; }
-        .app-footer a:hover { color: var(--primary); }
+        .nav-item i { font-size: 18px; transition: 0.2s; }
+        .nav-item.active { color: var(--nav-active); font-weight: 600; }
+        .nav-item.active i { transform: translateY(-2px); color: var(--accent); }
 
         /* LOADER */
-        #loader { text-align: center; padding: 80px; display: none; }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); 
-            border-top: 3px solid var(--primary);
-            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loader { text-align: center; padding: 50px; font-family: 'Roboto Mono'; color: var(--text-muted); font-size: 12px; }
+        
+        /* Footer */
+        .legal { text-align: center; padding: 20px; font-size: 10px; color: var(--text-muted); }
+        .legal a { color: var(--text-muted); }
 
-        /* RESPONSIVE */
-        @media (max-width: 600px) {
-            .tabs-container { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
-            .tabs-wrapper { padding: 10px 0; }
-            .main-content { padding: 10px 0; }
-            .card-table { border-radius: 0; border-left: none; border-right: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-            /* Ajuste de buscador en móvil */
-            .search-box { padding: 0 15px; }
-        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Buscar producto...">
+    <header>
+        <div class="top-bar">
+            <div class="logo"><i class="fa-solid fa-chart-line"></i> PRECIOS.APP</div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
         </div>
+        <div class="search-container">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="BUSCAR TICKER (EJ: POLLO)...">
+        </div>
+    </header>
+
+    <div id="loader">CONECTANDO AL MERCADO...</div>
+
+    <div class="market-list" id="marketList">
+        <!-- Los productos se inyectan aquí -->
     </div>
 
-    <div class="tabs-wrapper">
-        <div class="tabs-container" id="tabsContainer">
-            <!-- Botones JS -->
-        </div>
+    <div class="legal">
+        Datos de mercado en tiempo real.<br>
+        Desarrollado por <a href="#">Facundo Tomasella</a>
     </div>
 
-    <div class="main-content">
-        <div id="loader">
-            <div class="spinner"></div>
-            <div style="color:#888; font-size:14px; letter-spacing:1px; text-transform:uppercase;">Cargando...</div>
-        </div>
-
-        <div class="card-table">
-            <div class="table-scroll">
-                <table id="priceTable">
-                    <thead id="tableHead"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-            
-            <!-- CONTROLES DE PAGINACIÓN -->
-            <div class="pagination" id="paginationControls" style="display:none;">
-                <button class="page-btn" onclick="prevPage()">Anterior</button>
-                <span class="page-info" id="pageInfo">1 / 1</span>
-                <button class="page-btn" onclick="nextPage()">Siguiente</button>
-            </div>
-            
-            <div id="emptyState" style="text-align:center; padding:60px 20px; color:#555; display:none;">
-                No se encontraron productos con ese nombre.
-            </div>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="app-footer">
-        Desarrollado por <a href="#" target="_blank">Facundo Tomasella</a>
-    </footer>
+    <nav class="bottom-nav">
+        <!-- Íconos de FontAwesome -->
+        <button class="nav-item active" onclick="filterCat('Todo', this)">
+            <i class="fa-solid fa-globe"></i> Mercado
+        </button>
+        <button class="nav-item" onclick="filterCat('Carniceria', this)">
+            <i class="fa-solid fa-drumstick-bite"></i> Carne
+        </button>
+        <button class="nav-item" onclick="filterCat('Almacen', this)">
+            <i class="fa-solid fa-box-open"></i> Almacén
+        </button>
+        <button class="nav-item" onclick="filterCat('Verduleria', this)">
+            <i class="fa-solid fa-carrot"></i> Verdu
+        </button>
+        <button class="nav-item" onclick="filterCat('Mascotas', this)">
+            <i class="fa-solid fa-paw"></i> Mascotas
+        </button>
+    </nav>
 
     <script>
         // ==========================================
-        // 1. CONFIGURACIÓN (NO TOCAR SI YA FUNCIONA)
+        // 1. DATA SOURCE
         // ==========================================
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
+        
+        // Mapeo para normalizar nombres de categorías del JSON a filtros
+        const CAT_MAP = {
+            "Carniceria": "Carniceria",
+            "Verduleria": "Verduleria",
+            "Fiambres y Lacteos": "Fiambres",
+            "Higuiene": "Higiene",
+            "Almacen": "Almacen",
+            "Dietetica": "Dietetica",
+            "Mascotas": "Mascotas"
+        };
 
-        const CATEGORIAS = [
-            "Carniceria", "Verduleria", "Fiambres y Lacteos", 
-            "Higuiene", "Almacen", "Dietetica", "Mascotas"
+        const SUPPLIERS = [
+            { id: 0, name: "COTO", color: "#ff5252" },
+            { id: 1, name: "CARREFOUR", color: "#448aff" },
+            { id: 2, name: "DIA", color: "#ff5252" },
+            { id: 3, name: "JUMBO", color: "#69f0ae" },
+            { id: 4, name: "EXTRA", color: "#ffab40" }
         ];
 
-        // Definimos los nombres y colores para la vista Oscura
-        const COLUMNAS = [
-            { id: 0, name: "Coto", color: "var(--coto)" },
-            { id: 1, name: "Carrefour", color: "var(--carr)" },
-            { id: 2, name: "Día", color: "var(--dia)" },
-            { id: 3, name: "Jumbo", color: "var(--jumbo)" },
-            { id: 4, name: "Extra", color: "var(--extra)" }
-        ];
-
-        // ESTADO
-        let DB = {};            
-        let currentList = [];   
-        let currentPage = 1;    
-        const ITEMS_PER_PAGE = 10; 
+        let DB = {}; // Almacenamiento crudo
+        let flatList = []; // Lista plana para búsqueda global
 
         // ==========================================
         // 2. INICIALIZACIÓN
         // ==========================================
         async function init() {
-            const loader = document.getElementById('loader');
-            const tabs = document.getElementById('tabsContainer');
-            
-            loader.style.display = 'block';
-
             try {
-                // Descarga única del JSON
                 const response = await fetch(DATA_URL + '?t=' + Date.now());
-                if (!response.ok) throw new Error("Error cargando datos");
+                if (!response.ok) throw new Error("Error fetching data");
                 DB = await response.json();
-
-                loader.style.display = 'none';
-
-                // Generar Pestañas
-                tabs.innerHTML = '';
-                CATEGORIAS.forEach((cat, index) => {
-                    const btn = document.createElement('button');
-                    btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
-                    
-                    // Limpieza de nombre para mostrar (Quitar acentos si el JSON viene sin ellos pero mostrar con)
-                    let displayName = cat;
-                    if(cat.includes("Higuiene")) displayName = "Higiene"; // Corrección visual
-                    if(cat.includes("Lacteos")) displayName = "Lácteos";
-
-                    btn.innerText = displayName;
-                    btn.onclick = () => {
-                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        // Resetear búsqueda
-                        document.getElementById('searchInput').value = '';
-                        loadCategory(cat);
-                    };
-                    tabs.appendChild(btn);
+                
+                // Aplanar la base de datos para lista general
+                // El JSON viene por categorías { "Carniceria": [...], "Almacen": [...] }
+                Object.keys(DB).forEach(cat => {
+                    DB[cat].forEach(item => {
+                        // Agregamos la categoría al objeto del producto
+                        item.category = cat; 
+                        // Generar "Ticker" (Ej: Suprema Pollo -> SUPO)
+                        item.ticker = generateTicker(item.n);
+                        flatList.push(item);
+                    });
                 });
 
-                // Cargar primera categoría
-                loadCategory(CATEGORIAS[0]);
+                // Mezclar un poco la lista inicial para que no sea todo carne
+                flatList.sort(() => Math.random() - 0.5);
+
+                document.getElementById('loader').style.display = 'none';
+                renderList(flatList);
 
             } catch (error) {
                 console.error(error);
-                loader.innerHTML = '<div style="color:#ef5350">Error de conexión. Verifica el script de Google.</div>';
+                document.getElementById('loader').innerText = "MERCADO CERRADO (ERROR DE DATOS)";
             }
         }
 
-        function loadCategory(catName) {
-            // Obtener datos crudos
-            const rawData = DB[catName] || [];
-            currentList = rawData; 
-            currentPage = 1;       
-            renderPage();
-        }
-
         // ==========================================
-        // 3. RENDERIZADO Y PAGINACIÓN
+        // 3. RENDERIZADO TIPO TRADING
         // ==========================================
-        function renderPage() {
-            const thead = document.getElementById('tableHead');
-            const tbody = document.getElementById('tableBody');
-            const pagination = document.getElementById('paginationControls');
-            const emptyState = document.getElementById('emptyState');
+        function renderList(data) {
+            const container = document.getElementById('marketList');
+            container.innerHTML = '';
 
-            // 1. Encabezados Fijos
-            let headHtml = `<tr><th>PRODUCTO</th>`;
-            COLUMNAS.forEach(col => {
-                headHtml += `<th style="color:${col.color}">${col.name}</th>`;
-            });
-            headHtml += `</tr>`;
-            thead.innerHTML = headHtml;
-
-            // 2. Cálculos Paginación
-            const totalItems = currentList.length;
-            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-            
-            if (currentPage < 1) currentPage = 1;
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-
-            const start = (currentPage - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-            const itemsToShow = currentList.slice(start, end);
-
-            // 3. Renderizar Filas
-            tbody.innerHTML = '';
-            
-            if (itemsToShow.length === 0) {
-                emptyState.style.display = 'block';
-                pagination.style.display = 'none';
-                // En modo vacío, ocultamos la tabla también para que quede limpio
-                thead.style.display = 'none';
-                return;
-            } else {
-                emptyState.style.display = 'none';
-                pagination.style.display = 'flex';
-                thead.style.display = 'table-header-group';
-            }
-
-            const fragment = document.createDocumentFragment();
-
-            itemsToShow.forEach(item => {
-                const tr = document.createElement('tr');
+            data.forEach((product, index) => {
+                // Calcular estadísticas de mercado para este producto
+                const stats = calculateStats(product.p);
                 
-                // Nombre
-                let html = `<td>${item.n}</td>`;
+                if (stats.minPrice === 0) return; // No mostrar si no hay stock en ningún lado
 
-                // Calcular Mínimo
-                let minPrice = Infinity;
-                item.p.forEach(p => {
-                    if (p > 0 && p < minPrice) minPrice = p;
-                });
-
-                // Celdas Precios
-                item.p.forEach(price => {
-                    if (price > 0) {
-                        if (price === minPrice) {
-                            html += `<td><span class="winner">$${formatNumber(price)}</span></td>`;
-                        } else {
-                            html += `<td><span class="price-cell">$${formatNumber(price)}</span></td>`;
-                        }
-                    } else {
-                        html += `<td><span class="no-stock">-</span></td>`;
-                    }
-                });
-
-                tr.innerHTML = html;
-                fragment.appendChild(tr);
+                const div = document.createElement('div');
+                div.className = 'ticker-container';
+                
+                // HTML DE LA TARJETA
+                div.innerHTML = `
+                    <div class="ticker-card" onclick="toggleDetail('detail-${index}')">
+                        <div class="ticker-summary">
+                            <div class="ticker-info">
+                                <div class="ticker-symbol">${product.ticker}</div>
+                                <div class="ticker-name-col">
+                                    <div class="ticker-name">${product.n}</div>
+                                    <div class="ticker-cat">${product.category} • ${stats.bestProvider}</div>
+                                </div>
+                            </div>
+                            <div class="ticker-price-col">
+                                <span class="last-price">$${formatNum(stats.minPrice)}</span>
+                                <span class="change-pill ${stats.trendClass}">
+                                    ${stats.trendIcon} ${stats.spread}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DETALLE OCULTO (ACORDEÓN) -->
+                    <div id="detail-${index}" class="order-book">
+                        <div class="ob-header">
+                            <span>Exchange</span>
+                            <span>Precio</span>
+                        </div>
+                        ${renderOrderBook(product.p, stats.minPrice)}
+                    </div>
+                `;
+                container.appendChild(div);
             });
-
-            tbody.appendChild(fragment);
-
-            // 4. Actualizar Controles
-            document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages || 1}`;
-            document.querySelectorAll('.page-btn')[0].disabled = (currentPage === 1);
-            document.querySelectorAll('.page-btn')[1].disabled = (currentPage === totalPages || totalPages === 0);
         }
 
-        // Funciones Navegación
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage();
-                // Scroll suave arriba
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
+        // Generar las filas de los proveedores (Detalle)
+        function renderOrderBook(prices, bestPrice) {
+            let html = '';
+            prices.forEach((price, idx) => {
+                const supplier = SUPPLIERS[idx];
+                let priceClass = "ob-price";
+                let displayPrice = `$${formatNum(price)}`;
+                let dotColor = "#444";
 
-        function nextPage() {
-            const totalPages = Math.ceil(currentList.length / ITEMS_PER_PAGE);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderPage();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+                if (price === 0) {
+                    priceClass += " no-stock";
+                    displayPrice = "SIN STOCK";
+                } else if (price === bestPrice) {
+                    priceClass += " best";
+                    dotColor = varCss('--bull-green'); // Verde
+                } else {
+                    priceClass += " bad";
+                    dotColor = supplier.color;
+                }
+
+                html += `
+                    <div class="ob-row">
+                        <div class="ob-market">
+                            <div class="dot" style="background:${supplier.color}"></div>
+                            ${supplier.name}
+                        </div>
+                        <div class="${priceClass}">${displayPrice}</div>
+                    </div>
+                `;
+            });
+            return html;
         }
 
         // ==========================================
-        // 4. BUSCADOR
+        // 4. LÓGICA FINANCIERA (Simulada)
         // ==========================================
+        function calculateStats(pricesArray) {
+            // Filtrar precios válidos (>0)
+            const validPrices = pricesArray.filter(p => p > 0);
+            
+            if (validPrices.length === 0) return { minPrice: 0 };
+
+            const minPrice = Math.min(...validPrices);
+            const maxPrice = Math.max(...validPrices);
+            const avgPrice = validPrices.reduce((a, b) => a + b, 0) / validPrices.length;
+
+            // Encontrar quién tiene el mejor precio
+            const bestIdx = pricesArray.indexOf(minPrice);
+            const bestProvider = bestIdx >= 0 ? SUPPLIERS[bestIdx].name : "MERCADO";
+
+            // CALCULAR "SPREAD" o OPORTUNIDAD
+            // Si el precio mínimo es mucho menor al promedio, es una "Bajada" (Bueno para comprar)
+            // Usamos lógica inversa al trading: Precio Bajo = Bullish (Verde)
+            
+            let diffPercent = ((avgPrice - minPrice) / avgPrice) * 100;
+            
+            let trendClass = "change-up"; // Verde por defecto (Ahorro)
+            let trendIcon = "▼"; // Flecha abajo (Precio bajó respecto al promedio)
+            
+            // Si la diferencia es muy chica (< 2%), es neutral/rojo
+            if (diffPercent < 2) {
+                trendClass = "change-down";
+                trendIcon = "▶";
+            }
+
+            return {
+                minPrice,
+                spread: diffPercent.toFixed(2),
+                trendClass,
+                trendIcon,
+                bestProvider
+            };
+        }
+
+        // ==========================================
+        // 5. INTERACTIVIDAD
+        // ==========================================
+        
+        // Acordeón
+        function toggleDetail(id) {
+            const el = document.getElementById(id);
+            // Cerrar otros (opcional, para sentirlo más app)
+            document.querySelectorAll('.order-book.open').forEach(ob => {
+                if (ob.id !== id) ob.classList.remove('open');
+            });
+            el.classList.toggle('open');
+        }
+
+        // Filtros Categoría (Nav Inferior)
+        function filterCat(catKeyword, btnElement) {
+            // UI Botones
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            // Resetear búsqueda
+            document.getElementById('searchInput').value = "";
+
+            if (catKeyword === 'Todo') {
+                renderList(flatList);
+                return;
+            }
+
+            // Filtrar usando el nombre de la hoja en el JSON
+            // Buscamos coincidencia parcial en el nombre de la categoría del item
+            const filtered = flatList.filter(item => item.category.includes(catKeyword));
+            renderList(filtered);
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Buscador
         document.getElementById('searchInput').addEventListener('keyup', (e) => {
-            const term = e.target.value.toLowerCase();
+            const term = e.target.value.toUpperCase();
             
-            // Buscar la categoría activa
-            const activeBtn = document.querySelector('.tab-btn.active');
-            let catName = CATEGORIAS[0];
-            
-            // Truco para matchear nombre visual con nombre real (por si cambiamos Higuiene por Higiene)
-            if (activeBtn) {
-                const visualName = activeBtn.innerText;
-                // Mapeo inverso simple o búsqueda directa
-                const found = CATEGORIAS.find(c => visualName.includes(c) || (c === "Higuiene" && visualName === "Higiene"));
-                if(found) catName = found;
-            }
-
-            const rawData = DB[catName] || [];
-
-            if (term === "") {
-                currentList = rawData;
-            } else {
-                currentList = rawData.filter(item => item.n.toLowerCase().includes(term));
-            }
-
-            currentPage = 1; 
-            renderPage();
+            // Filtrar sobre la lista plana global
+            const filtered = flatList.filter(item => 
+                item.n.toUpperCase().includes(term) || 
+                item.ticker.includes(term)
+            );
+            renderList(filtered);
         });
 
-        function formatNumber(num) {
-            return new Intl.NumberFormat('es-AR', { minimumFractionDigits: 0 }).format(num);
+        // Cambio de Tema
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('warm-mode');
+            
+            if (body.classList.contains('warm-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
         }
 
+        // Helpers
+        function generateTicker(name) {
+            // Genera algo como "ACEITE" -> "ACT" o primeras 4 letras
+            // Quitar palabras comunes
+            const clean = name.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML/g, "").trim();
+            return clean.substring(0, 4).replace(/\s/g, "");
+        }
+
+        function formatNum(num) {
+            return new Intl.NumberFormat('es-AR', { minimumFractionDigits: 0 }).format(num);
+        }
+        
+        // Helper para leer variables CSS desde JS (solo para el color verde exacto)
+        function varCss(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // Start
         init();
+
     </script>
 </body>
 </html>
-
