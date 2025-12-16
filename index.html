@@ -4,170 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0d0d0d">
-    
-    <!-- Evitar caché -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-
     <title>Precios.App</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
     <style>
         :root {
-            /* MODO OSCURO (Default) */
-            --bg-app: #0d0d0d;
-            --bg-card: #161616;
-            --bg-nav: #1a1a1a;
-            --text-main: #e0e0e0;
-            --text-muted: #6b6b6b;
-            --border: #2a2a2a;
-            --accent: #ff3b30; 
-            
-            /* COLORES TRADING (Estricto) */
-            --bull-green: #00ff88; /* Subida */
-            --bear-red: #ff3b30;   /* Bajada */
-            --star-gold: #ffcc00;
+            --bg-app: #0d0d0d; --bg-card: #161616; --bg-nav: #1a1a1a;
+            --text-main: #e0e0e0; --text-muted: #6b6b6b; --border: #2a2a2a;
+            --accent: #ff3b30; --bull-green: #00ff88; --bear-red: #ff3b30; --star-gold: #ffcc00;
         }
-
         body.warm-mode {
-            /* MODO CÁLIDO */
-            --bg-app: #f5f5f0;
-            --bg-card: #ffffff;
-            --bg-nav: #ebebeb;
-            --text-main: #333333;
-            --text-muted: #888888;
-            --border: #dcdcdc;
-            --accent: #d32f2f;
-            
-            --bull-green: #008000;
-            --bear-red: #d32f2f;
+            --bg-app: #f5f5f0; --bg-card: #ffffff; --bg-nav: #ebebeb;
+            --text-main: #333333; --text-muted: #888888; --border: #dcdcdc; --accent: #d32f2f;
+            --bull-green: #008000; --bear-red: #d32f2f;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background-color: var(--bg-app); color: var(--text-main); 
-            font-family: 'Inter', sans-serif; padding-bottom: 90px; 
-            transition: background 0.3s;
-        }
-
-        /* HEADER */
-        header {
-            position: sticky; top: 0; z-index: 50;
-            background: rgba(13,13,13,0.95); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border); padding: 10px 15px;
-        }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s; }
+        header { position: sticky; top: 0; z-index: 50; background: rgba(13,13,13,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 10px 15px; }
         body.warm-mode header { background: rgba(245,245,240,0.95); }
-
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .logo { font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px; }
         .logo i { color: var(--accent); }
-        
         .theme-btn { background: none; border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
-
-        /* BUSCADOR */
-        #searchInput {
-            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
-            color: var(--text-main); padding: 12px 12px 12px 40px; border-radius: 8px;
-            font-size: 14px; font-family: 'Roboto Mono', monospace; text-transform: uppercase;
-        }
-        .search-container { position: relative; }
+        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 40px; border-radius: 8px; font-size: 14px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-        /* LISTA TICKERS */
-        .ticker-list { padding: 0; }
-
-        .ticker-card {
-            border-bottom: 1px solid var(--border);
-            cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            position: relative;
-        }
+        .search-container { position: relative; }
         
-        .ticker-info {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-right: 15px;
-        }
-
-        .t-left { display: flex; flex-direction: column; }
+        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 15px; }
+        .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
         .t-symbol { font-family: 'Roboto Mono'; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
         .t-name { font-size: 12px; color: var(--text-muted); max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
-        
-        /* ESTILOS DE TENDENCIA (TRADING REAL) */
-        .trend-up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); } /* Verde: Flecha Arriba */
-        .trend-down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }   /* Rojo: Flecha Abajo */
-
-        /* ESTRELLA (DERECHA) */
-        .fav-btn {
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: flex-end;
-            font-size: 18px; color: var(--border);
-            z-index: 10;
-            transition: 0.2s;
-        }
+        .up { color: var(--bull-green); background: rgba(0, 255, 136, 0.1); }
+        .down { color: var(--bear-red); background: rgba(255, 59, 48, 0.1); }
+        .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 18px; color: var(--border); z-index: 10; transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
-
-        /* DETALLE (ORDER BOOK) */
+        
         .order-book { display: none; background: var(--bg-card); padding: 10px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: fadeIn 0.2s; }
-        
         .ob-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
         .ob-row:last-child { border: none; }
         .ob-store { font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; }
         .ob-val { font-family: 'Roboto Mono'; }
-        
-        .best-val { color: var(--bull-green); font-weight: 700; } 
+        .best-val { color: var(--bull-green); font-weight: 700; }
         .no-price { color: var(--text-muted); font-style: italic; opacity: 0.7; }
-
-        /* FOOTER */
-        .app-footer {
-            text-align: center; padding: 20px; font-size: 11px; 
-            color: var(--text-muted); border-top: 1px solid var(--border);
-            background: var(--bg-app); margin-bottom: 60px; /* Para que no lo tape el nav */
-        }
-        .app-footer a { color: var(--accent); text-decoration: none; font-weight: 700; }
-
-        /* NAVBAR INFERIOR */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: var(--bg-nav); border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; padding: 10px 0;
-            z-index: 100; backdrop-filter: blur(10px);
-        }
         
-        .nav-item {
-            background: none; border: none; color: var(--text-muted);
-            display: flex; flex-direction: column; align-items: center;
-            font-size: 10px; gap: 4px; cursor: pointer; width: 25%;
-        }
+        .app-footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--bg-app); margin-bottom: 60px; }
+        .app-footer a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 4px; cursor: pointer; width: 25%; }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 700; }
         .nav-item.active i { color: var(--accent); }
-
-        /* ESTADOS VACIOS */
+        
         .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 14px; }
         .loader { text-align: center; padding: 40px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
     </style>
 </head>
 <body>
-
     <header>
         <div class="top-row">
             <div class="logo"><i class="fa-solid fa-chart-simple"></i> PRECIOS.APP</div>
@@ -179,35 +81,21 @@
         </div>
     </header>
 
-    <div id="loader">CONECTANDO A MERCADO...</div>
-
+    <div id="loader">CARGANDO MERCADO...</div>
     <div class="ticker-list" id="tickerList"></div>
 
-    <!-- FOOTER PERMANENTE -->
     <footer class="app-footer">
         Desarrollado por <a href="#" target="_blank">Facundo Tomasella</a>
     </footer>
 
     <nav class="bottom-nav">
-        <!-- ORDEN: Carnes, Verdu, Varios, Favoritos -->
-        <button class="nav-item active" onclick="setTab('carnes', this)">
-            <i class="fa-solid fa-drumstick-bite"></i> Carnes
-        </button>
-        <button class="nav-item" onclick="setTab('verdu', this)">
-            <i class="fa-solid fa-carrot"></i> Verdu
-        </button>
-        <button class="nav-item" onclick="setTab('varios', this)">
-            <i class="fa-solid fa-layer-group"></i> Varios
-        </button>
-        <button class="nav-item" onclick="setTab('favs', this)">
-            <i class="fa-solid fa-star"></i> Favoritos
-        </button>
+        <button class="nav-item active" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
+        <button class="nav-item" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
+        <button class="nav-item" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
+        <button class="nav-item" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
     </nav>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURACIÓN
-        // ==========================================
         const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
         
         const GROUPS = {
@@ -216,26 +104,22 @@
             'varios': ['Almacen', 'Higuiene', 'Fiambres y Lacteos', 'Dietetica', 'Mascotas']
         };
 
+        // QUITADO "EXTRA". Solo mostramos los 4 principales visualmente.
+        // Si hay un precio en la columna 5 del JSON (indice 4), no se mostrará como columna con nombre
+        // PERO se usará para el cálculo del mínimo.
         const STORES = [
             { id: 0, name: "COTO", color: "#f44336" },
             { id: 1, name: "CARREFOUR", color: "#2196f3" },
             { id: 2, name: "DIA", color: "#f44336" },
-            { id: 3, name: "JUMBO", color: "#4caf50" },
+            { id: 3, name: "JUMBO", color: "#4caf50" }
         ];
 
-        let DB = {};
-        let flatList = [];
-        let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [];
-        let currentTab = 'carnes'; 
+        let DB = {}, flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes';
 
-        // ==========================================
-        // 2. INICIALIZACIÓN
-        // ==========================================
         async function init() {
             try {
                 const res = await fetch(DATA_URL + '?t=' + Date.now());
                 DB = await res.json();
-                
                 Object.keys(DB).forEach(cat => {
                     DB[cat].forEach((item, idx) => {
                         item.cat = cat;
@@ -244,33 +128,23 @@
                         flatList.push(item);
                     });
                 });
-
                 document.getElementById('loader').style.display = 'none';
                 renderView();
-
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerText = "SIN DATOS";
+                document.getElementById('loader').innerText = "ERROR DE CONEXIÓN";
             }
         }
 
-        // ==========================================
-        // 3. RENDERIZADO
-        // ==========================================
         function renderView() {
             const container = document.getElementById('tickerList');
             const term = document.getElementById('searchInput').value.toUpperCase();
-            
             container.innerHTML = '';
-
             let dataToShow = [];
 
             if (currentTab === 'favs') {
                 if (favorites.length === 0) {
-                    container.innerHTML = `<div class="empty-state">
-                        <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br>
-                        Agrega productos a tu Watchlist.
-                    </div>`;
+                    container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px;"></i><br>Agrega productos a tu Watchlist.</div>`;
                     return;
                 }
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
@@ -279,21 +153,13 @@
                 dataToShow = flatList.filter(i => allowedCats.includes(i.cat));
             }
 
-            if (term) {
-                dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            }
-
+            if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             const limit = term ? 50 : 20; 
-            
-            if (dataToShow.length === 0) {
-                container.innerHTML = '<div class="empty-state">Sin activos en esta categoría.</div>';
-                return;
-            }
+            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos.</div>'; return; }
 
             dataToShow.slice(0, limit).forEach(item => {
                 const stats = getStats(item.p);
                 if (stats.min === 0) return; 
-
                 const isFav = favorites.includes(item.id);
                 const starClass = isFav ? 'active' : '';
                 const starIcon = isFav ? 'fa-solid fa-star' : 'fa-regular fa-star';
@@ -302,22 +168,12 @@
                 card.innerHTML = `
                     <div class="ticker-card">
                         <div class="ticker-info" onclick="toggleDetail('${item.id}')">
-                            <div class="t-left">
-                                <span class="t-symbol">${item.ticker}</span>
-                                <span class="t-name">${item.n}</span>
-                            </div>
-                            <div class="t-right">
-                                <span class="t-price">$${format(stats.min)}</span><br>
-                                <span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span>
-                            </div>
+                            <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
+                            <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
                         </div>
-                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)">
-                            <i class="${starIcon}"></i>
-                        </div>
+                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)"><i class="${starIcon}"></i></div>
                     </div>
-                    <div id="detail-${item.id}" class="order-book">
-                        ${renderOrderBook(item.p, stats.min)}
-                    </div>
+                    <div id="detail-${item.id}" class="order-book">${renderOrderBook(item.p, stats.min)}</div>
                 `;
                 container.appendChild(card);
             });
@@ -325,93 +181,54 @@
 
         function renderOrderBook(prices, best) {
             let html = '';
-            prices.forEach((p, i) => {
-                const store = STORES[i];
+            // Iteramos solo los primeros 4 precios (Supermercados)
+            // Si quieres mostrar la Dietética/Alternativo, hay que agregar un STORE más.
+            // Por ahora solo muestro los 4 Big Players.
+            STORES.forEach((store, i) => {
+                const p = prices[i]; // El índice del precio coincide con el índice del store
                 let val = `$${format(p)}`;
                 let styleClass = "ob-val";
                 let dotColor = store.color;
-
-                if (p === 0) { 
-                    val = "SIN PRECIO"; 
-                    styleClass += " no-price"; 
-                    dotColor = "#333"; 
-                }
-                else if (p === best) { 
-                    styleClass += " best-val"; 
-                    dotColor = "#00ff88"; 
-                }
-
-                html += `
-                    <div class="ob-row">
-                        <div class="ob-store"><div class="dot" style="background:${dotColor}"></div> ${store.name}</div>
-                        <div class="${styleClass}">${val}</div>
-                    </div>
-                `;
+                if (!p || p === 0) { val = "SIN PRECIO"; styleClass += " no-price"; dotColor = "#333"; }
+                else if (p === best) { styleClass += " best-val"; dotColor = "#00ff88"; }
+                html += `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${dotColor}"></div> ${store.name}</div><div class="${styleClass}">${val}</div></div>`;
             });
+            // Si hay un 5to precio (Alternativo) y tiene valor, lo mostramos como "OTRO"
+            if(prices[4] > 0) {
+                 let val = `$${format(prices[4])}`;
+                 let styleClass = "ob-val";
+                 if(prices[4] === best) styleClass += " best-val";
+                 html += `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:#ff9800"></div> ALTERNATIVO</div><div class="${styleClass}">${val}</div></div>`;
+            }
             return html;
         }
 
-        // ==========================================
-        // 4. LÓGICA DE NEGOCIO (ESTILO ACCIONES)
-        // ==========================================
-        
         function getStats(prices) {
+            // Filtramos todos los precios válidos (incluido el alternativo)
             const valid = prices.filter(p => p > 0);
             if (valid.length === 0) return { min: 0 };
-
             const min = Math.min(...valid);
             const avg = valid.reduce((a,b)=>a+b,0) / valid.length;
-            
-            // Calculamos Diferencia: (Actual - Promedio) / Promedio
-            // Ejemplo: Min 80, Prom 100 -> -20% (Abajo)
-            // Ejemplo: Min 120, Prom 100 -> +20% (Arriba)
             let diff = ((min - avg) / avg) * 100;
             
-            // LÓGICA TRADING ESTRICTA
-            // Flecha Arriba = Precio más alto que el promedio = VERDE
-            // Flecha Abajo = Precio más bajo que el promedio = ROJO
-            // (Si el precio baja es "Bearish" = Rojo)
-            
+            // LOGICA BURSÁTIL:
+            // Precio Alto (Mayor al promedio) -> VERDE (Up)
+            // Precio Bajo (Menor al promedio) -> ROJO (Down)
             let trendClass = "";
             let icon = "";
-
             if (diff >= 0) {
-                // Precio ARRIBA (Mayor al promedio) -> VERDE
-                trendClass = "trend-up";
-                icon = "▲";
-                // Agregamos el + si es positivo
-                diff = Math.abs(diff); 
+                trendClass = "up"; icon = "▲"; // Subió
             } else {
-                // Precio ABAJO (Menor al promedio) -> ROJO
-                trendClass = "trend-down";
-                icon = "▼";
-                // Quitamos el menos para mostrar solo el número con la flecha
-                diff = Math.abs(diff); 
+                trendClass = "down"; icon = "▼"; // Bajó
             }
-
-            // Nota: En trading, Verde suele ser Subida y Rojo Bajada.
-            // Si el precio es barato (bajó), acá se verá ROJO con flecha ABAJO.
-            // Tal como pediste.
-
-            return { min, spread: diff.toFixed(1), trendClass, icon };
+            return { min, spread: Math.abs(diff).toFixed(2), trendClass, icon };
         }
 
         function toggleFav(id, btn) {
-            btn.style.transform = "scale(1.2)";
-            setTimeout(() => btn.style.transform = "scale(1)", 200);
-
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(f => f !== id);
-                btn.classList.remove('active');
-                btn.innerHTML = '<i class="fa-regular fa-star"></i>';
-            } else {
-                favorites.push(id);
-                btn.classList.add('active');
-                btn.innerHTML = '<i class="fa-solid fa-star"></i>';
-            }
-            
+            btn.style.transform = "scale(1.2)"; setTimeout(() => btn.style.transform = "scale(1)", 200);
+            if (favorites.includes(id)) { favorites = favorites.filter(f => f !== id); btn.classList.remove('active'); btn.innerHTML = '<i class="fa-regular fa-star"></i>'; }
+            else { favorites.push(id); btn.classList.add('active'); btn.innerHTML = '<i class="fa-solid fa-star"></i>'; }
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
-            
             if (currentTab === 'favs') renderView();
         }
 
@@ -419,46 +236,26 @@
             currentTab = tabName;
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            window.scrollTo(0,0);
-            document.getElementById('searchInput').value = '';
-            renderView();
+            window.scrollTo(0,0); document.getElementById('searchInput').value = ''; renderView();
         }
 
         function toggleDetail(id) {
             const el = document.getElementById(`detail-${id}`);
-            document.querySelectorAll('.order-book.open').forEach(ob => {
-                if (ob.id !== `detail-${id}`) ob.classList.remove('open');
-            });
+            document.querySelectorAll('.order-book.open').forEach(ob => { if (ob.id !== `detail-${id}`) ob.classList.remove('open'); });
             el.classList.toggle('open');
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('warm-mode');
-        }
-
-        // ==========================================
-        // 5. UTILIDADES
-        // ==========================================
+        function toggleTheme() { document.body.classList.toggle('warm-mode'); }
         function generateID(cat, idx) { return `${cat.substring(0,3)}-${idx}`; }
-
         function generateTicker(name) {
             const clean = name.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, " ");
             const parts = clean.split(" ").filter(w => w.length > 2);
             if (parts.length >= 2) return (parts[0].substring(0,2) + parts[1].substring(0,2));
             return clean.substring(0, 4);
         }
-
-        function format(num) {
-            return new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(num);
-        }
-
+        function format(num) { return new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(num); }
         document.getElementById('searchInput').addEventListener('keyup', renderView);
-
-        // Arrancar
         init();
-
     </script>
 </body>
 </html>
-
-
