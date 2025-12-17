@@ -412,7 +412,7 @@
             }
 
             const limit = term ? 50 : 20; 
-            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos.</div>'; return; }
+            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin Productos.</div>'; return; }
 
             dataToShow.slice(0, limit).forEach(item => {
                 const stats = getStats(item.p, item.h);
@@ -582,3 +582,4 @@
     </script>
 </body>
 </html>
+
