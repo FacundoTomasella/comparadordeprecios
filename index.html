@@ -29,14 +29,14 @@
             --text-muted: #787b86;
             --border: #e0e3eb;
             
-            /* ACENTO AMARILLO */
-            --accent: #ffcf00; 
-            --accent-text: #000000;
+            --accent: #2962ff; 
             
             /* LÓGICA PRECIOS */
-            --color-good: #00a650;   
-            --color-bad: #f23645;    
+            --color-good: #00a650;   /* Verde Ahorro */
+            --color-bad: #f23645;    /* Rojo Gasto */
             --star-gold: #f2a900;
+            
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         body.dark-mode {
@@ -47,6 +47,8 @@
             --text-main: #ffffff;
             --text-muted: #888888;
             --border: #2a2a2a;
+            
+            --shadow: none;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -59,8 +61,11 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
+        /* CONTENEDOR CENTRAL */
         .app-container {
-            width: 100%; max-width: 600px; min-height: 100vh;
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
             background: var(--bg-app);
             border-left: 1px solid var(--border);
             border-right: 1px solid var(--border);
@@ -84,8 +89,8 @@
         
         .logo-icon { 
             position: relative; display: flex; align-items: center; justify-content: center;
-            width: 36px; height: 36px; background: var(--accent); 
-            border-radius: 8px; color: var(--accent-text);
+            width: 36px; height: 36px; background: rgba(41, 98, 255, 0.1); 
+            border-radius: 8px; color: var(--accent); 
         }
         .logo-icon .fa-cart-shopping { font-size: 16px; transform: translateX(-2px); }
         .candle-stick {
@@ -110,10 +115,10 @@
             font-size: 15px; font-family: 'Inter', sans-serif;
             transition: border-color 0.2s;
         }
-        #searchInput:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.2); }
+        #searchInput:focus { border-color: var(--accent); outline: none; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        /* FILTROS DE TENDENCIA (MEJORADOS) */
+        /* FILTROS DE TENDENCIA (VISIBLES SIEMPRE) */
         .trend-filters {
             display: flex; gap: 10px; margin-top: 12px;
         }
@@ -122,26 +127,25 @@
             padding: 10px; border-radius: 8px; 
             border: 1px solid var(--border);
             background: var(--bg-card); 
-            color: var(--text-main); /* Texto oscuro/claro según tema */
+            color: var(--text-main); /* Texto visible siempre */
             font-size: 13px; font-weight: 700; /* Negrita */
             cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             transition: 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
-        .trend-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .trend-btn:hover { background: var(--bg-app); transform: translateY(-1px); }
         
-        /* Íconos siempre con color para resaltar */
-        .trend-btn .fa-arrow-trend-down { color: var(--color-good); font-size: 14px; }
-        .trend-btn .fa-arrow-trend-up { color: var(--color-bad); font-size: 14px; }
+        /* ICONOS SIEMPRE CON COLOR */
+        #btnDown i { color: var(--color-good); font-size: 15px; } /* Flecha Verde */
+        #btnUp i { color: var(--color-bad); font-size: 15px; }   /* Flecha Roja */
 
-        /* Estado Activo Bajando */
+        /* Estados Activos */
         .trend-btn.active-down {
-            background: rgba(0, 166, 80, 0.1); border-color: var(--color-good); color: var(--color-good);
+            background: rgba(0, 166, 80, 0.1); border-color: var(--color-good);
         }
-        /* Estado Activo Subiendo */
         .trend-btn.active-up {
-            background: rgba(242, 54, 69, 0.1); border-color: var(--color-bad); color: var(--color-bad);
+            background: rgba(242, 54, 69, 0.1); border-color: var(--color-bad);
         }
 
         /* LISTA TICKERS */
@@ -168,6 +172,7 @@
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         
+        /* CAMBIOS DE PRECIO */
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         .trend-up { color: white; background: var(--color-bad); }   
         .trend-down { color: white; background: var(--color-good); } 
@@ -203,6 +208,7 @@
         .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); cursor: default; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         
+        /* PRECIO LINK */
         .price-link { 
             text-decoration: none; color: var(--text-main); 
             font-family: 'Roboto Mono'; font-size: 15px; 
@@ -233,6 +239,9 @@
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
             background: rgba(41,98,255,0.05); padding: 4px 8px; border-radius: 4px;
         }
+        /* Color footer dinámico */
+        body.dark-mode .dev-link { color: #448aff; } 
+        body:not(.dark-mode) .dev-link { color: #2962ff; }
 
         /* NAVBAR */
         .bottom-nav {
@@ -249,7 +258,7 @@
         }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
-        .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; filter: drop-shadow(0 2px 4px rgba(41, 98, 255, 0.3)); }
+        .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; }
 
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; letter-spacing: 1px; }
@@ -283,7 +292,7 @@
                 <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
             </div>
 
-            <!-- FILTROS DE TENDENCIA MEJORADOS -->
+            <!-- FILTROS DE TENDENCIA RESALTADOS -->
             <div class="trend-filters">
                 <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')">
                     <i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando
@@ -299,7 +308,7 @@
         <div class="ticker-list" id="tickerList"></div>
 
         <footer class="app-footer">
-            Desarrollado por <a href="https://github.com/FacundoTomasella" target="_blank" class="dev-link">Facundo Tomasella</a>
+            Desarrollado por <a href="https://github.com/FacundoTomasella" class="dev-link" target="_blank">Facundo Tomasella</a>
         </footer>
 
         <nav class="bottom-nav">
@@ -360,7 +369,8 @@
                 
                 document.getElementById('loader').style.display = 'none';
                 renderView();
-                // FIX: Force scroll top on load
+                
+                // SCROLL AL INICIO PARA EVITAR QUE SE VEA CORTADO
                 window.scrollTo(0, 0);
 
             } catch (e) {
@@ -373,6 +383,7 @@
             const btnUp = document.getElementById('btnUp');
             const btnDown = document.getElementById('btnDown');
             
+            // Toggle
             if (currentTrendFilter === type) {
                 currentTrendFilter = null;
                 btnUp.classList.remove('active-up');
@@ -412,6 +423,7 @@
 
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
 
+            // APLICAR FILTRO DE TENDENCIA
             if (currentTrendFilter) {
                 dataToShow = dataToShow.filter(item => {
                     const stats = getStats(item.p, item.h);
@@ -465,12 +477,11 @@
                 const p = prices[i];
                 let rawLink = (links && links[i]) ? links[i] : "";
                 
-                // Redirección Inteligente
                 let targetUrl = store.home; 
                 if (i !== 0 && rawLink && rawLink.startsWith("http")) {
                     targetUrl = rawLink;
                 }
-                if (i === 0) targetUrl = store.home; // Coto Excepción
+                if (i === 0) targetUrl = store.home; 
 
                 let val = `$${format(p)}`;
                 let styleClass = "price-link";
@@ -482,7 +493,7 @@
                     val = "SIN PRECIO"; 
                     styleClass += " no-price"; 
                     dotColor = "#444"; 
-                    href = "";
+                    href = ""; 
                 }
                 else if (p === best) { 
                     styleClass += " best-val"; 
@@ -521,12 +532,12 @@
                 diff = ((minToday - priceYesterday) / priceYesterday) * 100;
                 
                 if (diff > 0) { 
-                    trendClass = "trend-up"; // Rojo
+                    trendClass = "trend-up"; 
                     icon = "▲"; 
                     isUp = true;
                 } 
                 else if (diff < 0) { 
-                    trendClass = "trend-down"; // Verde
+                    trendClass = "trend-down"; 
                     icon = "▼"; 
                     isDown = true;
                 }
