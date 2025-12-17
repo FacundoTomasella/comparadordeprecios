@@ -29,12 +29,11 @@
             --text-muted: #787b86;
             --border: #e0e3eb;
             
-            /* AZUL ORIGINAL */
             --accent: #2962ff; 
             
             /* LÓGICA PRECIOS */
-            --color-good: #00a650;   
-            --color-bad: #f23645;    
+            --color-good: #00a650;   /* Verde */
+            --color-bad: #f23645;    /* Rojo */
             --star-gold: #f2a900;
         }
 
@@ -76,19 +75,25 @@
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
         .logo-link { text-decoration: none; color: inherit; }
-        .logo { 
-            font-weight: 800; font-size: 19px; letter-spacing: -0.5px; 
-            display: flex; align-items: center; gap: 10px; color: var(--text-main);
-        }
         
-        /* LOGO SIMPLE (Como antes) */
-        .logo-icon { 
-            display: flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; background: rgba(41, 98, 255, 0.1); 
-            border-radius: 8px; color: var(--accent); position: relative;
+        /* LOGO ESTILO IMAGEN (Carrito + Flecha) */
+        .logo { 
+            font-weight: 800; font-size: 20px; letter-spacing: -0.5px; 
+            display: flex; align-items: center; gap: 8px; color: var(--text-main);
         }
-        .logo-icon .fa-cart-shopping { font-size: 14px; }
-        .logo-icon .fa-chart-line { font-size: 10px; position: absolute; top: 6px; right: 6px; }
+        .logo-icon-wrapper {
+            position: relative; 
+            display: flex; align-items: center; justify-content: center;
+            height: 24px; width: 30px;
+        }
+        .logo-icon-wrapper .fa-cart-shopping {
+            font-size: 18px; color: var(--text-main); /* Color del texto */
+        }
+        .logo-icon-wrapper .fa-arrow-trend-up {
+            font-size: 12px; color: var(--color-good); /* Flecha verde */
+            position: absolute; top: -4px; right: -2px;
+            background: var(--bg-app); padding: 1px; border-radius: 50%;
+        }
         
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
 
@@ -103,6 +108,29 @@
         }
         #searchInput:focus { border-color: var(--accent); outline: none; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+
+        /* FILTROS DE TENDENCIA (NUEVO) */
+        .trend-filters {
+            display: flex; gap: 10px; margin-top: 12px;
+        }
+        .trend-btn {
+            flex: 1;
+            padding: 8px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-app); color: var(--text-muted);
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: 0.2s;
+        }
+        .trend-btn:hover { background: var(--bg-card); }
+        
+        /* Estado Activo Bajando (Verde) */
+        .trend-btn.active-down {
+            background: rgba(0, 166, 80, 0.1); border-color: var(--color-good); color: var(--color-good);
+        }
+        /* Estado Activo Subiendo (Rojo) */
+        .trend-btn.active-up {
+            background: rgba(242, 54, 69, 0.1); border-color: var(--color-bad); color: var(--color-bad);
+        }
 
         /* LISTA TICKERS */
         .ticker-list { padding: 0; }
@@ -172,15 +200,16 @@
             transition: 0.2s; display: flex; align-items: center; gap: 8px;
         }
         .price-link:hover { background: rgba(41, 98, 255, 0.1); border-color: var(--accent); color: var(--accent); }
+        body.dark-mode .price-link:hover { color: #fff; }
         
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         
+        /* SIN PRECIO TACHADO */
         .no-price { 
             color: var(--text-muted); font-style: italic; opacity: 0.6; 
             text-decoration: line-through; font-size: 12px; pointer-events: none; background: transparent;
         }
 
-        /* LINK ICON */
         .fa-up-right-from-square { font-size: 11px; opacity: 0.6; }
 
         /* FOOTER */
@@ -193,6 +222,9 @@
             color: var(--accent); text-decoration: none; 
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
         }
+        /* Color footer dinámico */
+        body.dark-mode .dev-link { color: #448aff; } 
+        body:not(.dark-mode) .dev-link { color: #d32f2f; }
 
         /* NAVBAR */
         .bottom-nav {
@@ -211,7 +243,6 @@
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         .nav-item.active i { color: var(--accent); transform: translateY(-2px); transition: 0.2s; }
 
-        /* ESTADOS */
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; letter-spacing: 1px; }
 
@@ -224,11 +255,11 @@
     <div class="app-container">
         <header>
             <div class="top-row">
-                <a href="https://facundotomasella.github.io/comparadordeprecios/" class="logo-link">
+                <a href="http://www.tradingchango.com.ar/" class="logo-link">
                     <div class="logo">
-                        <div class="logo-icon">
+                        <div class="logo-icon-wrapper">
                             <i class="fa-solid fa-cart-shopping"></i>
-                            <i class="fa-solid fa-chart-line"></i>
+                            <i class="fa-solid fa-arrow-trend-up"></i>
                         </div>
                         TradingChango
                     </div>
@@ -237,9 +268,20 @@
                     <i class="fa-solid fa-moon" id="themeIcon"></i>
                 </button>
             </div>
+            
             <div class="search-container">
                 <i class="fa-solid fa-search search-icon"></i>
                 <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
+            </div>
+
+            <!-- FILTROS DE TENDENCIA -->
+            <div class="trend-filters">
+                <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')">
+                    <i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando
+                </button>
+                <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo
+                </button>
             </div>
         </header>
 
@@ -284,6 +326,7 @@
         ];
 
         let DB = {}, flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes';
+        let currentTrendFilter = null; // 'up', 'down' o null
 
         async function init() {
             try {
@@ -299,9 +342,10 @@
                     });
                 });
                 
-                // Tema inicial (Día por defecto)
                 if (localStorage.getItem('theme') === 'dark') {
                     document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
                 }
                 updateThemeIcon();
                 
@@ -311,6 +355,28 @@
                 console.error(e);
                 document.getElementById('loader').innerText = "ERROR DE CONEXIÓN";
             }
+        }
+
+        function setTrendFilter(type) {
+            const btnUp = document.getElementById('btnUp');
+            const btnDown = document.getElementById('btnDown');
+            
+            // Toggle
+            if (currentTrendFilter === type) {
+                currentTrendFilter = null;
+                btnUp.classList.remove('active-up');
+                btnDown.classList.remove('active-down');
+            } else {
+                currentTrendFilter = type;
+                if (type === 'up') {
+                    btnUp.classList.add('active-up');
+                    btnDown.classList.remove('active-down');
+                } else {
+                    btnDown.classList.add('active-down');
+                    btnUp.classList.remove('active-up');
+                }
+            }
+            renderView();
         }
 
         function renderView() {
@@ -333,9 +399,20 @@
                 dataToShow = flatList.filter(i => allowedCats.includes(i.cat));
             }
 
-            if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
+            if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
+
+            // APLICAR FILTRO DE TENDENCIA
+            if (currentTrendFilter) {
+                dataToShow = dataToShow.filter(item => {
+                    const stats = getStats(item.p, item.h);
+                    if (currentTrendFilter === 'up') return stats.isUp;   // Solo subidas (Rojo)
+                    if (currentTrendFilter === 'down') return stats.isDown; // Solo bajadas (Verde)
+                    return true;
+                });
+            }
+
             const limit = term ? 50 : 20; 
-            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos en este mercado.</div>'; return; }
+            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin activos.</div>'; return; }
 
             dataToShow.slice(0, limit).forEach(item => {
                 const stats = getStats(item.p, item.h);
@@ -378,14 +455,12 @@
                 const p = prices[i];
                 let rawLink = (links && links[i]) ? links[i] : "";
                 
-                // LÓGICA DE REDIRECCIÓN INTELIGENTE
-                let targetUrl = store.home; // Por defecto Home
+                // Si link existe y es válido, usarlo. Sino Home.
+                let targetUrl = (rawLink && rawLink.startsWith("http")) ? rawLink : store.home;
                 
-                // Si hay link específico y no es Coto (índice 0), usar producto
-                if (i !== 0 && rawLink && rawLink.startsWith("http")) {
-                    targetUrl = rawLink;
-                }
-                
+                // COTO SIEMPRE HOME
+                if (i === 0) targetUrl = store.home;
+
                 let val = `$${format(p)}`;
                 let styleClass = "price-link";
                 let dotColor = store.color;
@@ -396,7 +471,7 @@
                     val = "SIN PRECIO"; 
                     styleClass += " no-price"; 
                     dotColor = "#444"; 
-                    href = ""; // Sin link si no hay precio
+                    href = "";
                 }
                 else if (p === best) { 
                     styleClass += " best-val"; 
@@ -428,6 +503,8 @@
             let diff = 0;
             let trendClass = "trend-neutral";
             let icon = "-";
+            let isUp = false;
+            let isDown = false;
 
             if (priceYesterday > 0) {
                 diff = ((minToday - priceYesterday) / priceYesterday) * 100;
@@ -435,14 +512,23 @@
                 if (diff > 0) { 
                     trendClass = "trend-up"; // Rojo (Subió)
                     icon = "▲"; 
+                    isUp = true;
                 } 
                 else if (diff < 0) { 
                     trendClass = "trend-down"; // Verde (Bajó)
                     icon = "▼"; 
+                    isDown = true;
                 }
             } 
 
-            return { min: minToday, spread: Math.abs(diff).toFixed(1), trendClass, icon };
+            return { 
+                min: minToday, 
+                spread: Math.abs(diff).toFixed(1), 
+                trendClass, 
+                icon,
+                isUp,
+                isDown
+            };
         }
 
         function toggleFav(id, btn) {
