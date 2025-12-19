@@ -25,7 +25,13 @@
             --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { 
+            background-color: var(--bg-app); color: var(--text-main); 
+            font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; 
+            padding-bottom: 90px; transition: background 0.3s, color 0.3s; 
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden; width: 100%;
+        }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -36,12 +42,9 @@
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
-        /* BUSCADOR ORIGINAL */
-        .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        /* TENDENCIA REQUERIDA */
         .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         #btnDown { color: var(--color-good); }
@@ -59,34 +62,36 @@
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
+        
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
+        
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
-
-        /* GRÁFICO REQUERIDO */
         .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
         .ob-tabs { display: flex; gap: 12px; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
+        
         .range-filters { display: flex; gap: 4px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
+        
         .ob-market-view, .ob-graph-view { display: none; }
         .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); display: flex; align-items: center; gap: 8px; }
+        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
-        .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
-        .dev-link { color: var(--text-main); text-decoration: none; font-weight: 800; }
         
-        /* NAV BLANCO Y NEGRO */
+        .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
-        .nav-item.active { color: var(--text-main); font-weight: 800; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
         .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--text-main); font-weight: 800; }
+        
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; }
@@ -112,7 +117,7 @@
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
 
-        <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" class="dev-link" target="_blank">Facu Tom</a></footer>
+        <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></footer>
 
         <nav class="bottom-nav">
             <button class="nav-item active" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
@@ -163,10 +168,12 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             
-            // FILTRO DE CATEGORÍAS ROBUSTO
+            // FILTRO DE CATEGORIAS INSENSIBLE A MAYUSCULAS/MINUSCULAS
+            const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
             let dataToShow = flatList.filter(i => {
                 if (currentTab === 'favs') return favorites.includes(i.id);
-                return i.cat.toLowerCase() === (currentTab === 'carnes' ? 'carnes' : currentTab === 'verdu' ? 'verdu' : 'varios');
+                // Comparamos limpiando espacios y pasando a minúsculas
+                return i.cat.trim().toLowerCase() === catMap[currentTab].toLowerCase();
             });
 
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
@@ -237,7 +244,7 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#2a2a2a', padding: 12, cornerRadius: 50, displayColors: false,
+                            backgroundColor: '#2a2a2a', padding: 12, cornerRadius: 8, displayColors: false,
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => { const item = data[c.dataIndex]; return [`${item.supermercado}: $${format(item.precio_minimo)}`]; }
@@ -250,6 +257,19 @@
                     }
                 }
             });
+        }
+
+        function getStats(p, h7d) {
+            const valid = p.filter(v => v > 0);
+            if (valid.length === 0) return { min: 0 };
+            const minToday = Math.min(...valid);
+            let diff = 0, trendClass = "trend-neutral", icon = "-", isUp = false, isDown = false;
+            if (h7d > 0) {
+                diff = ((minToday - h7d) / h7d) * 100;
+                if (diff > 0.1) { trendClass = "trend-up"; icon = "▲"; isUp = true; }
+                else if (diff < -0.1) { trendClass = "trend-down"; icon = "▼"; isDown = true; }
+            }
+            return { min: minToday, spread: Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown };
         }
 
         function toggleTheme() {
@@ -270,17 +290,11 @@
             });
         }
 
-        function getStats(p, h7d) {
-            const valid = p.filter(v => v > 0);
-            if (valid.length === 0) return { min: 0 };
-            const minToday = Math.min(...valid);
-            let diff = 0, trendClass = "trend-neutral", icon = "-", isUp = false, isDown = false;
-            if (h7d > 0) {
-                diff = ((minToday - h7d) / h7d) * 100;
-                if (diff > 0.1) { trendClass = "trend-up"; icon = "▲"; isUp = true; }
-                else if (diff < -0.1) { trendClass = "trend-down"; icon = "▼"; isDown = true; }
-            }
-            return { min: minToday, spread: Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown };
+        function renderMarket(item, min) {
+            return STORES.map((s, i) => {
+                const p = item.p[i];
+                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
+            }).join('');
         }
 
         function switchObTab(id, type) {
@@ -292,15 +306,8 @@
             if(type==='graph') { const n = flatList.find(p=>p.id==id).n; updateChart(id, n, 7); }
         }
 
-        function renderMarket(item, min) {
-            return STORES.map((s, i) => {
-                const p = item.p[i];
-                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
-            }).join('');
-        }
-
         function toggleFav(id, btn) {
-            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id);
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f !== id);
             else favorites.push(id);
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
             renderView();
