@@ -25,13 +25,7 @@
             --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: var(--bg-app); color: var(--text-main); 
-            font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; 
-            padding-bottom: 90px; transition: background 0.3s, color 0.3s; 
-            display: flex; flex-direction: column; align-items: center;
-            overflow-x: hidden; width: 100%;
-        }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -41,9 +35,13 @@
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
+        
+        /* BUSCADOR ORIGINAL */
+        .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
+        /* TENDENCIA REQUERIDA */
         .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         #btnDown { color: var(--color-good); }
@@ -66,6 +64,7 @@
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
 
+        /* GRÁFICO REQUERIDO */
         .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
         .ob-tabs { display: flex; gap: 12px; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
@@ -73,7 +72,6 @@
         .range-filters { display: flex; gap: 4px; }
         .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
-        
         .ob-market-view, .ob-graph-view { display: none; }
         .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
@@ -82,11 +80,13 @@
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
         .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
-        .dev-link { color: var(--accent); text-decoration: none; font-weight: 800; }
+        .dev-link { color: var(--text-main); text-decoration: none; font-weight: 800; }
+        
+        /* NAV BLANCO Y NEGRO */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
-        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
+        .nav-item i { font-size: 18px; }
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; }
@@ -136,7 +136,6 @@
                 });
                 const rows = await res.json();
                 
-                // Fetch historial de hace 7 días para el % de cambio
                 const d7 = new Date(); d7.setDate(d7.getDate() - 7);
                 const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
@@ -164,10 +163,12 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             
-            // Map de categorías para asegurar el filtrado
-            const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-            let dataToShow = flatList.filter(i => currentTab === 'favs' ? favorites.includes(i.id) : i.cat === catMap[currentTab]);
-            
+            // FILTRO DE CATEGORÍAS ROBUSTO
+            let dataToShow = flatList.filter(i => {
+                if (currentTab === 'favs') return favorites.includes(i.id);
+                return i.cat.toLowerCase() === (currentTab === 'carnes' ? 'carnes' : currentTab === 'verdu' ? 'verdu' : 'varios');
+            });
+
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             if (currentTrendFilter) {
                 dataToShow = dataToShow.filter(item => {
@@ -190,10 +191,7 @@
                     </div>
                     <div id="detail-${item.id}" class="order-book">
                         <div class="ob-header-row">
-                            <div class="ob-tabs">
-                                <button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
-                                <button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
-                            </div>
+                            <div class="ob-tabs"><button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button><button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button></div>
                             <div class="range-filters" id="rf-${item.id}" style="display:none">
                                 <button class="range-btn active" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
                                 <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',15,this)">15D</button>
@@ -229,7 +227,7 @@
                     datasets: [{ 
                         data: data.map(d => d.precio_minimo), 
                         borderColor: color, borderWidth: 1.5,
-                        pointStyle: 'circle', pointRadius: 5, pointBorderWidth: 1.5,
+                        pointStyle: 'circle', pointRadius: 5, pointBorderWidth: 2,
                         pointBackgroundColor: 'transparent', pointBorderColor: color, 
                         fill: false, tension: 0.1 
                     }]
@@ -254,6 +252,24 @@
             });
         }
 
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+            const color = isDark ? '#ffffff' : '#131722';
+            Object.keys(window).forEach(key => {
+                if(key.startsWith('ch') && window[key] instanceof Chart) {
+                    window[key].options.scales.x.ticks.color = color;
+                    window[key].options.scales.y.ticks.color = color;
+                    window[key].options.scales.y.grid.color = isDark?'#222':'#eee';
+                    window[key].data.datasets[0].borderColor = color;
+                    window[key].data.datasets[0].pointBorderColor = color;
+                    window[key].update('none');
+                }
+            });
+        }
+
         function getStats(p, h7d) {
             const valid = p.filter(v => v > 0);
             if (valid.length === 0) return { min: 0 };
@@ -274,26 +290,6 @@
             document.getElementById(`view-g-${id}`).classList.toggle('active', type==='graph');
             document.getElementById(`rf-${id}`).style.display = type==='graph'?'flex':'none';
             if(type==='graph') { const n = flatList.find(p=>p.id==id).n; updateChart(id, n, 7); }
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateThemeIcon();
-            
-            // Actualización de gráficos sin recarga
-            const color = isDark ? '#ffffff' : '#131722';
-            Object.keys(window).forEach(key => {
-                if(key.startsWith('ch') && window[key] instanceof Chart) {
-                    window[key].options.scales.x.ticks.color = color;
-                    window[key].options.scales.y.ticks.color = color;
-                    window[key].options.scales.y.grid.color = isDark?'#222':'#eee';
-                    window[key].data.datasets[0].borderColor = color;
-                    window[key].data.datasets[0].pointBorderColor = color;
-                    window[key].update('none');
-                }
-            });
         }
 
         function renderMarket(item, min) {
