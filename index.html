@@ -19,6 +19,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <!-- LIBRERÍA PARA EL GRÁFICO (REQUERIDO) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             /* MODO DÍA (Default) */
@@ -248,6 +251,16 @@
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* AGREGADO PARA EL GRÁFICO SIN TOCAR LO ANTERIOR */
+        .ob-selector { display: flex; gap: 15px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        .sel-btn { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .sel-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+        .ob-graph-container { display: none; width: 100%; height: 250px; padding: 10px 0; }
+        .ob-graph-container.active { display: block; }
+        .time-filters { display: flex; justify-content: center; gap: 8px; margin-top: 5px; }
+        .time-btn { background: var(--bg-app); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .time-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
     </style>
 </head>
 <body>
@@ -310,7 +323,9 @@
     </div>
 
     <script>
-        const DATA_URL = 'https://raw.githubusercontent.com/facundotomasella/comparadordeprecios/main/precios.json';
+        /* --- CONEXIÓN SUPABASE --- */
+        const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         
         const GROUPS = {
             'carnes': ['Carnes'],
@@ -326,29 +341,28 @@
         ];
 
         let DB = {}, flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes';
-        let currentTrendFilter = null; // 'up', 'down' o null
+        let currentTrendFilter = null; 
 
         async function init() {
             try {
-                const res = await fetch(DATA_URL + '?t=' + Date.now());
-                DB = await res.json();
-                
-                Object.keys(DB).forEach(cat => {
-                    DB[cat].forEach((item, idx) => {
-                        item.cat = cat;
-                        item.id = generateID(cat, idx);
-                        item.ticker = generateTicker(item.n);
-                        flatList.push(item);
-                    });
+                /* CAMBIO: Leer de Supabase */
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
+                const rows = await res.json();
                 
-                if (localStorage.getItem('theme') === 'dark') {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
+                flatList = rows.map(row => ({
+                    id: row.id,
+                    n: row.nombre,
+                    cat: row.categoria,
+                    ticker: generateTicker(row.nombre),
+                    p: [row.p_coto || 0, row.p_carrefour || 0, row.p_dia || 0, row.p_jumbo || 0],
+                    h: [row.h_coto || 0, row.h_carrefour || 0, row.h_dia || 0, row.h_jumbo || 0],
+                    u: [row.u_coto, row.u_carrefour, row.u_dia, row.u_jumbo]
+                }));
+                
+                if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
                 updateThemeIcon();
-                
                 document.getElementById('loader').style.display = 'none';
                 renderView();
             } catch (e) {
@@ -358,24 +372,9 @@
         }
 
         function setTrendFilter(type) {
-            const btnUp = document.getElementById('btnUp');
-            const btnDown = document.getElementById('btnDown');
-            
-            // Toggle
-            if (currentTrendFilter === type) {
-                currentTrendFilter = null;
-                btnUp.classList.remove('active-up');
-                btnDown.classList.remove('active-down');
-            } else {
-                currentTrendFilter = type;
-                if (type === 'up') {
-                    btnUp.classList.add('active-up');
-                    btnDown.classList.remove('active-down');
-                } else {
-                    btnDown.classList.add('active-down');
-                    btnUp.classList.remove('active-up');
-                }
-            }
+            currentTrendFilter = (currentTrendFilter === type) ? null : type;
+            document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
+            document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
             renderView();
         }
 
@@ -383,48 +382,21 @@
             const container = document.getElementById('tickerList');
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
-            let dataToShow = [];
-
-            if (currentTab === 'favs') {
-                if (favorites.length === 0) {
-                    container.innerHTML = `<div class="empty-state">
-                        <i class="fa-regular fa-star" style="font-size:40px; margin-bottom:10px; color:var(--accent);"></i><br><br>
-                        Tu Portfolio está vacío.<br>Agrega productos para seguirlos.
-                    </div>`;
-                    return;
-                }
-                dataToShow = flatList.filter(i => favorites.includes(i.id));
-            } else {
-                const allowedCats = GROUPS[currentTab] || [];
-                dataToShow = flatList.filter(i => allowedCats.includes(i.cat));
-            }
-
+            
+            let dataToShow = flatList.filter(i => currentTab === 'favs' ? favorites.includes(i.id) : (GROUPS[currentTab] || []).includes(i.cat));
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-
-            // APLICAR FILTRO DE TENDENCIA
             if (currentTrendFilter) {
                 dataToShow = dataToShow.filter(item => {
                     const stats = getStats(item.p, item.h);
-                    if (currentTrendFilter === 'up') return stats.isUp;   // Solo subidas (Rojo)
-                    if (currentTrendFilter === 'down') return stats.isDown; // Solo bajadas (Verde)
-                    return true;
+                    return currentTrendFilter === 'up' ? stats.isUp : stats.isDown;
                 });
             }
 
-            const limit = term ? 50 : 20; 
-            if (dataToShow.length === 0) { container.innerHTML = '<div class="empty-state">Sin Productos.</div>'; return; }
-
-            dataToShow.slice(0, limit).forEach(item => {
+            dataToShow.forEach(item => {
                 const stats = getStats(item.p, item.h);
                 if (stats.min === 0) return; 
-                
                 const isFav = favorites.includes(item.id);
-                const starClass = isFav ? 'active' : '';
-                const starIcon = isFav ? 'fa-solid fa-star' : 'fa-regular fa-star';
-
                 const card = document.createElement('div');
-                const detailHtml = renderOrderBook(item.p, item.u, stats.min);
-
                 card.innerHTML = `
                     <div class="ticker-card">
                         <div class="ticker-info" onclick="toggleDetail('${item.id}')">
@@ -437,114 +409,128 @@
                                 <span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span>
                             </div>
                         </div>
-                        <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)"><i class="${starIcon}"></i></div>
+                        <div class="fav-btn ${isFav?'active':''}" onclick="toggleFav('${item.id}', this)"><i class="${isFav?'fa-solid':'fa-regular'} fa-star"></i></div>
                     </div>
                     <div id="detail-${item.id}" class="order-book">
-                        <div class="ob-header"><span>Market</span><span>Precio</span></div>
-                        ${detailHtml}
+                        <div class="ob-selector">
+                            <button class="sel-btn active" id="btn-m-${item.id}" onclick="switchDetailTab('${item.id}', 'market')">Market</button>
+                            <button class="sel-btn" id="btn-g-${item.id}" onclick="switchDetailTab('${item.id}', 'graph')">Gráfico</button>
+                        </div>
+                        <div id="m-content-${item.id}" class="market-content active">
+                            <div class="ob-header"><span>Market</span><span>Precio</span></div>
+                            ${renderOrderBook(item.p, item.u, stats.min)}
+                        </div>
+                        <div id="g-content-${item.id}" class="ob-graph-container">
+                            <canvas id="canvas-${item.id}"></canvas>
+                            <div class="time-filters">
+                                <button class="time-btn active" onclick="updateChartRange('${item.id}', '${item.n}', 7, this)">7D</button>
+                                <button class="time-btn" onclick="updateChartRange('${item.id}', '${item.n}', 15, this)">15D</button>
+                                <button class="time-btn" onclick="updateChartRange('${item.id}', '${item.n}', 30, this)">1M</button>
+                            </div>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
+        async function switchDetailTab(id, type) {
+            const m = document.getElementById(`m-content-${id}`);
+            const g = document.getElementById(`g-content-${id}`);
+            const btnM = document.getElementById(`btn-m-${id}`);
+            const btnG = document.getElementById(`btn-g-${id}`);
+            
+            if(type === 'market') {
+                m.style.display = 'block'; g.classList.remove('active');
+                btnM.classList.add('active'); btnG.classList.remove('active');
+            } else {
+                m.style.display = 'none'; g.classList.add('active');
+                btnM.classList.remove('active'); btnG.classList.add('active');
+                const item = flatList.find(i => i.id == id);
+                renderChart(id, item.n, 7);
+            }
+        }
+
+        async function renderChart(id, nombre, dias) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${nombre}&order=fecha.asc`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await res.json();
+            const filtered = data.slice(-dias);
+            
+            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
+            if(window[`chart_${id}`]) window[`chart_${id}`].destroy();
+            
+            window[`chart_${id}`] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: filtered.map(d => d.fecha.split('-').reverse().slice(0,2).join('/')),
+                    datasets: [{
+                        data: filtered.map(d => d.precio_minimo),
+                        borderColor: '#2962ff',
+                        backgroundColor: 'rgba(41, 98, 255, 0.1)',
+                        fill: true, tension: 0.3, pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: {display: false}, tooltip: { callbacks: { label: (c) => `$${c.raw} (${filtered[c.dataIndex].supermercado})` } } },
+                    scales: { y: { ticks: { font: { family: 'Roboto Mono', size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function updateChartRange(id, nombre, dias, btn) {
+            btn.parentElement.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderChart(id, nombre, dias);
+        }
+
         function renderOrderBook(prices, links, best) {
             let html = '';
-            
             STORES.forEach((store, i) => {
                 const p = prices[i];
-                let rawLink = (links && links[i]) ? links[i] : "";
-                
-                // Si link existe y es válido, usarlo. Sino Home.
-                let targetUrl = (rawLink && rawLink.startsWith("http")) ? rawLink : store.home;
-                
-                // COTO SIEMPRE HOME
+                let targetUrl = (links && links[i] && links[i].startsWith("http")) ? links[i] : store.home;
                 if (i === 0) targetUrl = store.home;
-
-                let val = `$${format(p)}`;
-                let styleClass = "price-link";
-                let dotColor = store.color;
-                
-                let href = `href="${targetUrl}" target="_blank"`;
-
-                if (!p || p === 0) { 
-                    val = "SIN PRECIO"; 
-                    styleClass += " no-price"; 
-                    dotColor = "#444"; 
-                    href = "";
-                }
-                else if (p === best) { 
-                    styleClass += " best-val"; 
-                }
-
+                let val = p > 0 ? `$${format(p)}` : "SIN PRECIO";
+                let styleClass = `price-link ${p === 0 ? 'no-price' : (p === best ? 'best-val' : '')}`;
                 html += `
                     <div class="ob-row">
-                        <div class="ob-store">
-                            <div class="dot" style="background:${dotColor}"></div> 
-                            ${store.name}
-                        </div>
-                        <a ${href} class="${styleClass}">
+                        <div class="ob-store"><div class="dot" style="background:${p>0?store.color:'#444'}"></div>${store.name}</div>
+                        <a ${p>0?`href="${targetUrl}" target="_blank"`:''} class="${styleClass}">
                             ${val} ${p > 0 ? '<i class="fa-solid fa-arrow-up-right-from-square"></i>' : ''}
                         </a>
-                    </div>
-                `;
+                    </div>`;
             });
             return html;
         }
 
-        function getStats(pricesToday, pricesYesterday) {
-            const valid = pricesToday.slice(0, 4).filter(p => p > 0);
+        function getStats(pToday, pYesterday) {
+            const valid = pToday.filter(p => p > 0);
             if (valid.length === 0) return { min: 0 };
             const minToday = Math.min(...valid);
-            
-            const bestIndex = pricesToday.indexOf(minToday);
-            const priceYesterday = (pricesYesterday && pricesYesterday[bestIndex]) ? pricesYesterday[bestIndex] : 0;
-
-            let diff = 0;
-            let trendClass = "trend-neutral";
-            let icon = "-";
-            let isUp = false;
-            let isDown = false;
-
-            if (priceYesterday > 0) {
-                diff = ((minToday - priceYesterday) / priceYesterday) * 100;
-                
-                if (diff > 0) { 
-                    trendClass = "trend-up"; // Rojo (Subió)
-                    icon = "▲"; 
-                    isUp = true;
-                } 
-                else if (diff < 0) { 
-                    trendClass = "trend-down"; // Verde (Bajó)
-                    icon = "▼"; 
-                    isDown = true;
-                }
-            } 
-
-            return { 
-                min: minToday, 
-                spread: Math.abs(diff).toFixed(1), 
-                trendClass, 
-                icon,
-                isUp,
-                isDown
-            };
+            const idx = pToday.indexOf(minToday);
+            const old = pYesterday[idx] || 0;
+            let diff = 0, trendClass = "trend-neutral", icon = "-", isUp = false, isDown = false;
+            if (old > 0) {
+                diff = ((minToday - old) / old) * 100;
+                if (diff > 0.1) { trendClass = "trend-up"; icon = "▲"; isUp = true; }
+                else if (diff < -0.1) { trendClass = "trend-down"; icon = "▼"; isDown = true; }
+            }
+            return { min: minToday, spread: Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown };
         }
 
         function toggleFav(id, btn) {
-            btn.style.transform = "scale(1.2)"; setTimeout(() => btn.style.transform = "scale(1)", 200);
-            if (favorites.includes(id)) { favorites = favorites.filter(f => f !== id); }
-            else { favorites.push(id); }
+            favorites = favorites.includes(id) ? favorites.filter(f => f !== id) : [...favorites, id];
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
-            if (currentTab === 'favs') renderView();
-            else renderView(); 
+            renderView();
         }
 
         function setTab(tabName, btn) {
             currentTab = tabName;
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            window.scrollTo(0,0); document.getElementById('searchInput').value = ''; renderView();
+            renderView();
         }
 
         function toggleDetail(id) {
@@ -560,20 +546,13 @@
         }
 
         function updateThemeIcon() {
-            const icon = document.getElementById('themeIcon');
-            if (document.body.classList.contains('dark-mode')) {
-                icon.className = 'fa-solid fa-sun'; 
-            } else {
-                icon.className = 'fa-solid fa-moon'; 
-            }
+            document.getElementById('themeIcon').className = document.body.classList.contains('dark-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
 
-        function generateID(cat, idx) { return `${cat.substring(0,3)}-${idx}`; }
         function generateTicker(name) {
             const clean = name.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, " ");
             const parts = clean.split(" ").filter(w => w.length > 2);
-            if (parts.length >= 2) return (parts[0].substring(0,2) + parts[1].substring(0,2));
-            return clean.substring(0, 4);
+            return parts.length >= 2 ? (parts[0].substring(0,2) + parts[1].substring(0,2)) : clean.substring(0, 4);
         }
         function format(num) { return new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(num); }
         
