@@ -5,88 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
     
-    <title>TradingChango | Tradeá los Precios</title>
+    <title>TradingChango | Tradeá los Precios, Maximizá el Carrito</title>
+    <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- LIBRERÍA GRÁFICO -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
-            --accent: #131722; /* Cambiado a negro para el estilo financiero */
-            --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
+            --accent: #2962ff; --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
         }
         body.dark-mode {
             --bg-app: #000000; --bg-card: #121212; --bg-nav: #121212;
             --text-main: #ffffff; --text-muted: #888888; --border: #2a2a2a;
-            --accent: #ffffff; 
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .logo-link { text-decoration: none; color: inherit; }
-        .logo { font-weight: 800; font-size: 20px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+        .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
-        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; }
+        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
-        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--bg-app); }
+
+        /* TENDENCIA SEGÚN PEDIDO */
+        .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
+        .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        #btnDown { color: var(--color-good); }
+        #btnUp { color: var(--color-bad); }
+        .trend-btn.active-down { background: var(--color-good) !important; color: white !important; border-color: var(--color-good); }
+        .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
+
+        .ticker-list { padding: 0; }
+        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
         .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
         .t-left { display: flex; flex-direction: column; gap: 3px; }
-        .t-symbol { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; }
-        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .t-price { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; text-align: right; }
+        .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
+        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+        .t-right { text-align: right; }
+        .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
-        .ob-header { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; padding: 12px 0 8px 0; border-bottom: 1px solid var(--border); }
+
+        /* GRÁFICO - DISEÑO FINANCIERO ARRIBA A LA DERECHA */
+        .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
+        .ob-tabs { display: flex; gap: 12px; }
+        .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
+        .ob-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .range-filters { display: flex; gap: 4px; }
+        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+        .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
+        
+        .ob-market-view, .ob-graph-view { display: none; }
+        .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
+        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); border: 1px solid transparent; }
+        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); border: 1px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
+        .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; background: transparent; }
         .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
-        .dev-link { color: var(--color-bad); text-decoration: none; font-weight: 800; }
+        .dev-link { color: var(--accent); text-decoration: none; font-weight: 800; }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
+        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
-        .loader { text-align: center; padding: 50px; font-family: 'Roboto Mono'; font-size: 12px; }
+        .nav-item.active i { color: var(--accent); }
+        .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- BOTONES TENDENCIA --- */
-        .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
-        .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
-        #btnDown { color: var(--color-good); border-color: var(--color-good); }
-        #btnUp { color: var(--color-bad); border-color: var(--color-bad); }
-        .trend-btn.active-down { background: #00a650; color: white !important; }
-        .trend-btn.active-up { background: #d32f2f; color: white !important; }
-
-        /* --- SECCIÓN GRÁFICO --- */
-        .ob-top-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .ob-tabs { display: flex; gap: 15px; }
-        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .time-filters { display: flex; gap: 4px; }
-        .time-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
-        .time-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
-        .ob-content-market, .ob-content-graph { display: none; }
-        .ob-content-market.active, .ob-content-graph.active { display: block; }
-        .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; }
     </style>
 </head>
 <body>
-
     <div class="app-container">
         <header>
             <div class="top-row">
@@ -104,7 +106,7 @@
         </header>
 
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
-        <div class="ticker-list" id="tickerList"></div>
+        <div id="tickerList" class="ticker-list"></div>
 
         <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" class="dev-link" target="_blank">Facu Tom</a></footer>
 
@@ -162,6 +164,7 @@
             }
             dataToShow.forEach(item => {
                 const stats = getStats(item.p, item.h);
+                if (stats.min === 0) return;
                 const isFav = favorites.includes(item.id);
                 const card = document.createElement('div');
                 card.innerHTML = `
@@ -173,25 +176,19 @@
                         <div class="fav-btn ${isFav?'active':''}" onclick="toggleFav(${item.id}, this)"><i class="${isFav?'fa-solid':'fa-regular'} fa-star"></i></div>
                     </div>
                     <div id="detail-${item.id}" class="order-book">
-                        <div class="ob-top-row">
+                        <div class="ob-header-row">
                             <div class="ob-tabs">
-                                <button class="tab-btn active" id="tab-m-${item.id}" onclick="switchTab('${item.id}', 'market')">Market</button>
-                                <button class="tab-btn" id="tab-g-${item.id}" onclick="switchTab('${item.id}', 'graph')">Gráfico</button>
+                                <button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
+                                <button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
                             </div>
-                            <div class="time-filters" id="tf-${item.id}" style="display:none">
-                                <button class="time-btn active" onclick="changeRange('${item.id}','${item.n}',7,this)">7D</button>
-                                <button class="time-btn" onclick="changeRange('${item.id}','${item.n}',15,this)">15D</button>
-                                <button class="time-btn" onclick="changeRange('${item.id}','${item.n}',30,this)">1M</button>
-                                <button class="time-btn" onclick="changeRange('${item.id}','${item.n}',90,this)">3M</button>
-                                <button class="time-btn" onclick="changeRange('${item.id}','${item.n}',180,this)">6M</button>
-                                <button class="time-btn" onclick="changeRange('${item.id}','${item.n}',365,this)">1Y</button>
+                            <div class="range-filters" id="rf-${item.id}" style="display:none">
+                                <button class="range-btn active" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
+                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',30,this)">1M</button>
+                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',365,this)">1Y</button>
                             </div>
                         </div>
-                        <div id="m-cont-${item.id}" class="ob-content-market active">
-                            <div class="ob-header"><span>Market</span><span>Precio</span></div>
-                            ${renderMarket(item, stats.min)}
-                        </div>
-                        <div id="g-cont-${item.id}" class="ob-content-graph"><div class="chart-wrapper"><canvas id="chart-${item.id}"></canvas></div></div>
+                        <div id="view-m-${item.id}" class="ob-market-view active">${renderMarket(item, stats.min)}</div>
+                        <div id="view-g-${item.id}" class="ob-graph-view"><canvas id="canvas-${item.id}" height="200"></canvas></div>
                     </div>`;
                 container.appendChild(card);
             });
@@ -200,84 +197,81 @@
         function renderMarket(item, min) {
             return STORES.map((s, i) => {
                 const p = item.p[i];
+                const url = item.u[i] || s.home;
                 return `<div class="ob-row">
                     <div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div>
-                    <a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a>
+                    <a href="${p>0?url:'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a>
                 </div>`;
             }).join('');
         }
 
-        async function switchTab(id, type) {
-            document.getElementById(`tab-m-${id}`).classList.toggle('active', type==='market');
-            document.getElementById(`tab-g-${id}`).classList.toggle('active', type==='graph');
-            document.getElementById(`m-cont-${id}`).classList.toggle('active', type==='market');
-            document.getElementById(`g-cont-${id}`).classList.toggle('active', type==='graph');
-            document.getElementById(`tf-${id}`).style.display = type==='graph' ? 'flex' : 'none';
-            if(type==='graph') { const n = flatList.find(p=>p.id==id).n; loadChart(id, n, 7); }
+        async function switchObTab(id, type) {
+            document.getElementById(`btn-m-${id}`).classList.toggle('active', type==='market');
+            document.getElementById(`btn-g-${id}`).classList.toggle('active', type==='graph');
+            document.getElementById(`view-m-${id}`).classList.toggle('active', type==='market');
+            document.getElementById(`view-g-${id}`).classList.toggle('active', type==='graph');
+            document.getElementById(`rf-${id}`).style.display = type==='graph'?'flex':'none';
+            if(type==='graph') { const n = flatList.find(p=>p.id==id).n; updateChart(id, n, 7); }
         }
 
-        async function loadChart(id, name, days) {
+        async function updateChart(id, name, days, btn) {
+            if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
             const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(name.trim())}&order=fecha.asc`, {
                 headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
             });
             const data = await res.json();
             const filtered = data.slice(-days);
-            const ctx = document.getElementById(`chart-${id}`).getContext('2d');
+            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
             const isDark = document.body.classList.contains('dark-mode');
-            const color = isDark ? '#ffffff' : '#131722';
-
+            const color = isDark?'#fff':'#131722';
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: filtered.map(d => d.fecha.split('-').reverse().slice(0,2).join('/')),
+                    labels: filtered.map(d=>d.fecha.split('-').reverse().slice(0,2).join('/')),
                     datasets: [{
-                        data: filtered.map(d => d.precio_minimo),
-                        borderColor: color, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                        fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: color, borderWidth: 2
+                        data: filtered.map(d=>d.precio_minimo),
+                        borderColor: color, pointBackgroundColor: color, fill: false, tension: 0.2, pointRadius: 5
                     }]
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: {display:false}, tooltip: { callbacks: { label: (c) => `$${c.raw} (${filtered[c.dataIndex].supermercado})` } } },
-                    scales: { 
-                        y: { grid: { color: isDark ? '#222' : '#eee' }, ticks: { color: color, font: { family: 'Roboto Mono', size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: color, font: { size: 9 } } }
-                    }
+                    plugins: { legend:{display:false}, tooltip:{callbacks:{label:(c)=>`$${c.raw} (${filtered[c.dataIndex].supermercado})`}}},
+                    scales: { y:{ ticks:{ color: color, font:{family:'Roboto Mono', size:10} } }, x:{ ticks:{ color: color, font:{size:10} } } }
                 }
             });
         }
 
-        function changeRange(id, name, days, btn) {
-            btn.parentElement.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            loadChart(id, name, days);
-        }
-
         function getStats(p, h) {
-            const valid = p.filter(v => v > 0);
-            if (valid.length === 0) return { min: 0 };
+            const valid = p.filter(v=>v>0);
+            if(valid.length===0) return {min:0};
             const min = Math.min(...valid);
             const idx = p.indexOf(min);
             const old = h[idx] || 0;
-            let diff = 0, trendClass = "trend-neutral", icon = "-", isUp = false, isDown = false;
-            if (old > 0) {
-                diff = ((min - old) / old) * 100;
-                if (diff > 0.1) { trendClass = "trend-up"; icon = "▲"; isUp = true; }
-                else if (diff < -0.1) { trendClass = "trend-down"; icon = "▼"; isDown = true; }
+            let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false;
+            if(old>0){
+                diff = ((min-old)/old)*100;
+                if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; }
+                else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; }
             }
-            return { min, spread: Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown };
+            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown};
         }
 
         function toggleFav(id, btn) {
-            if (favorites.includes(id)) { favorites = favorites.filter(f => f !== id); }
-            else { favorites.push(id); }
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id);
+            else favorites.push(id);
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
             renderView();
         }
 
-        function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; renderView(); }
-        function setTab(t, btn) { currentTab = t; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); btn.classList.add('active'); renderView(); }
+        function setTrendFilter(type) {
+            currentTrendFilter = (currentTrendFilter === type) ? null : type;
+            document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
+            document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
+            renderView();
+        }
+
+        function setTab(t, btn) { currentTab=t; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); btn.classList.add('active'); renderView(); }
         function toggleDetail(id) { document.getElementById(`detail-${id}`).classList.toggle('open'); }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.body.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
