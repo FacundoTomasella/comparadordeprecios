@@ -17,17 +17,17 @@
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
-            --accent: #131722; /* Negro para navegación */
-            --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
+            --accent: #131722; --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
         }
         body.dark-mode {
             --bg-app: #000000; --bg-card: #121212; --bg-nav: #121212;
             --text-main: #ffffff; --text-muted: #888888; --border: #2a2a2a;
-            --accent: #ffffff; /* Blanco para navegación */
+            --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
+        
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .logo-link { text-decoration: none; color: inherit; }
@@ -37,11 +37,12 @@
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
+        /* BUSCADOR ORIGINAL SIN TOCAR */
         .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        /* TENDENCIA SEGÚN PEDIDO */
+        /* TENDENCIA - SEGÚN PEDIDO */
         .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         #btnDown { color: var(--color-good); }
@@ -65,7 +66,7 @@
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
 
-        /* DISEÑO GRÁFICO PROFESIONAL */
+        /* GRÁFICO PROFESIONAL */
         .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
         .ob-tabs { display: flex; gap: 12px; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
@@ -73,11 +74,12 @@
         .range-filters { display: flex; gap: 4px; }
         .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
+        
         .ob-market-view, .ob-graph-view { display: none; }
         .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
+        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); display: flex; align-items: center; gap: 8px; }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
         
@@ -85,7 +87,7 @@
         
         /* NAVBAR BLACK & WHITE */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
@@ -133,31 +135,35 @@
 
         async function init() {
             try {
+                // 1. CARGAMOS PRODUCTOS PRIMERO
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
                 const rows = await res.json();
                 
-                // Fetch historial para el porcentaje de 7 días
+                flatList = rows.map(r => ({
+                    id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
+                    p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
+                    h7d: 0, 
+                    u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
+                }));
+
+                document.getElementById('loader').style.display = 'none';
+                renderView();
+
+                // 2. CARGAMOS HISTORIAL PARA LOS % (En segundo plano)
                 const d7 = new Date(); d7.setDate(d7.getDate() - 7);
                 const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
                 const hData = await resH.json();
-
-                flatList = rows.map(r => {
-                    const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-                    return {
-                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
-                        p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
-                        h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
-                        u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
-                    }
+                
+                flatList.forEach(item => {
+                    const h7 = hData.filter(h => h.nombre_producto === item.n).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+                    if(h7.length > 0) item.h7d = h7[0].precio_minimo;
                 });
-                if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-                updateThemeIcon();
-                document.getElementById('loader').style.display = 'none';
-                renderView();
+                renderView(); // Refresca para mostrar los %
+
             } catch (e) { console.error(e); }
         }
 
@@ -166,12 +172,11 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             
-            // FILTRO DE CATEGORÍAS ROBUSTO
             let dataToShow = flatList.filter(i => {
                 if (currentTab === 'favs') return favorites.includes(i.id);
-                // Mapeo dinámico: comparamos ignorando mayúsculas y espacios
+                // Filtro insensible a mayúsculas
                 const tabMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-                return i.cat.trim().toLowerCase() === tabMap[currentTab].toLowerCase();
+                return i.cat.toLowerCase() === tabMap[currentTab].toLowerCase();
             });
             
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
@@ -197,8 +202,8 @@
                     <div id="detail-${item.id}" class="order-book">
                         <div class="ob-header-row">
                             <div class="ob-tabs">
-                                <button class="ob-tab active" id="tab-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
-                                <button class="ob-tab" id="tab-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
+                                <button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
+                                <button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
                             </div>
                             <div class="range-filters" id="rf-${item.id}" style="display:none">
                                 <button class="range-btn active" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
@@ -278,7 +283,6 @@
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeIcon();
-            
             const color = isDark ? '#ffffff' : '#131722';
             Object.keys(window).forEach(key => {
                 if(key.startsWith('ch') && window[key] instanceof Chart) {
