@@ -17,22 +17,18 @@
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
-            --accent: #131722; --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
+            --accent: #131722; /* Cambiado a Negro para estilo financiero */
+            --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
         }
         body.dark-mode {
             --bg-app: #000000; --bg-card: #121212; --bg-nav: #121212;
             --text-main: #ffffff; --text-muted: #888888; --border: #2a2a2a;
-            --accent: #ffffff;
+            --accent: #ffffff; /* Blanco en modo oscuro */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: var(--bg-app); color: var(--text-main); 
-            font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; 
-            padding-bottom: 90px; transition: background 0.3s, color 0.3s; 
-            display: flex; flex-direction: column; align-items: center;
-            overflow-x: hidden; width: 100%;
-        }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
+        
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .logo-link { text-decoration: none; color: inherit; }
@@ -42,9 +38,12 @@
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
+        /* BUSCADOR - RESTAURADO ORIGINAL */
+        .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
+        /* TENDENCIA - SEGÚN PEDIDO */
         .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         #btnDown { color: var(--color-good); }
@@ -62,33 +61,34 @@
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
-        
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
         
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
+
+        /* GRÁFICO - DISEÑO FINANCIERO */
         .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
         .ob-tabs { display: flex; gap: 12px; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
-        
         .range-filters { display: flex; gap: 4px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
         
         .ob-market-view, .ob-graph-view { display: none; }
         .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
+        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); display: flex; align-items: center; gap: 8px; }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
         
         .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         
+        /* NAVBAR - SIN AZUL */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
@@ -136,30 +136,35 @@
 
         async function init() {
             try {
+                // PRIMERO CARGAMOS PRODUCTOS (PARA QUE SE VEAN YA)
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
                 const rows = await res.json();
                 
+                flatList = rows.map(r => ({
+                    id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
+                    p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
+                    h7d: 0, 
+                    u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
+                }));
+
+                document.getElementById('loader').style.display = 'none';
+                renderView();
+
+                // LUEGO CARGAMOS HISTORIAL DE FORMA ASÍNCRONA PARA EL %
                 const d7 = new Date(); d7.setDate(d7.getDate() - 7);
                 const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, {
                     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
                 });
                 const hData = await resH.json();
-
-                flatList = rows.map(r => {
-                    const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-                    return {
-                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
-                        p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
-                        h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
-                        u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
-                    }
+                
+                flatList.forEach(item => {
+                    const h7 = hData.filter(h => h.nombre_producto === item.n).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+                    if(h7.length > 0) item.h7d = h7[0].precio_minimo;
                 });
-                if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-                updateThemeIcon();
-                document.getElementById('loader').style.display = 'none';
-                renderView();
+                renderView(); // Refrescamos solo para actualizar los %
+
             } catch (e) { console.error(e); }
         }
 
@@ -168,14 +173,13 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             
-            // FILTRO DE CATEGORIAS INSENSIBLE A MAYUSCULAS/MINUSCULAS
-            const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
+            // FILTRO DE CATEGORIAS EXACTO A SUPABASE
             let dataToShow = flatList.filter(i => {
                 if (currentTab === 'favs') return favorites.includes(i.id);
-                // Comparamos limpiando espacios y pasando a minúsculas
-                return i.cat.trim().toLowerCase() === catMap[currentTab].toLowerCase();
+                const tabMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
+                return i.cat === tabMap[currentTab];
             });
-
+            
             if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             if (currentTrendFilter) {
                 dataToShow = dataToShow.filter(item => {
@@ -198,7 +202,10 @@
                     </div>
                     <div id="detail-${item.id}" class="order-book">
                         <div class="ob-header-row">
-                            <div class="ob-tabs"><button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button><button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button></div>
+                            <div class="ob-tabs">
+                                <button class="ob-tab active" id="btn-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
+                                <button class="ob-tab" id="btn-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
+                            </div>
                             <div class="range-filters" id="rf-${item.id}" style="display:none">
                                 <button class="range-btn active" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
                                 <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',15,this)">15D</button>
@@ -218,7 +225,7 @@
         async function updateChart(id, name, days, btn) {
             if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
             const dateLimit = new Date(); dateLimit.setDate(dateLimit.getDate() - days);
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(name.trim())}&fecha=gte.${dateLimit.toISOString().split('T')[0]}&order=fecha.asc`, {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(name)}&fecha=gte.${dateLimit.toISOString().split('T')[0]}&order=fecha.asc`, {
                 headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
             });
             const data = await res.json();
@@ -233,8 +240,8 @@
                     labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}`; }),
                     datasets: [{ 
                         data: data.map(d => d.precio_minimo), 
-                        borderColor: color, borderWidth: 1.5,
-                        pointStyle: 'circle', pointRadius: 5, pointBorderWidth: 2,
+                        borderColor: color, borderWidth: 1.2,
+                        pointStyle: 'circle', pointRadius: 5, pointBorderWidth: 1.5,
                         pointBackgroundColor: 'transparent', pointBorderColor: color, 
                         fill: false, tension: 0.1 
                     }]
@@ -244,7 +251,7 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#2a2a2a', padding: 12, cornerRadius: 8, displayColors: false,
+                            backgroundColor: '#2a2a2a', padding: 12, cornerRadius: 50, displayColors: false,
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => { const item = data[c.dataIndex]; return [`${item.supermercado}: $${format(item.precio_minimo)}`]; }
@@ -290,13 +297,6 @@
             });
         }
 
-        function renderMarket(item, min) {
-            return STORES.map((s, i) => {
-                const p = item.p[i];
-                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
-            }).join('');
-        }
-
         function switchObTab(id, type) {
             document.getElementById(`btn-m-${id}`).classList.toggle('active', type==='market');
             document.getElementById(`btn-g-${id}`).classList.toggle('active', type==='graph');
@@ -306,8 +306,15 @@
             if(type==='graph') { const n = flatList.find(p=>p.id==id).n; updateChart(id, n, 7); }
         }
 
+        function renderMarket(item, min) {
+            return STORES.map((s, i) => {
+                const p = item.p[i];
+                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
+            }).join('');
+        }
+
         function toggleFav(id, btn) {
-            if(favorites.includes(id)) favorites = favorites.filter(f=>f !== id);
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id);
             else favorites.push(id);
             localStorage.setItem('fav_tickers', JSON.stringify(favorites));
             renderView();
