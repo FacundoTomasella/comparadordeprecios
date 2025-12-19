@@ -439,10 +439,38 @@
                         </div>
                         <div class="fav-btn ${starClass}" onclick="toggleFav('${item.id}', this)"><i class="${starIcon}"></i></div>
                     </div>
-                    <div id="detail-${item.id}" class="order-book">
-                        <div class="ob-header"><span>Market</span><span>Precio</span></div>
-                        ${detailHtml}
-                    </div>
+                    // 1. Definimos los botones de control (Tabs)
+const tabsHtml = `
+    <div class="ob-tabs">
+        <button class="tab-btn" onclick="switchView('market', '${item.id}')">MARKET</button>
+        <button class="tab-btn" onclick="switchView('grafico', '${item.id}')">GRÁFICO</button>
+    </div>
+`;
+
+// 2. Definimos la vista de la tabla (lo que ya tenías)
+const marketViewHtml = `
+    <div id="view-market-${item.id}" class="view-content order-book">
+        <div class="ob-header"><span>Market</span><span>Precio</span></div>
+        ${detailHtml}
+    </div>
+`;
+
+// 3. Definimos la vista del gráfico (nueva, oculta por defecto)
+const graficoViewHtml = `
+    <div id="view-grafico-${item.id}" class="view-content" style="display: none;">
+        <canvas id="canvas-${item.id}" width="400" height="200"></canvas> 
+        <p style="text-align:center; color:#888;">Cargando gráfico...</p>
+    </div>
+`;
+
+// 4. UNIMOS TODO dentro del contenedor principal
+return `
+    <div id="detail-${item.id}" class="detail-container">
+        ${tabsHtml}
+        ${marketViewHtml}
+        ${graficoViewHtml}
+    </div>
+`;
                 `;
                 container.appendChild(card);
             });
@@ -582,4 +610,5 @@
     </script>
 </body>
 </html>
+
 
