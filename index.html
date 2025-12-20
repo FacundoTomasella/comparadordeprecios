@@ -91,19 +91,18 @@
         
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
+        .nav-item i { font-size: 18px; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
         
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
     </style>
 </head>
-<body>
+<body onload="window.scrollTo(0,0)">
     <div class="app-container">
         <header>
             <div class="top-row">
@@ -137,6 +136,13 @@
         const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+        const STORE_COLORS = {
+            'COTO': '#ff3b30',
+            'CARREFOUR': '#2962ff',
+            'DIA': '#ff3b30',
+            'JUMBO': '#00c853'
+        };
 
         let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes', currentTrendFilter = null, openId = null;
 
@@ -239,7 +245,6 @@
             const lastP = data[data.length-1].precio_minimo;
             const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
             
-            // REQUERIDO: TEXTOS ESPECIFICOS DE TEMPORALIDAD
             let labelDays = '';
             if (days === 7) labelDays = 'últimos 7 días';
             else if (days === 15) labelDays = 'últimos 15 días';
@@ -255,13 +260,14 @@
             const ctx = canvas.getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
+            const tooltipBg = isDark ? 'rgba(60, 60, 60, 0.95)' : 'rgba(40, 40, 40, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; }),
-                    datasets: [{ data: data.map(d => d.precio_minimo), borderColor: color, borderWidth: 1.8, pointStyle: 'circle', pointRadius: 3.5, pointBorderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: color, fill: false, tension: 0.15 }]
+                    datasets: [{ data: data.map(d => d.precio_minimo), borderColor: color, borderWidth: 1.5, pointStyle: 'circle', pointRadius: 3, pointBorderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: color, fill: false, tension: 0.1 }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
@@ -269,11 +275,16 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(30,30,30,0.95)', padding: 12, cornerRadius: 4, displayColors: false, // FIX: RECTANGULAR
+                            backgroundColor: tooltipBg, padding: 12, cornerRadius: 4, displayColors: true,
                             titleFont: { size: 11 }, bodyFont: { size: 13, weight: 'bold' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`,
+                                labelColor: function(context) {
+                                    const sName = data[context.dataIndex].supermercado.toUpperCase();
+                                    const c = STORE_COLORS[sName] || '#888';
+                                    return { borderColor: c, backgroundColor: c, borderWidth: 2, borderRadius: 5 };
+                                }
                             }
                         }
                     },
@@ -303,7 +314,7 @@
         }
 
         function toggleTheme() {
-            closeAllDetails(); // REQUERIDO: CIERRE AL CAMBIAR MODO
+            closeAllDetails(); 
             const isDark = document.documentElement.classList.toggle('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeIcon();
@@ -316,7 +327,7 @@
             if (!wasOpen) { 
                 el.classList.add('open'); 
                 openId = id; 
-                switchObTab(id, 'market'); // SIEMPRE INICIAR EN MARKET
+                switchObTab(id, 'market'); 
             }
         }
 
@@ -346,12 +357,11 @@
                 m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); 
             } else { 
                 m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); 
-                // REQUERIDO: RESET A 7D AL ABRIR
                 const btns = rf.querySelectorAll('.range-btn');
                 btns.forEach(b => b.classList.remove('active'));
                 document.getElementById(`rb-7-${id}`).classList.add('active');
                 const n = flatList.find(p => p.id == id).n; 
-                updateChart(id, n, 7); // INSTANTANEO
+                updateChart(id, n, 7); 
             }
         }
 
