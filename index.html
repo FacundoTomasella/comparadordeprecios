@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
     
-    <!-- SEO & PWA (INSTALAR COMO APP) -->
     <title>TradingChango | Tradeá los Precios, Maximizá el Carrito</title>
-    <meta name="description" content="Comparador de precios de supermercados en tiempo real. Analizá tendencias y compará antes de comprar.">
+    <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="TradingChango">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    <link rel="manifest" href="data:application/json,{'name':'TradingChango','short_name':'TradingChango','start_url':'/','display':'standalone','background_color':'#ffffff','theme_color':'#ffffff'}">
-
+    <!-- FIX: FUERZA LA PÁGINA AL INICIO Y EVITA EL PARPADEO DE MODO OSCURO -->
     <script>
-        if (typeof history.scrollRestoration !== 'undefined') { history.scrollRestoration = 'manual'; }
-        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark-mode'); }
+        if (typeof history.scrollRestoration !== 'undefined') {
+            history.scrollRestoration = 'manual';
+        }
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -37,38 +35,27 @@
             --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
-        
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
         .logo-link { text-decoration: none; color: inherit; }
         .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
-        
-        .theme-btn, .user-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
+        .theme-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
         .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 12px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        /* HERO TEXTO REQUERIDO */
-        .hero-section { text-align: center; padding: 20px; border-bottom: 1px solid var(--border); }
-        .hero-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
-        .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-
-        .trend-filters { display: flex; gap: 10px; margin-top: 12px; padding: 0 20px; }
+        .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         #btnDown { color: var(--color-good); }
         #btnUp { color: var(--color-bad); }
         .trend-btn.active-down { background: var(--color-good) !important; color: white !important; border-color: var(--color-good); }
         .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
-
-        /* PUBLICIDAD */
-        .ad-space { width: 90%; height: 80px; margin: 15px auto; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
         .ticker-list { padding: 0; }
         .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
@@ -85,10 +72,13 @@
         
         .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
         .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
+
         .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .ob-tabs { display: flex; gap: 12px; }
+        .ob-tabs { display: flex; gap: 12px; align-items: center; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
+        
+        .share-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 5px; margin-left: 5px; }
         .range-filters { display: flex; gap: 4px; }
         .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
@@ -96,24 +86,23 @@
         .ob-market-view, .ob-graph-view { display: none; }
         .ob-market-view.active, .ob-graph-view.active { display: block; }
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
+        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
+        .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         
-        .app-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
-        .footer-links { display: flex; justify-content: center; gap: 15px; margin-top: 10px; font-weight: 600; }
-        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 11px; }
-
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
-        
+        .nav-item i { font-size: 18px; }
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
+        .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
+        .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
+        .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .chart-wrapper { width: 100%; height: 260px; padding-top: 5px; position: relative; }
-        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
@@ -121,10 +110,7 @@
         <header>
             <div class="top-row">
                 <a href="#" class="logo-link" onclick="location.reload()"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
-                <div class="header-actions">
-                    <button class="user-btn" onclick="alert('Próximamente: Membresías Plus y Pro')"><i class="fa-regular fa-circle-user"></i></button>
-                    <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-                </div>
+                <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
             </div>
             <div class="search-container">
                 <i class="fa-solid fa-search search-icon"></i>
@@ -134,32 +120,12 @@
                 <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')"><i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando</button>
                 <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')"><i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo</button>
             </div>
-
-            <!-- HERO TEXTO REQUERIDO -->
-            <div class="hero-section">
-                <div class="hero-title">Los precios del super como nunca los viste.</div>
-                <div class="hero-subtitle">Analizá los precios, tendencias, y compará antes de comprar.</div>
-            </div>
         </header>
-
-        <!-- ESPACIO PUBLICIDAD ARRIBA -->
-        <div class="ad-space">Espacio Publicitario / Google Adsense</div>
 
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
 
-        <!-- ESPACIO PUBLICIDAD ABAJO -->
-        <div class="ad-space">Publicidad / Banner Miembro Pro</div>
-
-        <footer class="app-footer">
-            <div>Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></div>
-            <!-- LINKS LEGALES REQUERIDOS -->
-            <div class="footer-links">
-                <a href="#">Acerca de</a>
-                <a href="#">Términos</a>
-                <a href="#">Contacto</a>
-            </div>
-        </footer>
+        <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></footer>
 
         <nav class="bottom-nav">
             <button class="nav-item active" id="btn-tab-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
@@ -203,7 +169,23 @@
                     }
                 });
                 document.getElementById('loader').style.display = 'none';
+                const activeBtn = document.getElementById('btn-tab-' + currentTab);
+                if(activeBtn) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); activeBtn.classList.add('active'); }
+                
                 renderView();
+                window.scrollTo(0,0); // REQUERIDO: Asegurar inicio arriba
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const sharedId = urlParams.get('p');
+                if (sharedId) {
+                    const prod = flatList.find(i => i.id == sharedId);
+                    if (prod) {
+                        const tabKey = prod.cat.toLowerCase().trim();
+                        const btn = document.getElementById('btn-tab-' + (tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios'));
+                        setTab(tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios', btn);
+                        setTimeout(() => toggleDetail(sharedId), 500);
+                    }
+                }
             } catch (e) { console.error(e); }
         }
 
@@ -237,15 +219,22 @@
                             <div class="ob-tabs">
                                 <button class="ob-tab active" id="tab-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
                                 <button class="ob-tab" id="tab-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
+                                <button class="share-btn" onclick="shareProd(${item.id}, '${item.n}')"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
                             </div>
                             <div class="range-filters" id="rf-${item.id}" style="display:none">
-                                <button class="range-btn active" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
+                                <button class="range-btn active" id="rb-7-${item.id}" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
+                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',15,this)">15D</button>
                                 <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',30,this)">1M</button>
+                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',90,this)">3M</button>
+                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',180,this)">6M</button>
                                 <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',365,this)">1Y</button>
                             </div>
                         </div>
                         <div id="view-m-${item.id}" class="ob-market-view active">${renderMarket(item, stats.min)}</div>
-                        <div id="view-g-${item.id}" class="ob-graph-view"><span id="perf-${item.id}" class="chart-performance"></span><div class="chart-wrapper" id="wrap-${item.id}"><canvas id="canvas-${item.id}"></canvas></div></div>
+                        <div id="view-g-${item.id}" class="ob-graph-view">
+                            <span id="perf-${item.id}" class="chart-performance"></span>
+                            <div class="chart-wrapper" id="wrap-${item.id}"><canvas id="canvas-${item.id}"></canvas></div>
+                        </div>
                     </div>`;
                 container.appendChild(card);
             });
@@ -268,7 +257,7 @@
             }
 
             const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-            let label = days === 7 ? 'últimos 7 días' : days === 30 ? 'último mes' : 'último año';
+            let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
             perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
 
@@ -276,6 +265,7 @@
             const ctx = canvas.getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
+            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(85, 85, 85, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
@@ -290,41 +280,90 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(30,30,30,0.95)', padding: 12, cornerRadius: 4, displayColors: false,
-                            titleFont: { size: 11 }, bodyFont: { size: 13, weight: 'bold' },
+                            backgroundColor: tooltipBg, padding: 10, cornerRadius: 4, displayColors: false,
+                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
+                            bodyFont: { size: 12, family: 'Roboto Mono' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`,
+                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
                             }
                         }
                     },
                     scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [2,2] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
+                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
                         x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
                     }
-                }
+                },
+                plugins: [{ beforeTooltipDraw: (chart) => { chart.tooltip.options.bodyFont.weight = 'bold'; },
+                    afterDraw: (chart) => {
+                        if (chart.tooltip?._active?.length) {
+                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
+                            ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
+                            ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+                            ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
+                        }
+                    }
+                }]
             });
         }
 
+        function shareProd(id, name) {
+            const url = `${window.location.origin}${window.location.pathname}?p=${id}`;
+            if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${name}`, url: url });
+            else { navigator.clipboard.writeText(url); alert("Vínculo copiado"); }
+        }
+
         function closeAllDetails() { document.querySelectorAll('.order-book.open').forEach(ob => ob.classList.remove('open')); openId = null; }
-        function toggleTheme() { closeAllDetails(); document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); }
-        function toggleDetail(id) { const el = document.getElementById(`detail-${id}`); const wasOpen = el.classList.contains('open'); closeAllDetails(); if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } }
-        function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; if(currentTab === 'favs') renderView(); }
-        function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
+        
+        function toggleTheme() { 
+            closeAllDetails(); 
+            document.documentElement.classList.toggle('dark-mode'); 
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); 
+            updateThemeIcon(); 
+        }
+
+        function toggleDetail(id) { 
+            const el = document.getElementById(`detail-${id}`); 
+            const wasOpen = el.classList.contains('open'); 
+            closeAllDetails(); 
+            if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } 
+        }
+
+        function toggleFav(id, btn) { 
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); 
+            localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
+            if(currentTab === 'favs') { renderView(); } 
+            else { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; }
+        }
+
+        function getStats(p, h) { 
+            const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; 
+            const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; 
+            if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } 
+            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; 
+        }
+
         function switchObTab(id, type) {
             const m = document.getElementById(`view-m-${id}`), g = document.getElementById(`view-g-${id}`), rf = document.getElementById(`rf-${id}`), btnM = document.getElementById(`tab-m-${id}`), btnG = document.getElementById(`tab-g-${id}`);
             if(!m) return;
             if(type === 'market') { m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); } 
-            else { m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); const n = flatList.find(p => p.id == id).n; updateChart(id, n, 7); }
+            else { 
+                m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); 
+                const n = flatList.find(p => p.id == id).n; 
+                rf.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`rb-7-${id}`).classList.add('active');
+                updateChart(id, n, 7); 
+            }
         }
+
         function renderMarket(item, min) {
             const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
             return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
         function setTrendFilter(t) { closeAllDetails(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
-        function setTab(t, btn) { closeAllDetails(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
+        function setTab(t, btn) { closeAllDetails(); currentTab=t; localStorage.setItem('last_tab', t); window.scrollTo(0,0); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
-        function generateTicker(n) { const cleanN = n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, ""); return cleanN.substring(0, 4); }
+        function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
         document.getElementById('searchInput').addEventListener('input', renderView);
         init();
