@@ -9,6 +9,7 @@
     <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
+    <!-- EVITA EL PARPADEO DE MODO OSCURO -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -56,11 +57,10 @@
         .ticker-list { padding: 0; }
         .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
         .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
-        .t-left { display: flex; flex-direction: column; gap: 2px; }
+        .t-left { display: flex; flex-direction: column; gap: 3px; }
         .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
         .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-        .t-brand-label { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; opacity: 0.6; margin-top: 1px; width: fit-content; }
-        .t-brand-label:hover { opacity: 1; text-decoration: underline; }
+        .t-brand-link { color: var(--accent); text-decoration: underline; cursor: pointer; }
 
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
@@ -76,7 +76,6 @@
         .ob-tabs { display: flex; gap: 12px; align-items: center; }
         .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
-        
         .share-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 5px; margin-left: 5px; }
 
         .range-filters { display: flex; gap: 4px; }
@@ -99,11 +98,11 @@
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -129,10 +128,10 @@
         <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></footer>
 
         <nav class="bottom-nav">
-            <button class="nav-item active" id="nav-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
-            <button class="nav-item" id="nav-verdu" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
-            <button class="nav-item" id="nav-varios" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
-            <button class="nav-item" id="nav-favs" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
+            <button class="nav-item active" id="btn-tab-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
+            <button class="nav-item" id="btn-tab-verdu" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
+            <button class="nav-item" id="btn-tab-varios" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
+            <button class="nav-item" id="btn-tab-favs" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
         </nav>
     </div>
 
@@ -141,7 +140,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes', currentTrendFilter = null, openId = null, currentBrandFilter = null;
+        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = localStorage.getItem('last_tab') || 'carnes', currentTrendFilter = null, openId = null, currentBrandFilter = null;
 
         async function init() {
             try {
@@ -157,26 +156,33 @@
                 flatList = rows.map(r => {
                     const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
                     return {
-                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
-                        marca: r.marca || "", 
+                        id: r.id, n: r.nombre.trim(), cat: r.categoria, marca: r.marca || "",
+                        ticker: generateTicker(r.nombre, r.marca),
                         p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
                         h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
                         u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
                     }
                 });
                 document.getElementById('loader').style.display = 'none';
+                
+                // Restaurar pestaña activa visualmente
+                const activeBtn = document.getElementById('btn-tab-' + currentTab);
+                if(activeBtn) {
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    activeBtn.classList.add('active');
+                }
+
                 renderView();
 
-                // LÓGICA COMPARTIR: Abrir desplegado dsd URL
+                // LÓGICA COMPARTIR
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedId = urlParams.get('p');
                 if (sharedId) {
                     const prod = flatList.find(i => i.id == sharedId);
                     if (prod) {
-                        const tabKey = prod.cat.toLowerCase().trim();
-                        const btn = document.getElementById('nav-' + (tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios'));
-                        setTab(tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios', btn);
-                        setTimeout(() => toggleDetail(sharedId), 400);
+                        const targetTab = prod.cat.toLowerCase().trim() === 'carnes' ? 'carnes' : prod.cat.toLowerCase().trim() === 'verdu' ? 'verdu' : 'varios';
+                        setTab(targetTab, document.getElementById('btn-tab-' + targetTab));
+                        setTimeout(() => toggleDetail(sharedId), 500);
                     }
                 }
             } catch (e) { console.error(e); }
@@ -190,18 +196,21 @@
             
             let dataToShow = flatList;
 
-            // Filtro Principal
+            // Filtro por pestaña (Solo si no hay búsqueda global o marca)
             if (currentTab === 'favs') {
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
-            } else if (currentBrandFilter) {
-                // Filtro de Marca "Invisible"
-                dataToShow = flatList.filter(i => i.marca.toUpperCase() === currentBrandFilter.toUpperCase());
-            } else if (term) {
-                // Buscador Global (En todas las categorías)
-                dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term) || i.marca.toUpperCase().includes(term));
-            } else {
-                // Por Categoría
+            } else if (!term && !currentBrandFilter) {
                 dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
+            }
+
+            // Filtro por Marca (Si está activo)
+            if (currentBrandFilter) {
+                dataToShow = dataToShow.filter(i => i.marca.toUpperCase() === currentBrandFilter.toUpperCase());
+            }
+
+            // Buscador Global (En todas las categorías si no es favs)
+            if (term) {
+                dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term) || i.marca.toUpperCase().includes(term));
             }
             
             if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
@@ -217,8 +226,7 @@
                         <div class="ticker-info" onclick="toggleDetail('${item.id}')">
                             <div class="t-left">
                                 <span class="t-symbol">${item.ticker}</span>
-                                <span class="t-name">${item.n}</span>
-                                ${item.marca ? `<span class="t-brand-label" onclick="event.stopPropagation(); filterByBrand('${item.marca}')">${item.marca}</span>` : ''}
+                                <span class="t-name">${item.n}${item.marca ? ` - <span class="t-brand-link" onclick="event.stopPropagation(); filterByBrand('${item.marca}')">${item.marca}</span>` : ''}</span>
                             </div>
                             <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
                         </div>
@@ -259,11 +267,10 @@
             wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
 
             if(data.length < 2) {
-                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos históricos</span>';
+                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
                 wrap.appendChild(overlay); perfEl.innerText = ''; if(window['ch'+id]) window['ch'+id].destroy(); return;
             }
 
-            // RENDIMIENTO
             const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
             let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
@@ -271,7 +278,7 @@
 
             const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
-            const color = isDark?'#ffffff':'#131722';
+            const color = isDark?'#fff':'#131722';
             const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
@@ -288,8 +295,6 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: tooltipBg, padding: 8, cornerRadius: 4, displayColors: false,
-                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
-                            bodyFont: { size: 12, family: 'Roboto Mono' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
@@ -297,7 +302,7 @@
                         }
                     },
                     scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [2,2] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
+                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
                         x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
                     }
                 },
@@ -327,24 +332,68 @@
         }
 
         function closeAllDetails() { document.querySelectorAll('.order-book.open').forEach(ob => ob.classList.remove('open')); openId = null; }
-        function toggleTheme() { closeAllDetails(); document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); }
-        function toggleDetail(id) { const el = document.getElementById(`detail-${id}`); const wasOpen = el.classList.contains('open'); closeAllDetails(); if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } }
-        function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; if(currentTab === 'favs') renderView(); }
-        function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
+        
+        function toggleTheme() { 
+            closeAllDetails(); 
+            document.documentElement.classList.toggle('dark-mode'); 
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); 
+            updateThemeIcon(); 
+        }
+
+        function toggleDetail(id) { 
+            const el = document.getElementById(`detail-${id}`); 
+            const wasOpen = el.classList.contains('open'); 
+            closeAllDetails(); 
+            if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } 
+        }
+
+        function toggleFav(id, btn) { 
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); 
+            localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
+            if(currentTab === 'favs') { renderView(); } 
+            else { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; }
+        }
+
+        function getStats(p, h) { 
+            const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; 
+            const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; 
+            if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } 
+            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; 
+        }
+
         function switchObTab(id, type) {
             const m = document.getElementById(`view-m-${id}`), g = document.getElementById(`view-g-${id}`), rf = document.getElementById(`rf-${id}`), btnM = document.getElementById(`tab-m-${id}`), btnG = document.getElementById(`tab-g-${id}`);
             if(!m) return;
             if(type === 'market') { m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); } 
             else { m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); const n = flatList.find(p => p.id == id).n; setTimeout(() => updateChart(id, n, 7), 50); }
         }
+
         function renderMarket(item, min) {
-            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
+            const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
+            return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
+
         function setTrendFilter(t) { closeAllDetails(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
-        function setTab(t, btn) { closeAllDetails(); currentTab=t; currentBrandFilter = null; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
+        
+        function setTab(t, btn) { 
+            closeAllDetails(); 
+            currentTab=t; 
+            localStorage.setItem('last_tab', t);
+            currentBrandFilter = null; 
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); 
+            if(btn) btn.classList.add('active'); 
+            renderView(); 
+        }
+
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
-        function generateTicker(n) { const c = n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, " "); const p = c.split(" ").filter(w=>w.length>2); return p.length>=2 ? p[0].substring(0,2)+p[1].substring(0,2) : c.substring(0,4); }
+        
+        function generateTicker(n, b) { 
+            const cleanN = n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "");
+            const cleanB = b ? b.toUpperCase().replace(/\W/g, "") : "";
+            if (cleanB.length >= 2) return cleanB.substring(0,2) + cleanN.substring(0,2);
+            return cleanN.substring(0, 4);
+        }
+
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
         document.getElementById('searchInput').addEventListener('input', () => { currentBrandFilter = null; renderView(); });
         init();
