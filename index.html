@@ -56,12 +56,12 @@
         .ticker-list { padding: 0; }
         .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
         .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
-        .t-left { display: flex; flex-direction: column; gap: 3px; }
+        .t-left { display: flex; flex-direction: column; gap: 2px; }
         .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
-        .t-name { font-size: 13px; color: var(--text-muted); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-        .t-brand { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-top: 2px; cursor: pointer; opacity: 0.7; }
-        .t-brand:hover { opacity: 1; text-decoration: underline; }
-        
+        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+        .t-brand-label { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; cursor: pointer; opacity: 0.6; margin-top: 1px; width: fit-content; }
+        .t-brand-label:hover { opacity: 1; text-decoration: underline; }
+
         .t-right { text-align: right; }
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
@@ -95,19 +95,18 @@
         .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item.active { color: var(--text-main); font-weight: 800; }
         .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--text-main); font-weight: 800; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
-        
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
     </style>
 </head>
-<body onload="window.scrollTo(0,0)">
+<body>
     <div class="app-container">
         <header>
             <div class="top-row">
@@ -130,10 +129,10 @@
         <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></footer>
 
         <nav class="bottom-nav">
-            <button class="nav-item active" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
-            <button class="nav-item" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
-            <button class="nav-item" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
-            <button class="nav-item" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
+            <button class="nav-item active" id="nav-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
+            <button class="nav-item" id="nav-verdu" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
+            <button class="nav-item" id="nav-varios" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
+            <button class="nav-item" id="nav-favs" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
         </nav>
     </div>
 
@@ -159,7 +158,7 @@
                     const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
                     return {
                         id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre),
-                        brand: r.marca || r.nombre.split(' ')[0], // Si no hay marca en DB, usa la primera palabra
+                        marca: r.marca || "", 
                         p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
                         h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
                         u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
@@ -167,6 +166,19 @@
                 });
                 document.getElementById('loader').style.display = 'none';
                 renderView();
+
+                // LÓGICA COMPARTIR: Abrir desplegado dsd URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const sharedId = urlParams.get('p');
+                if (sharedId) {
+                    const prod = flatList.find(i => i.id == sharedId);
+                    if (prod) {
+                        const tabKey = prod.cat.toLowerCase().trim();
+                        const btn = document.getElementById('nav-' + (tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios'));
+                        setTab(tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios', btn);
+                        setTimeout(() => toggleDetail(sharedId), 400);
+                    }
+                }
             } catch (e) { console.error(e); }
         }
 
@@ -174,29 +186,24 @@
             const container = document.getElementById('tickerList');
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
+            const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
             
-            // BUSCADOR GLOBAL vs FILTRO CATEGORIA
             let dataToShow = flatList;
 
+            // Filtro Principal
             if (currentTab === 'favs') {
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
+            } else if (currentBrandFilter) {
+                // Filtro de Marca "Invisible"
+                dataToShow = flatList.filter(i => i.marca.toUpperCase() === currentBrandFilter.toUpperCase());
+            } else if (term) {
+                // Buscador Global (En todas las categorías)
+                dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term) || i.marca.toUpperCase().includes(term));
             } else {
-                // Si hay búsqueda o marca, ignorar pestaña de categoría (Buscador Global)
-                if (!term && !currentBrandFilter) {
-                    const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-                    dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
-                }
+                // Por Categoría
+                dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
             }
             
-            // Aplicar Filtro de Marca
-            if (currentBrandFilter) {
-                dataToShow = dataToShow.filter(i => i.brand.toUpperCase() === currentBrandFilter.toUpperCase());
-            }
-
-            // Aplicar Filtro de Búsqueda
-            if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term) || i.brand.toUpperCase().includes(term));
-            
-            // Aplicar Filtro de Tendencia
             if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
             
             dataToShow.forEach(item => {
@@ -211,7 +218,7 @@
                             <div class="t-left">
                                 <span class="t-symbol">${item.ticker}</span>
                                 <span class="t-name">${item.n}</span>
-                                <span class="t-brand" onclick="event.stopPropagation(); setBrandFilter('${item.brand}')">${item.brand}</span>
+                                ${item.marca ? `<span class="t-brand-label" onclick="event.stopPropagation(); filterByBrand('${item.marca}')">${item.marca}</span>` : ''}
                             </div>
                             <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
                         </div>
@@ -234,10 +241,7 @@
                             </div>
                         </div>
                         <div id="view-m-${item.id}" class="ob-market-view active">${renderMarket(item, stats.min)}</div>
-                        <div id="view-g-${item.id}" class="ob-graph-view">
-                            <span id="perf-${item.id}" class="chart-performance"></span>
-                            <div class="chart-wrapper" id="wrap-${item.id}"><canvas id="canvas-${item.id}"></canvas></div>
-                        </div>
+                        <div id="view-g-${item.id}" class="ob-graph-view"><div class="chart-wrapper" id="wrap-${item.id}"><canvas id="canvas-${item.id}"></canvas></div><span id="perf-${item.id}" class="chart-performance"></span></div>
                     </div>`;
                 container.appendChild(card);
             });
@@ -252,31 +256,23 @@
             const wrap = document.getElementById(`wrap-${id}`);
             const perfEl = document.getElementById(`perf-${id}`);
             if(!wrap) return;
-
             wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
 
             if(data.length < 2) {
-                const overlay = document.createElement('div');
-                overlay.className = 'no-data-overlay';
-                overlay.innerHTML = '<span class="no-data-text">Sin suficientes datos para mostrar</span>';
-                wrap.appendChild(overlay);
-                perfEl.innerText = '';
-                if(window['ch'+id]) window['ch'+id].destroy();
-                return;
+                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos históricos</span>';
+                wrap.appendChild(overlay); perfEl.innerText = ''; if(window['ch'+id]) window['ch'+id].destroy(); return;
             }
 
-            // CALCULAR VARIACIÓN SEGÚN TEMPORALIDAD
-            const firstP = data[0].precio_minimo;
-            const lastP = data[data.length-1].precio_minimo;
-            const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+            // RENDIMIENTO
+            const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
             let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
             perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
 
-            const canvas = document.getElementById(`canvas-${id}`);
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
-            const color = isDark?'#fff':'#131722';
+            const color = isDark?'#ffffff':'#131722';
+            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
@@ -291,10 +287,12 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(50,50,50,0.95)', padding: 10, cornerRadius: 4, displayColors: false,
+                            backgroundColor: tooltipBg, padding: 8, cornerRadius: 4, displayColors: false,
+                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
+                            bodyFont: { size: 12, family: 'Roboto Mono' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`,
+                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
                             }
                         }
                     },
@@ -306,9 +304,7 @@
                 plugins: [{ beforeTooltipDraw: (chart) => { chart.tooltip.options.bodyFont.weight = 'bold'; },
                     afterDraw: (chart) => {
                         if (chart.tooltip?._active?.length) {
-                            const x = chart.tooltip._active[0].element.x;
-                            const yAxis = chart.scales.y;
-                            const ctx = chart.ctx;
+                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
                             ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
                             ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
                             ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
@@ -318,9 +314,8 @@
             });
         }
 
-        function setBrandFilter(brand) {
+        function filterByBrand(brand) {
             currentBrandFilter = brand;
-            document.getElementById('searchInput').value = brand;
             closeAllDetails();
             renderView();
         }
@@ -343,8 +338,8 @@
             else { m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); const n = flatList.find(p => p.id == id).n; setTimeout(() => updateChart(id, n, 7), 50); }
         }
         function renderMarket(item, min) {
-            const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
+            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
+            return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
         function setTrendFilter(t) { closeAllDetails(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
         function setTab(t, btn) { closeAllDetails(); currentTab=t; currentBrandFilter = null; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
