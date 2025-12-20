@@ -9,6 +9,7 @@
     <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
+    <!-- FIX: EVITA EL PARPADEO DE MODO OSCURO -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -75,7 +76,7 @@
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
         
         .range-filters { display: flex; gap: 4px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
         
         .ob-market-view, .ob-graph-view { display: none; }
@@ -91,8 +92,8 @@
         
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item.active { color: var(--text-main); font-weight: 800; }
         .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--text-main); font-weight: 800; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
@@ -100,6 +101,7 @@
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
+
     </style>
 </head>
 <body onload="window.scrollTo(0,0)">
@@ -137,12 +139,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-        const STORE_COLORS = {
-            'COTO': '#ff3b30',
-            'CARREFOUR': '#2962ff',
-            'DIA': '#ff3b30',
-            'JUMBO': '#00c853'
-        };
+        const STORE_COLORS = { 'COTO': '#ff3b30', 'CARREFOUR': '#2962ff', 'DIA': '#ff3b30', 'JUMBO': '#00c853' };
 
         let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'carnes', currentTrendFilter = null, openId = null;
 
@@ -244,14 +241,7 @@
             const firstP = data[0].precio_minimo;
             const lastP = data[data.length-1].precio_minimo;
             const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-            
-            let labelDays = '';
-            if (days === 7) labelDays = 'últimos 7 días';
-            else if (days === 15) labelDays = 'últimos 15 días';
-            else if (days === 30) labelDays = 'último mes';
-            else if (days === 90) labelDays = 'últimos 3 meses';
-            else if (days === 180) labelDays = 'últimos 6 meses';
-            else if (days === 365) labelDays = 'último año';
+            let labelDays = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
 
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
             perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${labelDays}`;
@@ -260,7 +250,7 @@
             const ctx = canvas.getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
-            const tooltipBg = isDark ? 'rgba(60, 60, 60, 0.95)' : 'rgba(40, 40, 40, 0.95)';
+            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
@@ -275,15 +265,19 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: tooltipBg, padding: 12, cornerRadius: 4, displayColors: true,
-                            titleFont: { size: 11 }, bodyFont: { size: 13, weight: 'bold' },
+                            backgroundColor: tooltipBg, padding: 12, cornerRadius: 5, displayColors: true,
+                            titleFont: { size: 11, family: 'Inter', weight: 'normal' },
+                            bodyFont: { size: 13, family: 'Roboto Mono' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`,
-                                labelColor: function(context) {
+                                label: (c) => {
+                                    const item = data[c.dataIndex];
+                                    return `${item.supermercado}: $ ${format(item.precio_minimo)}`;
+                                },
+                                labelColor: (context) => {
                                     const sName = data[context.dataIndex].supermercado.toUpperCase();
                                     const c = STORE_COLORS[sName] || '#888';
-                                    return { borderColor: c, backgroundColor: c, borderWidth: 2, borderRadius: 5 };
+                                    return { borderColor: 'transparent', backgroundColor: c, borderWidth: 0, borderRadius: 5 };
                                 }
                             }
                         }
@@ -294,6 +288,9 @@
                     }
                 },
                 plugins: [{
+                    beforeTooltipDraw: (chart) => {
+                        chart.tooltip.options.bodyFont.weight = 'bold';
+                    },
                     afterDraw: (chart) => {
                         if (chart.tooltip?._active?.length) {
                             const x = chart.tooltip._active[0].element.x;
