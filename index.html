@@ -9,7 +9,6 @@
     <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
-    <!-- EVITA EL PARPADEO DE MODO OSCURO -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -97,16 +96,15 @@
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-        .chart-wrapper { width: 100%; height: 260px; padding-top: 5px; position: relative; }
+        .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
+        
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* FLUCTUACION ARRIBA */
-        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 8px; display: block; }
+        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body onload="window.scrollTo(0,0)">
     <div class="app-container">
         <header>
             <div class="top-row">
@@ -155,34 +153,25 @@
                 });
                 const hData = await resH.json();
                 
-                // Generar tickers únicos verificando duplicados
                 const usedTickers = new Set();
                 flatList = rows.map(r => {
                     const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-                    let ticker = generateTicker(r.nombre);
-                    // Si el ticker ya existe, le agregamos el ID para hacerlo único
-                    if(usedTickers.has(ticker)) {
-                        ticker = (ticker.substring(0,2) + r.id.toString().slice(-2)).toUpperCase();
-                    }
-                    usedTickers.add(ticker);
+                    let t = generateTicker(r.nombre);
+                    if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
+                    usedTickers.add(t);
 
                     return {
-                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: ticker,
+                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: t,
                         p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
                         h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
                         u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
                     }
                 });
-                
                 document.getElementById('loader').style.display = 'none';
                 const activeBtn = document.getElementById('btn-tab-' + currentTab);
-                if(activeBtn) {
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    activeBtn.classList.add('active');
-                }
+                if(activeBtn) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); activeBtn.classList.add('active'); }
                 renderView();
 
-                // DEEP LINKING COMPARTIR
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedId = urlParams.get('p');
                 if (sharedId) {
@@ -201,18 +190,10 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-            
             let dataToShow = flatList;
-
-            if (currentTab === 'favs') {
-                dataToShow = flatList.filter(i => favorites.includes(i.id));
-            } else if (term) {
-                // Buscador Global
-                dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            } else {
-                // Filtro Categoría normal
-                dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
-            }
+            if (currentTab === 'favs') dataToShow = flatList.filter(i => favorites.includes(i.id));
+            else if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
+            else dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
             
             if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
             
@@ -278,6 +259,7 @@
             const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
+            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(85, 85, 85, 0.95)';
             
             if(window['ch'+id]) window['ch'+id].destroy();
             window['ch'+id] = new Chart(ctx, {
@@ -292,7 +274,9 @@
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(50,50,50,0.95)', padding: 10, cornerRadius: 4, displayColors: false,
+                            backgroundColor: tooltipBg, padding: 10, cornerRadius: 4, displayColors: false,
+                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
+                            bodyFont: { size: 12, family: 'Roboto Mono' },
                             callbacks: {
                                 title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
@@ -319,7 +303,7 @@
 
         function shareProd(id, name) {
             const url = `${window.location.origin}${window.location.pathname}?p=${id}`;
-            if (navigator.share) { navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${name}`, url: url }); }
+            if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${name}`, url: url });
             else { navigator.clipboard.writeText(url); alert("Vínculo copiado"); }
         }
 
@@ -357,33 +341,24 @@
             const m = document.getElementById(`view-m-${id}`), g = document.getElementById(`view-g-${id}`), rf = document.getElementById(`rf-${id}`), btnM = document.getElementById(`tab-m-${id}`), btnG = document.getElementById(`tab-g-${id}`);
             if(!m) return;
             if(type === 'market') { m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); } 
-            else { m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); const n = flatList.find(p => p.id == id).n; updateChart(id, n, 7); }
+            else { 
+                m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); 
+                const n = flatList.find(p => p.id == id).n; 
+                rf.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`rb-7-${id}`).classList.add('active');
+                updateChart(id, n, 7); 
+            }
         }
 
         function renderMarket(item, min) {
             const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
             return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
+
         function setTrendFilter(t) { closeAllDetails(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
-        
-        function setTab(t, btn) { 
-            closeAllDetails(); 
-            currentTab=t; 
-            localStorage.setItem('last_tab', t);
-            window.scrollTo(0, 0); // REQUERIDO: SCROLL ARRIBA
-            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); 
-            if(btn) btn.classList.add('active'); 
-            renderView(); 
-        }
-
+        function setTab(t, btn) { closeAllDetails(); currentTab=t; localStorage.setItem('last_tab', t); window.scrollTo(0,0); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
-        
-        function generateTicker(n) { 
-            // Algoritmo profesional para ticker único basado en el nombre
-            const cleanN = n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "");
-            return cleanN.substring(0, 4);
-        }
-
+        function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
         document.getElementById('searchInput').addEventListener('input', renderView);
         init();
