@@ -9,7 +9,11 @@
     <meta name="description" content="Comparador de precios de supermercados en tiempo real.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
+    <!-- FIX: FUERZA LA PÁGINA AL INICIO Y EVITA EL PARPADEO DE MODO OSCURO -->
     <script>
+        if (typeof history.scrollRestoration !== 'undefined') {
+            history.scrollRestoration = 'manual';
+        }
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
         }
@@ -31,7 +35,7 @@
             --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         header { position: sticky; top: 0; z-index: 50; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -75,7 +79,6 @@
         .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
         
         .share-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 5px; margin-left: 5px; }
-
         .range-filters { display: flex; gap: 4px; }
         .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
@@ -88,23 +91,21 @@
         .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
         .no-price { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; pointer-events: none; }
-        
         .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+        
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
-        
+        .nav-item i { font-size: 18px; }
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 10px; position: relative; }
-        
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body onload="window.scrollTo(0,0)">
+<body>
     <div class="app-container">
         <header>
             <div class="top-row">
@@ -170,15 +171,18 @@
                 document.getElementById('loader').style.display = 'none';
                 const activeBtn = document.getElementById('btn-tab-' + currentTab);
                 if(activeBtn) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); activeBtn.classList.add('active'); }
+                
                 renderView();
+                window.scrollTo(0,0); // REQUERIDO: Asegurar inicio arriba
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedId = urlParams.get('p');
                 if (sharedId) {
                     const prod = flatList.find(i => i.id == sharedId);
                     if (prod) {
-                        const t = prod.cat.toLowerCase().trim();
-                        setTab(t === 'carnes' ? 'carnes' : t === 'verdu' ? 'verdu' : 'varios', document.getElementById('btn-tab-' + t));
+                        const tabKey = prod.cat.toLowerCase().trim();
+                        const btn = document.getElementById('btn-tab-' + (tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios'));
+                        setTab(tabKey === 'carnes' ? 'carnes' : tabKey === 'verdu' ? 'verdu' : 'varios', btn);
                         setTimeout(() => toggleDetail(sharedId), 500);
                     }
                 }
@@ -190,6 +194,7 @@
             const term = document.getElementById('searchInput').value.toUpperCase();
             container.innerHTML = '';
             const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
+            
             let dataToShow = flatList;
             if (currentTab === 'favs') dataToShow = flatList.filter(i => favorites.includes(i.id));
             else if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
@@ -256,7 +261,8 @@
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
             perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
 
-            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
+            const canvas = document.getElementById(`canvas-${id}`);
+            const ctx = canvas.getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
             const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(85, 85, 85, 0.95)';
@@ -354,7 +360,6 @@
             const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
             return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
-
         function setTrendFilter(t) { closeAllDetails(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
         function setTab(t, btn) { closeAllDetails(); currentTab=t; localStorage.setItem('last_tab', t); window.scrollTo(0,0); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
