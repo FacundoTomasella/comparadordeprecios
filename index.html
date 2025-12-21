@@ -37,22 +37,21 @@
             --accent: #ffffff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 160px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 90px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         
         header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
         .logo-link { text-decoration: none; color: inherit; cursor: pointer; }
         .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         
-        .theme-btn, .legal-btn, .pv-back-btn, .pv-fav-btn, .pv-share-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
+        .theme-btn, .legal-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
-        .search-container { position: relative; }
         #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 42px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
+        .search-container { position: relative; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
         .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 18px; z-index: 5; }
 
@@ -63,15 +62,9 @@
         .trend-btn.active-down { background: var(--color-good) !important; color: white !important; border-color: var(--color-good); }
         .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
 
-        /* HERO TEXTO - SOLO EN HOME */
         .hero-section { text-align: center; padding: 25px 20px 20px 20px; border-bottom: 1px solid var(--border); display: none; }
         .hero-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
         .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-
-        /* PUBLICIDAD FIJA */
-        .ad-space { width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-align: center; padding: 10px; background: var(--bg-app); }
-        #adTop { position: sticky; top: 125px; z-index: 40; border-bottom: 1px dashed var(--border); }
-        #adBottom { position: fixed; bottom: 64px; width: 100%; max-width: 600px; z-index: 90; border-top: 1px dashed var(--border); background: var(--bg-app); }
 
         .ticker-list { padding: 0; }
         .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
@@ -86,29 +79,33 @@
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
 
-        /* VISTA PRODUCTO FULL PAGE REQUERIDA */
+        /* VISTA PRODUCTO FULL PAGE COMPRIMIDA */
         #productFullView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-app); z-index: 500; overflow-y: auto; }
         .pv-container { width: 100%; max-width: 600px; margin: 0 auto; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
-        .pv-header { position: sticky; top: 0; background: var(--bg-app); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .pv-content { padding: 25px 20px; }
-        .pv-title-box h1 { font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
-        .pv-best-store { font-size: 14px; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
-        .pv-price-big { font-family: 'Roboto Mono'; font-size: 34px; font-weight: 800; margin-top: 10px; color: var(--text-main); }
+        .pv-header { position: sticky; top: 0; background: var(--bg-app); padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .pv-content { padding: 15px 20px; }
+        .pv-title-box h1 { font-size: 22px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
         
-        .pv-chart-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .range-filters { display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 10px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+        .pv-info-grid { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; }
+        .pv-brand-box { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); opacity: 0.7; cursor: pointer; text-decoration: underline; }
+        
+        /* BOTÓN LINK SUPERMERCADO */
+        .pv-best-store-link { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-good); font-weight: 700; text-decoration: none; background: rgba(0, 166, 80, 0.1); padding: 6px 12px; border-radius: 6px; margin-top: 8px; }
+        .pv-price-big { font-family: 'Roboto Mono'; font-size: 30px; font-weight: 800; color: var(--text-main); }
+
+        .pv-chart-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .chart-performance { font-size: 14px; font-weight: 800; margin-bottom: 8px; display: block; } /* MAS GRANDE */
+        .range-filters { display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 8px; }
+        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
         .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
         
-        .pv-market-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 25px; }
-        .pv-market-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 1px; }
+        .pv-market-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+        .pv-market-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; }
 
-        /* MARKET ITEMS */
-        .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
-        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); font-family: '-apple-system', sans-serif; }
+        .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
+        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
-        .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); border-color: rgba(0, 230, 118, 0.3); } 
+        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 14px; padding: 5px 8px; border-radius: 6px; background: rgba(0,0,0,0.03); }
 
         /* PAGINAS DINAMICAS */
         #pageView { display: none; padding: 25px 20px; line-height: 1.6; font-size: 14px; }
@@ -127,16 +124,15 @@
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-        .chart-wrapper { width: 100%; height: 300px; position: relative; }
+        .chart-wrapper { width: 100%; height: 240px; position: relative; }
         .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
         .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- VISTA PRODUCTO COMPLETA -->
+    <!-- VISTA PRODUCTO FULL PAGE -->
     <div id="productFullView">
         <div class="pv-container">
             <div class="pv-header">
@@ -144,7 +140,7 @@
                     <button class="pv-back-btn" onclick="closeProductView()"><i class="fa-solid fa-arrow-left"></i></button>
                     <div class="logo" style="font-size:16px;">TradingChango</div>
                 </div>
-                <div class="header-actions">
+                <div style="display:flex; gap:15px;">
                     <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-regular fa-star"></i></button>
                     <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
                 </div>
@@ -153,8 +149,14 @@
             <div class="pv-content">
                 <div class="pv-title-box">
                     <h1 id="pv-name">---</h1>
-                    <div class="pv-best-store" id="pv-best-store">---</div>
-                    <div class="pv-price-big" id="pv-price-big">$ 0</div>
+                    <div id="pv-brand" class="pv-brand-box"></div>
+                    <div class="pv-info-grid">
+                        <div id="pv-best-box">
+                            <!-- Link dinámico al súper -->
+                            <a id="pv-best-link" class="pv-best-store-link" target="_blank">---</a>
+                        </div>
+                        <div class="pv-price-big" id="pv-price-big">$ 0</div>
+                    </div>
                 </div>
 
                 <div class="pv-chart-section">
@@ -171,7 +173,7 @@
                 </div>
 
                 <div class="pv-market-section">
-                    <div class="pv-market-title">Comparativa de Mercado</div>
+                    <div class="pv-market-title">Otras opciones de Mercado</div>
                     <div id="pv-market-list"></div>
                 </div>
             </div>
@@ -182,7 +184,7 @@
     <div id="pageView">
         <div class="page-header">
             <div id="pageTitle" class="page-title"></div>
-            <div class="back-link" onclick="goHome()">Cerrar <i class="fa-solid fa-xmark"></i></div>
+            <div class="back-link" onclick="goHome()">Volver <i class="fa-solid fa-chevron-right"></i></div>
         </div>
         <div id="pageContent"></div>
     </div>
@@ -198,7 +200,6 @@
                         <a onclick="openPage('terminos', 'Términos')">Términos</a>
                         <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
                     </div>
-                    <button class="user-btn"><i class="fa-regular fa-circle-user"></i></button>
                     <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
                 </div>
             </div>
@@ -220,10 +221,8 @@
             </div>
         </header>
 
-        <div id="adTop" class="ad-space">Google Adsense / Banner Superior</div>
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
-        <div id="adBottom" class="ad-space">Publicidad / Banner Miembro Pro</div>
 
         <footer class="app-footer">
             <div>Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></div>
@@ -242,7 +241,13 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
+        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null, currentBrandFilter = null;
+
+        // CIERRE AL TOCAR FUERA
+        document.addEventListener('click', (e) => {
+            const isInsideLegal = e.target.closest('.legal-btn') || e.target.closest('.legal-dropdown');
+            if (!isInsideLegal) { document.getElementById('legalDropdown').style.display = 'none'; }
+        });
 
         async function init() {
             try {
@@ -262,7 +267,7 @@
                     let t = generateTicker(r.nombre);
                     if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
                     usedTickers.add(t);
-                    return { id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: t, p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0], h7d: h7.length > 0 ? h7[0].precio_minimo : 0, u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo] }
+                    return { id: r.id, n: r.nombre.trim(), cat: r.categoria, marca: r.marca || "", ticker: t, p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0], h7d: h7.length > 0 ? h7[0].precio_minimo : 0, u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo] }
                 });
                 document.getElementById('loader').style.display = 'none';
                 goHome();
@@ -273,7 +278,7 @@
         }
 
         function goHome() {
-            currentTab = 'home'; currentTrendFilter = null;
+            currentTab = 'home'; currentTrendFilter = null; currentBrandFilter = null;
             document.getElementById('tickerList').style.display = 'block';
             document.getElementById('pageView').classList.remove('active');
             document.getElementById('searchBarSection').style.display = 'block';
@@ -290,17 +295,29 @@
             openId = id;
             const stats = getStats(item.p, item.h7d);
             document.getElementById('pv-name').innerText = item.n;
+            
+            // MARCA
+            const brandEl = document.getElementById('pv-brand');
+            if(item.marca) { brandEl.innerText = `Marca: ${item.marca}`; brandEl.onclick = () => { filterByBrand(item.marca); closeProductView(); }; brandEl.style.display = 'block'; }
+            else { brandEl.style.display = 'none'; }
+
+            // MEJOR PRECIO LINK
             const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
             const bestIdx = item.p.indexOf(stats.min);
-            document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[bestIdx]}`;
+            const bestLink = document.getElementById('pv-best-link');
+            bestLink.innerText = `Comprar en ${stores[bestIdx]} →`;
+            bestLink.href = item.u[bestIdx] || "#";
             document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
             
+            // FAV Y SHARE
             const favBtn = document.getElementById('pv-fav-btn');
             favBtn.innerHTML = favorites.includes(item.id) ? '<i class="fa-solid fa-star" style="color:var(--star-gold)"></i>' : '<i class="fa-regular fa-star"></i>';
             favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id); };
-            
             document.getElementById('pv-share-btn').onclick = () => shareProd(item.id, item.n);
-            document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
+
+            // MARKET LIST (EXCLUYENDO EL MEJOR)
+            document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min, bestIdx);
+
             document.getElementById('productFullView').style.display = 'block';
             document.body.style.overflow = 'hidden';
             loadPvChart(7);
@@ -320,17 +337,14 @@
             const wrap = document.getElementById('pv-wrap');
             const perfEl = document.getElementById('pv-perf');
             wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
-
             if(data.length < 2) {
                 const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
                 wrap.appendChild(overlay); perfEl.innerText = ''; if(currentChart) currentChart.destroy(); return;
             }
-
             const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
             let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
             perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
-
             const ctx = document.getElementById('pv-canvas').getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
             const color = isDark?'#fff':'#131722';
@@ -374,6 +388,8 @@
             });
         }
 
+        function filterByBrand(brand) { currentBrandFilter = brand; closeAllDetails(); renderView(); }
+
         function renderView() {
             const container = document.getElementById('tickerList');
             const term = document.getElementById('searchInput').value.toUpperCase();
@@ -382,12 +398,13 @@
             document.getElementById('clearSearch').style.display = term ? 'block' : 'none';
             let dataToShow = flatList;
             if (currentTab === 'favs') dataToShow = flatList.filter(i => favorites.includes(i.id));
+            else if (currentBrandFilter) dataToShow = flatList.filter(i => i.marca.toUpperCase() === currentBrandFilter.toUpperCase());
             else if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             else if (currentTab !== 'home') {
                 const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
                 dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
             }
-            if (currentTab === 'home') hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
+            if (currentTab === 'home') hero.style.display = (term || currentTrendFilter || currentBrandFilter) ? 'none' : 'block';
             if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
             dataToShow.forEach(item => {
                 const stats = getStats(item.p, item.h7d);
@@ -405,13 +422,17 @@
             });
         }
 
+        function renderMarket(item, min, excludeIdx = -1) {
+            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
+            return STORES.map((s, i) => {
+                if (i === excludeIdx) return '';
+                const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
+            }).join('');
+        }
+
         function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
         function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); if(btn) { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; } if(currentTab === 'favs') renderView(); }
         function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
-        function renderMarket(item, min) {
-            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
-        }
         function setTrendFilter(t) { goHome(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
         function setTab(t, btn) { goHome(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
