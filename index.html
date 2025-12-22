@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
     
-    <!-- SEO & PWA -->
-    <title>TradingChango | Tradeá los Precios, Maximizá el Carrito</title>
-    <meta name="description" content="Comparador de precios de supermercados en tiempo real. Analizá tendencias y compará antes de comprar.">
+    <title>TradingChango | Tradeá los Precios</title>
+    
+    <!-- PWA & SEO -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="TradingChango">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="TradingChango">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    <link rel="manifest" href="data:application/json,{'name':'TradingChango','short_name':'TradingChango','start_url':'/','display':'standalone','background_color':'#ffffff','theme_color':'#ffffff'}">
-
     <script>
         if (typeof history.scrollRestoration !== 'undefined') { history.scrollRestoration = 'manual'; }
         if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark-mode'); }
@@ -42,18 +38,15 @@
         
         header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo-link { text-decoration: none; color: inherit; cursor: pointer; }
-        .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-        .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
-        .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
-        .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
+        .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); text-decoration: none; cursor: pointer; }
         
-        .theme-btn, .legal-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .theme-btn, .legal-btn, .pv-back-btn, .pv-fav-btn, .pv-share-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; padding: 0; }
         
-        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 42px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
         .search-container { position: relative; }
+        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 42px 12px 42px; border-radius: 8px; font-size: 15px; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
-        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 18px; z-index: 5; }
+        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 18px; }
 
         .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
         .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
@@ -62,72 +55,49 @@
         .trend-btn.active-down { background: var(--color-good) !important; color: white !important; border-color: var(--color-good); }
         .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
 
-        .hero-section { text-align: center; padding: 25px 20px 20px 20px; border-bottom: 1px solid var(--border); display: none; }
+        .hero-section { text-align: center; padding: 25px 20px; border-bottom: 1px solid var(--border); display: none; }
         .hero-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
-        .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .hero-subtitle { font-size: 13px; color: var(--text-muted); }
+
+        .ad-space { width: 100%; min-height: 80px; border-bottom: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-align: center; padding: 10px; background: var(--bg-app); }
 
         .ticker-list { padding: 0; }
-        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
+        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--bg-app); }
         .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
         .t-left { display: flex; flex-direction: column; gap: 3px; }
-        .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
-        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-        .t-right { text-align: right; }
-        .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
-        .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
-        .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
-        .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
-        .fav-btn.active { color: var(--star-gold); }
+        .t-symbol { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; }
+        .t-name { font-size: 13px; color: var(--text-muted); max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .t-price { font-family: 'Roboto Mono'; font-weight: 700; font-size: 16px; text-align: right; }
+        .t-change { font-family: 'Roboto Mono'; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
 
-        /* VISTA PRODUCTO FULL PAGE COMPRIMIDA */
+        /* VISTA PRODUCTO FULL PAGE */
         #productFullView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-app); z-index: 500; overflow-y: auto; }
         .pv-container { width: 100%; max-width: 600px; margin: 0 auto; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
-        .pv-header { position: sticky; top: 0; background: var(--bg-app); padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .pv-content { padding: 15px 20px; }
-        .pv-title-box h1 { font-size: 22px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
-        
-        .pv-info-grid { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; }
-        .pv-brand-box { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); opacity: 0.7; cursor: pointer; text-decoration: underline; }
-        
-        /* BOTÓN LINK SUPERMERCADO */
-        .pv-best-store-link { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-good); font-weight: 700; text-decoration: none; background: rgba(0, 166, 80, 0.1); padding: 6px 12px; border-radius: 6px; margin-top: 8px; }
-        .pv-price-big { font-family: 'Roboto Mono'; font-size: 30px; font-weight: 800; color: var(--text-main); }
+        .pv-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .pv-content { padding: 25px 20px; }
+        .pv-price-big { font-family: 'Roboto Mono'; font-size: 34px; font-weight: 800; margin-top: 10px; }
+        .pv-best-store-link { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-good); font-weight: 700; text-decoration: none; margin-top: 8px; }
 
-        .pv-chart-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
-        .chart-performance { font-size: 14px; font-weight: 800; margin-bottom: 8px; display: block; } /* MAS GRANDE */
-        .range-filters { display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 8px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
-        .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
-        
-        .pv-market-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .pv-market-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 1px; }
+        /* PAGINAS LEGALES ESTILO PRECIAR */
+        #pageView { display: none; width: 100%; max-width: 600px; margin: 0 auto; min-height: 100vh; background: var(--bg-app); padding: 20px; }
+        .legal-back { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 30px; color: var(--text-main); }
+        .legal-icon { font-size: 40px; margin-bottom: 20px; display: block; }
+        .legal-content h2 { font-size: 22px; font-weight: 800; margin-bottom: 15px; }
+        .legal-content p { line-height: 1.6; margin-bottom: 15px; color: var(--text-main); font-size: 15px; }
+        .legal-content ul { padding-left: 20px; margin-bottom: 15px; }
+        .legal-content li { margin-bottom: 8px; }
 
-        .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
-        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 14px; padding: 5px 8px; border-radius: 6px; background: rgba(0,0,0,0.03); }
+        .legal-dropdown { position: absolute; top: 55px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 160px; overflow: hidden; }
+        .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); cursor: pointer; }
 
-        /* PAGINAS DINAMICAS */
-        #pageView { display: none; padding: 25px 20px; line-height: 1.6; font-size: 14px; }
-        #pageView.active { display: block; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .page-title { font-size: 22px; font-weight: 800; }
-        .back-link { font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; text-transform: uppercase; }
-
-        .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
-        .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
-
-        .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+        .app-footer { text-align: center; padding: 30px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item i { font-size: 18px; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         
-        .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-        .chart-wrapper { width: 100%; height: 240px; position: relative; }
-        .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
-        .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { text-align: center; padding: 50px; font-family: 'Roboto Mono'; font-size: 12px; }
+        .chart-wrapper { width: 100%; height: 280px; position: relative; margin-top: 20px; }
+        .chart-performance { font-size: 11px; font-weight: 700; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -136,31 +106,20 @@
     <div id="productFullView">
         <div class="pv-container">
             <div class="pv-header">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <button class="pv-back-btn" onclick="closeProductView()"><i class="fa-solid fa-arrow-left"></i></button>
-                    <div class="logo" style="font-size:16px;">TradingChango</div>
-                </div>
-                <div style="display:flex; gap:15px;">
-                    <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-regular fa-star"></i></button>
+                <button class="pv-back-btn" onclick="location.hash='home'"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="header-actions">
+                    <button class="pv-fav-btn" id="pv-fav-btn"></button>
                     <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
                 </div>
             </div>
-            
             <div class="pv-content">
                 <div class="pv-title-box">
-                    <h1 id="pv-name">---</h1>
-                    <div id="pv-brand" class="pv-brand-box"></div>
-                    <div class="pv-info-grid">
-                        <div id="pv-best-box">
-                            <!-- Link dinámico al súper -->
-                            <a id="pv-best-link" class="pv-best-store-link" target="_blank">---</a>
-                        </div>
-                        <div class="pv-price-big" id="pv-price-big">$ 0</div>
-                    </div>
+                    <h1 id="pv-name" style="font-size: 24px; font-weight: 800;">---</h1>
+                    <a id="pv-best-link" class="pv-best-store-link" target="_blank">---</a>
+                    <div class="pv-price-big" id="pv-price-big">$ 0</div>
                 </div>
-
                 <div class="pv-chart-section">
-                    <div class="range-filters" id="pv-range-filters">
+                    <div class="range-filters" id="pv-range-filters" style="display:flex; gap:5px; margin-top:20px; justify-content: flex-end;">
                         <button class="range-btn active" onclick="loadPvChart(7, this)">7D</button>
                         <button class="range-btn" onclick="loadPvChart(15, this)">15D</button>
                         <button class="range-btn" onclick="loadPvChart(30, this)">1M</button>
@@ -168,65 +127,56 @@
                         <button class="range-btn" onclick="loadPvChart(180, this)">6M</button>
                         <button class="range-btn" onclick="loadPvChart(365, this)">1Y</button>
                     </div>
-                    <span id="pv-perf" class="chart-performance"></span>
+                    <span id="pv-perf" class="chart-performance" style="margin-top: -25px;"></span>
                     <div class="chart-wrapper" id="pv-wrap"><canvas id="pv-canvas"></canvas></div>
                 </div>
-
-                <div class="pv-market-section">
-                    <div class="pv-market-title">Otras opciones de Mercado</div>
-                    <div id="pv-market-list"></div>
-                </div>
+                <div id="pv-market-list" style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;"></div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL LEGAL -->
+    <!-- PÁGINAS LEGALES -->
     <div id="pageView">
-        <div class="page-header">
-            <div id="pageTitle" class="page-title"></div>
-            <div class="back-link" onclick="goHome()">Volver <i class="fa-solid fa-chevron-right"></i></div>
-        </div>
-        <div id="pageContent"></div>
+        <div class="legal-back" onclick="location.hash='home'"><i class="fa-solid fa-chevron-left"></i> Regresar</div>
+        <div class="legal-icon">🛒</div>
+        <div class="legal-content" id="pageContent"></div>
     </div>
 
-    <div class="app-container">
-        <header id="appHeader">
+    <div class="app-container" id="mainApp">
+        <header>
             <div class="top-row">
-                <a class="logo-link" onclick="goHome()"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
+                <a class="logo" onclick="location.hash='home'">🛒 TradingChango</a>
                 <div class="header-actions">
                     <button class="legal-btn" onclick="toggleLegalDropdown()"><i class="fa-solid fa-circle-info"></i></button>
                     <div id="legalDropdown" class="legal-dropdown">
-                        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
-                        <a onclick="openPage('terminos', 'Términos')">Términos</a>
-                        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
+                        <a onclick="location.hash='about'">Acerca de</a>
+                        <a onclick="location.hash='terms'">Términos</a>
+                        <a onclick="location.hash='contact'">Contacto</a>
                     </div>
                     <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
                 </div>
             </div>
-            <div id="searchBarSection">
-                <div class="search-container">
-                    <i class="fa-solid fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
-                    <i class="fa-solid fa-circle-xmark clear-search" id="clearSearch" onclick="clearInput()"></i>
-                </div>
-                <div class="trend-filters">
-                    <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')"><i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando</button>
-                    <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')"><i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo</button>
-                </div>
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
+                <i class="fa-solid fa-circle-xmark clear-search" id="clearSearch" onclick="clearInput()"></i>
             </div>
-            
+            <div class="trend-filters">
+                <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')"><i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando</button>
+                <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')"><i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo</button>
+            </div>
             <div class="hero-section" id="heroSection">
                 <div class="hero-title">Los precios del super como nunca los viste</div>
                 <div class="hero-subtitle">Analizá los precios, tendencias, y compará antes de comprar</div>
             </div>
         </header>
 
+        <div id="adTop" class="ad-space">Google Adsense / Banner Superior</div>
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
+        <div id="adBottom" class="ad-space" style="border-top:1px dashed var(--border); border-bottom:none;">Publicidad / Banner Miembro Pro</div>
 
-        <footer class="app-footer">
-            <div>Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></div>
-        </footer>
+        <footer class="app-footer">Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></footer>
 
         <nav class="bottom-nav">
             <button class="nav-item" id="btn-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
@@ -241,19 +191,13 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
         const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null, currentBrandFilter = null;
-
-        // CIERRE AL TOCAR FUERA
-        document.addEventListener('click', (e) => {
-            const isInsideLegal = e.target.closest('.legal-btn') || e.target.closest('.legal-dropdown');
-            if (!isInsideLegal) { document.getElementById('legalDropdown').style.display = 'none'; }
-        });
+        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, configDB = {}, currentChart = null;
 
         async function init() {
             try {
                 const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
-                const configRows = await resC.json();
-                configRows.forEach(row => configDB[row.clave] = row.valor);
+                const cRows = await resC.json();
+                cRows.forEach(row => configDB[row.clave] = row.valor);
 
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
                 const rows = await res.json();
@@ -261,93 +205,97 @@
                 const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
                 const hData = await resH.json();
                 
-                const usedTickers = new Set();
                 flatList = rows.map(r => {
                     const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-                    let t = generateTicker(r.nombre);
-                    if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
-                    usedTickers.add(t);
-                    return { id: r.id, n: r.nombre.trim(), cat: r.categoria, marca: r.marca || "", ticker: t, p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0], h7d: h7.length > 0 ? h7[0].precio_minimo : 0, u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo] }
+                    return { id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: generateTicker(r.nombre), p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0], h7d: h7.length > 0 ? h7[0].precio_minimo : 0, u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo] }
                 });
                 document.getElementById('loader').style.display = 'none';
-                goHome();
-                const urlParams = new URLSearchParams(window.location.search);
-                const sharedId = urlParams.get('p');
-                if (sharedId) { openProductView(sharedId); }
+                
+                window.addEventListener('hashchange', router);
+                router();
             } catch (e) { console.error(e); }
         }
 
+        function router() {
+            const hash = location.hash || '#home';
+            document.getElementById('productFullView').style.display = 'none';
+            document.getElementById('pageView').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.body.style.overflow = 'auto';
+
+            if (hash.startsWith('#p-')) {
+                const id = hash.split('-')[1];
+                openProductView(id);
+            } else if (hash === '#about' || hash === '#terms' || hash === '#contact') {
+                showLegalPage(hash.substring(1));
+            } else {
+                document.getElementById('mainApp').style.display = 'block';
+                if (hash === '#home') goHome();
+                else {
+                    const cat = hash.substring(1);
+                    const btn = document.getElementById('btn-' + cat);
+                    if(btn) setTab(cat, btn);
+                }
+            }
+        }
+
         function goHome() {
-            currentTab = 'home'; currentTrendFilter = null; currentBrandFilter = null;
-            document.getElementById('tickerList').style.display = 'block';
-            document.getElementById('pageView').classList.remove('active');
-            document.getElementById('searchBarSection').style.display = 'block';
-            document.getElementById('heroSection').style.display = 'block';
+            currentTab = 'home'; currentTrendFilter = null;
             document.getElementById('searchInput').value = '';
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            window.scrollTo(0,0);
             renderView();
         }
 
         function openProductView(id) {
             const item = flatList.find(i => i.id == id);
-            if (!item) return;
-            openId = id;
+            if (!item) return location.hash = 'home';
             const stats = getStats(item.p, item.h7d);
-            document.getElementById('pv-name').innerText = item.n;
-            
-            // MARCA
-            const brandEl = document.getElementById('pv-brand');
-            if(item.marca) { brandEl.innerText = `Marca: ${item.marca}`; brandEl.onclick = () => { filterByBrand(item.marca); closeProductView(); }; brandEl.style.display = 'block'; }
-            else { brandEl.style.display = 'none'; }
+            document.getElementById('productFullView').style.display = 'block';
+            document.body.style.overflow = 'hidden';
 
-            // MEJOR PRECIO LINK
+            document.getElementById('pv-name').innerText = item.n;
             const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
             const bestIdx = item.p.indexOf(stats.min);
             const bestLink = document.getElementById('pv-best-link');
-            bestLink.innerText = `Comprar en ${stores[bestIdx]} →`;
+            bestLink.innerHTML = `El mejor precio hoy en ${stores[bestIdx]} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:12px; margin-left:5px;"></i>`;
             bestLink.href = item.u[bestIdx] || "#";
             document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
             
-            // FAV Y SHARE
             const favBtn = document.getElementById('pv-fav-btn');
             favBtn.innerHTML = favorites.includes(item.id) ? '<i class="fa-solid fa-star" style="color:var(--star-gold)"></i>' : '<i class="fa-regular fa-star"></i>';
-            favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id); };
+            favBtn.onclick = () => { toggleFav(item.id); openProductView(id); };
+            
             document.getElementById('pv-share-btn').onclick = () => shareProd(item.id, item.n);
-
-            // MARKET LIST (EXCLUYENDO EL MEJOR)
-            document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min, bestIdx);
-
-            document.getElementById('productFullView').style.display = 'block';
-            document.body.style.overflow = 'hidden';
+            document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
             loadPvChart(7);
         }
 
-        function closeProductView() {
-            document.getElementById('productFullView').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            openId = null;
+        function showLegalPage(type) {
+            const titles = { about: 'Acerca de TradingChango', terms: 'Términos y condiciones', contact: 'Contacto' };
+            const keys = { about: 'acerca_de', terms: 'terminos', contact: 'contacto' };
+            document.getElementById('pageView').style.display = 'block';
+            document.getElementById('pageContent').innerHTML = `<h2>${titles[type]}</h2><p>${configDB[keys[type]] || 'Próximamente...'}</p>`;
         }
 
         async function loadPvChart(days, btn) {
             if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
-            const item = flatList.find(i => i.id == openId);
+            const item = flatList.find(i => i.id == location.hash.split('-')[1]);
             const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
             const data = await res.json();
-            const wrap = document.getElementById('pv-wrap');
             const perfEl = document.getElementById('pv-perf');
-            wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
+            
             if(data.length < 2) {
-                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
-                wrap.appendChild(overlay); perfEl.innerText = ''; if(currentChart) currentChart.destroy(); return;
+                document.getElementById('pv-wrap').innerHTML = '<div class="no-data-overlay"><span class="no-data-text">Sin datos suficientes</span><canvas id="pv-canvas"></canvas></div>';
+                perfEl.innerText = ''; return;
             }
+            document.getElementById('pv-wrap').innerHTML = '<canvas id="pv-canvas"></canvas>';
+
             const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-            let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
-            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
+            perfEl.innerText = `${diffP > 0 ? '▲' : '▼'} ${Math.abs(diffP)}% últimos ${days} días`;
+
             const ctx = document.getElementById('pv-canvas').getContext('2d');
-            const isDark = document.documentElement.classList.contains('dark-mode');
-            const color = isDark?'#fff':'#131722';
+            const color = document.documentElement.classList.contains('dark-mode')?'#fff':'#131722';
             if(currentChart) currentChart.destroy();
             currentChart = new Chart(ctx, {
                 type: 'line',
@@ -357,38 +305,11 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(50, 50, 50, 0.95)', padding: 10, cornerRadius: 4, displayColors: false,
-                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
-                            bodyFont: { size: 12, family: 'Roboto Mono', weight: 'bold' },
-                            callbacks: {
-                                title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
-                        x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
-                    }
-                },
-                plugins: [{
-                    afterDraw: (chart) => {
-                        if (chart.tooltip?._active?.length) {
-                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
-                            ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
-                            ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
-                            ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
-                        }
-                    }
-                }]
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(50,50,50,0.95)', padding: 10, cornerRadius: 4, displayColors: false } },
+                    scales: { y: { grid: { color: color==='#fff'?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } }, x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } } }
+                }
             });
         }
-
-        function filterByBrand(brand) { currentBrandFilter = brand; closeAllDetails(); renderView(); }
 
         function renderView() {
             const container = document.getElementById('tickerList');
@@ -396,52 +317,67 @@
             const hero = document.getElementById('heroSection');
             container.innerHTML = '';
             document.getElementById('clearSearch').style.display = term ? 'block' : 'none';
+
             let dataToShow = flatList;
             if (currentTab === 'favs') dataToShow = flatList.filter(i => favorites.includes(i.id));
-            else if (currentBrandFilter) dataToShow = flatList.filter(i => i.marca.toUpperCase() === currentBrandFilter.toUpperCase());
             else if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             else if (currentTab !== 'home') {
                 const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
                 dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
             }
-            if (currentTab === 'home') hero.style.display = (term || currentTrendFilter || currentBrandFilter) ? 'none' : 'block';
+            if (currentTab === 'home') hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
+            
             if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
+            
             dataToShow.forEach(item => {
                 const stats = getStats(item.p, item.h7d);
                 if (stats.min === 0) return;
                 const card = document.createElement('div');
                 card.className = 'ticker-card';
-                card.onclick = () => openProductView(item.id);
-                card.innerHTML = `
-                    <div class="ticker-info">
-                        <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
-                        <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
-                    </div>
-                    <div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="${favorites.includes(item.id)?'fa-solid':'fa-regular'} fa-star"></i></div>`;
+                card.onclick = () => location.hash = 'p-' + item.id;
+                card.innerHTML = `<div class="ticker-info"><div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div><div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div></div><div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="${favorites.includes(item.id)?'fa-solid':'fa-regular'} fa-star"></i></div>`;
                 container.appendChild(card);
             });
         }
 
-        function renderMarket(item, min, excludeIdx = -1) {
-            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => {
-                if (i === excludeIdx) return '';
-                const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`;
-            }).join('');
+        function setTrendFilter(t) {
+            if (currentTrendFilter === t) currentTrendFilter = null;
+            else currentTrendFilter = t;
+            document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
+            document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
+            renderView();
         }
 
-        function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
-        function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); if(btn) { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; } if(currentTab === 'favs') renderView(); }
+        function setTab(t, btn) {
+            location.hash = t;
+            currentTab = t;
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            renderView();
+        }
+
+        function toggleTheme() { 
+            const isDark = document.documentElement.classList.toggle('dark-mode'); 
+            localStorage.setItem('theme', isDark ? 'dark' : 'light'); 
+            document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            if(location.hash.startsWith('#p-')) loadPvChart(7);
+        }
+
+        function toggleLegalDropdown() {
+            const d = document.getElementById('legalDropdown');
+            d.style.display = d.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function toggleFav(id) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); renderView(); }
         function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
-        function setTrendFilter(t) { goHome(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
-        function setTab(t, btn) { goHome(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
-        function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
+        function renderMarket(item, min) {
+            const S = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
+            return S.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
+        }
         function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
-        function shareProd(id, n) { const u = `${window.location.origin}${window.location.pathname}?p=${id}`; if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${n}`, url: u }); else { navigator.clipboard.writeText(u); alert("Vínculo copiado"); } }
-        function toggleLegalDropdown() { const d = document.getElementById('legalDropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'; }
-        function openPage(clave, titulo) { document.getElementById('legalDropdown').style.display='none'; document.getElementById('tickerList').style.display='none'; document.getElementById('searchBarSection').style.display='none'; document.getElementById('heroSection').style.display='none'; const pv = document.getElementById('pageView'); pv.classList.add('active'); document.getElementById('pageTitle').innerText = titulo; document.getElementById('pageContent').innerHTML = configDB[clave] || 'Cargando...'; window.scrollTo(0,0); }
-        function clearInput() { document.getElementById('searchInput').value = ''; document.getElementById('clearSearch').style.display = 'none'; renderView(); }
+        function shareProd(id, n) { const u = `${window.location.origin}${window.location.pathname}#p-${id}`; if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${n}`, url: u }); else { navigator.clipboard.writeText(u); alert("Link copiado"); } }
+        function clearInput() { document.getElementById('searchInput').value = ''; renderView(); }
         document.getElementById('searchInput').addEventListener('input', renderView);
         init();
     </script>
