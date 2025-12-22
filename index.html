@@ -377,200 +377,118 @@
             });
         }
 
-        async function let currentChart = null; 
-
-        function toggleDetail(id) {
-            const item = flatList.find(i => i.id == id);
-            if(!item) return;
-            
-            openId = id;
-            // Ocultamos el Home
-            document.getElementById('tickerList').style.display = 'none';
-            document.getElementById('searchBarSection').style.display = 'none';
-            document.getElementById('heroSection').style.display = 'none';
-            
-            // Mostramos la vista de producto nueva (asegúrate que el ID coincida con tu HTML)
-            const pv = document.getElementById('productView');
-            pv.classList.add('active');
-            document.getElementById('pv-name').innerText = item.n;
-            
-            // Renderizamos los precios por tienda
-            const stats = getStats(item.p, item.h7d);
-            document.getElementById('pv-market').innerHTML = renderMarket(item, stats.min);
-            
-            // Configurar compartir
-            document.getElementById('pv-share').onclick = () => shareProd(item.id, item.n);
-            
-            // Cargar gráfico de 7 días por defecto
-            loadPvChart(7);
-            window.scrollTo(0,0);
-        }
-
-        function closeProductView() {
-            document.getElementById('productView').classList.remove('active');
-            document.getElementById('tickerList').style.display = 'block';
-            document.getElementById('searchBarSection').style.display = 'block';
-            if(currentTab === 'home' && !document.getElementById('searchInput').value) {
-                document.getElementById('heroSection').style.display = 'block';
-            }
-            if(currentChart) currentChart.destroy();
-            openId = null;
-        }
-
-        async function loadPvChart(days, btn) {
-            if(btn) { 
-                btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
-                btn.classList.add('active'); 
-            }
-            const item = flatList.find(i => i.id == openId);
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, {
+        async function updateChart(id, name, days, btn) {
+            if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(name.trim())}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, {
                 headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
             });
             const data = await res.json();
-            const wrap = document.getElementById('pv-wrap');
-            const perfEl = document.getElementById('pv-perf');
-            
+            const wrap = document.getElementById(`wrap-${id}`);
+            const perfEl = document.getElementById(`perf-${id}`);
+            if(!wrap) return;
             wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
 
             if(data.length < 2) {
-                const overlay = document.createElement('div');
-                overlay.className = 'no-data-overlay';
-                overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
-                wrap.appendChild(overlay);
-                perfEl.innerText = '';
-                if(currentChart) currentChart.destroy();
-                return;
+                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
+                wrap.appendChild(overlay); perfEl.innerText = ''; if(window['ch'+id]) window['ch'+id].destroy(); return;
             }
 
-            const firstP = data[0].precio_minimo;
-            const lastP = data[data.length-1].precio_minimo;
-            const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+            const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+            let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
             perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
-            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% en este periodo`;
+            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
 
-            const ctx = document.getElementById('pv-canvas').getContext('2d');
+            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark-mode');
+            const color = isDark?'#fff':'#131722';
+            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)';
             
-            if(currentChart) currentChart.destroy();
-
-            currentChart = new Chart(ctx, {
+            if(window['ch'+id]) window['ch'+id].destroy();
+            window['ch'+id] = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; }),
-                    datasets: [{ 
-                        data: data.map(d => d.precio_minimo), 
-                        borderColor: isDark ? '#fff' : '#131722', 
-                        borderWidth: 1.5, 
-                        pointRadius: 3, 
-                        pointBackgroundColor: '#fff', 
-                        fill: false, 
-                        tension: 0.1 
-                    }]
+                    datasets: [{ data: data.map(d => d.precio_minimo), borderColor: color, borderWidth: 1.5, pointStyle: 'circle', pointRadius: 3, pointBorderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: color, fill: false, tension: 0.1 }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)',
-                            displayColors: false,
-                            bodyFont: { family: 'Roboto Mono' },
+                            backgroundColor: tooltipBg, padding: 10, cornerRadius: 4, displayColors: false,
+                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
+                            bodyFont: { size: 12, family: 'Roboto Mono' },
                             callbacks: {
+                                title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
                                 label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
                             }
                         }
                     },
                     scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { font: { family: 'Roboto Mono', size: 10 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
+                        x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
                     }
                 },
-                plugins: [{
+                plugins: [{ beforeTooltipDraw: (chart) => { chart.tooltip.options.bodyFont.weight = 'bold'; },
                     afterDraw: (chart) => {
                         if (chart.tooltip?._active?.length) {
-                            const x = chart.tooltip._active[0].element.x;
-                            const yAxis = chart.scales.y;
-                            const ctx = chart.ctx;
-                            ctx.save();
-                            ctx.beginPath();
-                            ctx.moveTo(x, yAxis.top);
-                            ctx.lineTo(x, yAxis.bottom);
-                            ctx.lineWidth = 1;
-                            ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
-                            ctx.setLineDash([3, 3]);
-                            ctx.stroke();
-                            ctx.restore();
+                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
+                            ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
+                            ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+                            ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
                         }
                     }
                 }]
             });
         }
 
-        function toggleTheme() { 
-            document.documentElement.classList.toggle('dark-mode'); 
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); 
-            updateThemeIcon(); 
-            if(openId) loadPvChart(7); // Recarga el gráfico si está abierto para ajustar colores
-        }
+        function closeAllDetails() { document.querySelectorAll('.order-book.open').forEach(ob => ob.classList.remove('open')); openId = null; }
+        function toggleTheme() { closeAllDetails(); document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); }
+        function toggleDetail(id) { const el = document.getElementById(`detail-${id}`); const wasOpen = el.classList.contains('open'); closeAllDetails(); if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } }
+        function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); if(currentTab === 'favs') { renderView(); } else { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; } }
+        function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
         
-        function toggleFav(id, btn) { 
-            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); 
-            else favorites.push(id); 
-            localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
-            if(currentTab === 'favs') { renderView(); } 
-            else if(btn) { 
-                btn.classList.toggle('active'); 
-                btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; 
-            } 
+        function switchObTab(id, type) {
+            const m = document.getElementById(`view-m-${id}`), g = document.getElementById(`view-g-${id}`), rf = document.getElementById(`rf-${id}`), btnM = document.getElementById(`tab-m-${id}`), btnG = document.getElementById(`tab-g-${id}`);
+            if(!m) return;
+            if(type === 'market') { m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); } 
+            else { 
+                m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); 
+                const n = flatList.find(p => p.id == id).n; 
+                rf.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`rb-7-${id}`).classList.add('active');
+                updateChart(id, n, 7); 
+            }
         }
-
-        function getStats(p, h) { 
-            const valid = p.filter(v=>v>0); 
-            if(valid.length===0) return {min:0}; 
-            const min = Math.min(...valid); 
-            let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; 
-            if(h>0){ 
-                diff = ((min-h)/h)*100; 
-                if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } 
-                else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } 
-            } 
-            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; 
-        }
-        
         function renderMarket(item, min) {
             const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => { 
-                const p = item.p[i]; 
-                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; 
-            }).join('');
+            return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
-
         function setTrendFilter(t) {
-            currentTrendFilter = (currentTrendFilter === t) ? null : t; 
-            document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
-            document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
-            renderView();
+        currentTrendFilter = (currentTrendFilter === t) ? null : t; 
+        document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
+        document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
+        renderView();
         }
-
         function setTab(t, btn) { goHome(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
         function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
         function shareProd(id, n) { const u = `${window.location.origin}${window.location.pathname}?p=${id}`; if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${n}`, url: u }); else { navigator.clipboard.writeText(u); alert("Vínculo copiado"); } }
-        
         document.getElementById('searchInput').addEventListener('input', renderView);
-
+        // Cerrar el menú legal si se toca fuera de él
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('legalDropdown');
-            const button = document.querySelector('.legal-btn'); // Cambié esto a .legal-btn para que coincida con tu HTML
-            if (dropdown && dropdown.style.display === 'flex') {
-                if (!dropdown.contains(event.target) && !button.contains(event.target)) {
-                    dropdown.style.display = 'none';
-                }
+        const dropdown = document.getElementById('legalDropdown');
+        const button = document.querySelector('.user-btn[onclick*="toggleLegalDropdown"]');
+        
+        if (dropdown.style.display === 'flex') {
+            // Si el clic NO fue dentro del menú ni en el botón que lo abre, lo cerramos
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.style.display = 'none';
             }
-        });
+    }
+});
         init();
     </script>
 </body>
