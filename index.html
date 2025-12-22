@@ -170,7 +170,37 @@
 
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
+<div id="productView" class="page-view">
+    <div class="page-header">
+        <div id="pv-name" class="page-title" style="font-size: 18px;"></div>
+        <div class="back-link" onclick="closeProductView()">Cerrar <i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div id="pv-content">
+        <div class="ob-header-row">
+            <div class="ob-tabs">
+                <span style="font-size: 11px; font-weight: 800; text-transform: uppercase;">Historial de Precios</span>
+                <button class="share-btn" id="pv-share"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+            </div>
+            <div class="range-filters" id="pv-rf">
+                <button class="range-btn active" onclick="loadPvChart(7, this)">7D</button>
+                <button class="range-btn" onclick="loadPvChart(15, this)">15D</button>
+                <button class="range-btn" onclick="loadPvChart(30, this)">1M</button>
+                <button class="range-btn" onclick="loadPvChart(90, this)">3M</button>
+            </div>
+        </div>
+        <span id="pv-perf" class="chart-performance"></span>
+        <div class="chart-wrapper" id="pv-wrap">
+            <canvas id="pv-canvas"></canvas>
+        </div>
+        <div style="margin-top: 20px;">
+            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; display: block;">Comparativa de Tiendas</span>
+            <div id="pv-market"></div>
+        </div>
+    </div>
+</div>
 
+
+        
         <!-- CUERPO DE PÁGINAS DINÁMICAS REQUERIDO -->
         <div id="pageView" class="page-view">
             <div class="page-header">
