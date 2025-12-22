@@ -4,492 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    
-    <!-- SEO & PWA -->
-    <title>TradingChango | Tradeá los Precios, Maximizá el Carrito</title>
-    <meta name="description" content="Comparador de precios de supermercados en tiempo real. Analizá tendencias y compará antes de comprar.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="TradingChango">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    <link rel="manifest" href="data:application/json,{'name':'TradingChango','short_name':'TradingChango','start_url':'/','display':'standalone','background_color':'#ffffff','theme_color':'#ffffff'}">
-
-    <script>
-        if (typeof history.scrollRestoration !== 'undefined') { history.scrollRestoration = 'manual'; }
-        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark-mode'); }
-    </script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>TradingChango | Producto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
-            --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
-            --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
-            --accent: #131722; --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --text-sec: #8e8e93;
+            --accent: #007aff;
+            --color-good: #34c759;
+            --color-bad: #ff3b30;
+            --border-color: #e5e5ea;
         }
+
         .dark-mode {
-            --bg-app: #000000; --bg-card: #121212; --bg-nav: #121212;
-            --text-main: #ffffff; --text-muted: #888888; --border: #2a2a2a;
-            --accent: #ffffff;
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-sec: #8e8e93;
+            --border-color: #38383a;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 160px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
-        .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
-        
-        header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-        .logo-link { text-decoration: none; color: inherit; cursor: pointer; }
-        .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-        .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
-        .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
-        .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
-        
-        .theme-btn, .user-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
-        
-        .search-container { position: relative; }
-        #searchInput { width: 100%; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); padding: 12px 42px 12px 42px; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; }
-        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
-        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; display: none; font-size: 18px; z-index: 5; }
 
-        .trend-filters { display: flex; gap: 10px; margin-top: 12px; }
-        .trend-btn { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-app); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
-        #btnDown { color: var(--color-good); }
-        #btnUp { color: var(--color-bad); }
-        .trend-btn.active-down { background: var(--color-good) !important; color: white !important; border-color: var(--color-good); }
-        .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        .hero-section { text-align: center; padding: 25px 20px 0px 20px; display: none; }
-        .hero-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
-        .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        /* HEADER */
+        header {
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
 
-        /* PUBLICIDAD FIJA - REQUERIDA SIN ESPACIOS */
-        .ad-space { width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-align: center; padding: 10px; background: var(--bg-app); }
-        #adTop { position: sticky; top: 125px; z-index: 40; border-bottom: 1px dashed var(--border); }
-        #adBottom { position: fixed; bottom: 64px; width: 100%; max-width: 600px; z-index: 90; border-top: 1px dashed var(--border); background: var(--bg-app); }
+        .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
 
-        /* PAGINAS DINAMICAS */
-        .page-view { display: none; padding: 25px 20px; line-height: 1.6; font-size: 14px; }
+        .header-actions { display: flex; gap: 15px; }
+        .header-btn {
+            background: none; border: none; color: var(--text-main);
+            font-size: 18px; cursor: pointer; padding: 5px;
+        }
+
+        /* VISTAS */
+        .page-view {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
         .page-view.active { display: block; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .page-title { font-size: 22px; font-weight: 800; }
-        .back-link { font-size: 12px; font-weight: 700; color: var(--accent); cursor: pointer; text-transform: uppercase; }
 
-        /* DROPDOWN LEGAL */
-        .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
-        .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
-        .legal-dropdown a:last-child { border-bottom: none; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-        .ticker-list { padding: 0; }
-        .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
-        .ticker-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
-        .t-left { display: flex; flex-direction: column; gap: 3px; }
-        .t-symbol { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; letter-spacing: -0.5px; }
-        .t-name { font-size: 13px; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-        .t-right { text-align: right; }
-        .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
-        .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
-        .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
-        .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
-        .fav-btn.active { color: var(--star-gold); }
-        
-        .order-book { display: none; background: var(--bg-card); padding: 5px 20px 20px 20px; border-bottom: 1px solid var(--border); }
-        .order-book.open { display: block; animation: slideDown 0.2s ease-out; }
-        .ob-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .ob-tabs { display: flex; gap: 12px; align-items: center; }
-        .ob-tab { background: none; border: none; color: var(--text-muted); padding: 10px 0; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; }
-        .ob-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); font-weight: 800; }
-        .share-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 5px; margin-left: 5px; }
+        .page-title { font-size: 24px; font-weight: 800; }
+        .back-link { color: var(--accent); cursor: pointer; font-weight: 600; }
 
-        .range-filters { display: flex; gap: 4px; }
-        .range-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
-        .range-btn.active { background: var(--text-main); color: var(--bg-app); border-color: var(--text-main); }
-        
-        .ob-market-view, .ob-graph-view { display: none; }
-        .ob-market-view.active, .ob-graph-view.active { display: block; }
-        .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
-        .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        /* VISTA PRODUCTO ESPECIFICA */
+        .ob-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .range-filters { display: flex; gap: 8px; }
+        .range-btn {
+            background: var(--border-color);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sec);
+            cursor: pointer;
+        }
+
+        .range-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 280px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .chart-performance {
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* TIENDAS */
+        .ob-row {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .ob-store { display: flex; align-items: center; gap: 10px; font-weight: 600; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
         
-        .app-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
-        .nav-item.active { color: var(--text-main); font-weight: 800; }
-        .nav-item i { font-size: 18px; }
-        
-        .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .chart-wrapper { width: 100%; height: 260px; padding-top: 5px; position: relative; }
-        .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
-        .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: block; }
+        .price-link {
+            text-decoration: none;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            color: var(--text-main);
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .best-val { background: rgba(52, 199, 89, 0.1); color: var(--color-good); }
+        .no-price { color: var(--text-sec); opacity: 0.5; }
+
+        .no-data-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(2px);
+            font-size: 12px; font-weight: 700; color: var(--text-sec);
+        }
+
+        /* LISTA PRINCIPAL (VERSION 4) */
+        .ticker-item {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <div class="top-row">
-                <a class="logo-link" onclick="goHome()"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
-                <div class="header-actions">
-                    <!-- ICONO LEGAL ARRIBA REQUERIDO -->
-                    <button class="user-btn" onclick="toggleLegalDropdown(event)"><i class="fa-solid fa-circle-info"></i></button>
-                    <div id="legalDropdown" class="legal-dropdown">
-                        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
-                        <a onclick="openPage('terminos', 'Términos')">Términos</a>
-                        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
-                    </div>
-                 
-                    <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-                </div>
-            </div>
-            <div id="searchBarSection">
-                <div class="search-container">
-                    <i class="fa-solid fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
-                    <i class="fa-solid fa-circle-xmark clear-search" id="clearSearch" onclick="clearInput()"></i>
-                </div>
-                <div class="trend-filters">
-                    <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')"><i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando</button>
-                    <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')"><i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo</button>
+    <header>
+        <div class="logo" onclick="location.reload()">TradingChango</div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="toggleTheme()"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
+        </div>
+    </header>
+
+    <div id="mainList">
+        <div class="ticker-item" onclick="toggleDetail('123')">
+            <span>Producto de Ejemplo</span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+    </div>
+
+    <div id="productView" class="page-view">
+        <div class="page-header">
+            <div id="pv-name" class="page-title" style="font-size: 18px;"></div>
+            <div class="back-link" onclick="closeProductView()">Cerrar <i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div id="pv-content">
+            <div class="ob-header-row">
+                <span style="font-size: 11px; font-weight: 800; text-transform: uppercase;">Historial de Precios</span>
+                <div class="range-filters" id="pv-rf">
+                    <button class="range-btn active" onclick="loadPvChart(7, this)">7D</button>
+                    <button class="range-btn" onclick="loadPvChart(30, this)">1M</button>
+                    <button class="range-btn" onclick="loadPvChart(90, this)">3M</button>
                 </div>
             </div>
             
-            <div class="hero-section" id="heroSection">
-                <div class="hero-title">Los precios del super como nunca los viste</div>
-                <div class="hero-subtitle">Analizá los precios, tendencias, y compará antes de comprar</div>
+            <span id="pv-perf" class="chart-performance"></span>
+            
+            <div class="chart-wrapper" id="pv-wrap">
+                <canvas id="pv-canvas"></canvas>
             </div>
-        </header>
 
-        <div id="adTop" class="ad-space">Google Adsense / Banner Superior</div>
-
-        <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
-        <div id="tickerList" class="ticker-list"></div>
-<div id="productView" class="page-view">
-    <div class="page-header">
-        <div id="pv-name" class="page-title" style="font-size: 18px;"></div>
-        <div class="back-link" onclick="closeProductView()">Cerrar <i class="fa-solid fa-xmark"></i></div>
-    </div>
-    <div id="pv-content">
-        <div class="ob-header-row">
-            <div class="ob-tabs">
-                <span style="font-size: 11px; font-weight: 800; text-transform: uppercase;">Historial de Precios</span>
-                <button class="share-btn" id="pv-share"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
-            </div>
-            <div class="range-filters" id="pv-rf">
-                <button class="range-btn active" onclick="loadPvChart(7, this)">7D</button>
-                <button class="range-btn" onclick="loadPvChart(15, this)">15D</button>
-                <button class="range-btn" onclick="loadPvChart(30, this)">1M</button>
-                <button class="range-btn" onclick="loadPvChart(90, this)">3M</button>
+            <div style="margin-top: 25px;">
+                <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: block;">Comparativa de Tiendas</span>
+                <div id="pv-market"></div>
             </div>
         </div>
-        <span id="pv-perf" class="chart-performance"></span>
-        <div class="chart-wrapper" id="pv-wrap">
-            <canvas id="pv-canvas"></canvas>
-        </div>
-        <div style="margin-top: 20px;">
-            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; display: block;">Comparativa de Tiendas</span>
-            <div id="pv-market"></div>
-        </div>
-    </div>
-</div>
-
-
-        
-        <!-- CUERPO DE PÁGINAS DINÁMICAS REQUERIDO -->
-        <div id="pageView" class="page-view">
-            <div class="page-header">
-                <div id="pageTitle" class="page-title"></div>
-                <div class="back-link" onclick="goHome()">Volver <i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-            <div id="pageContent"></div>
-        </div>
-
-        <div id="adBottom" class="ad-space">Publicidad / Banner Miembro Pro</div>
-
-        <footer class="app-footer">
-            <div>Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></div>
-        </footer>
-
-        <nav class="bottom-nav">
-            <button class="nav-item" id="btn-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
-            <button class="nav-item" id="btn-verdu" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
-            <button class="nav-item" id="btn-varios" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
-            <button class="nav-item" id="btn-favs" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
-        </nav>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
-        const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+        // CONFIGURACIÓN Y VARIABLES (Asegúrate de tener tus constantes SUPABASE aquí)
+        let openId = null;
+        let currentChart = null;
+        const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-        let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {};
+        // --- LÓGICA DE NAVEGACIÓN (VERSION 4) ---
+        function toggleDetail(id) {
+            // Simulamos encontrar el item. En tu código real usas flatList.find
+            const item = { id: id, n: "Producto de Ejemplo", p: [1000, 1100, 950, 0], h7d: 1050 }; 
+            openId = id;
 
-        async function init() {
-            try {
-                // 1. CARGA DE CONFIGURACION
-                const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
-                const configRows = await resC.json();
-                configRows.forEach(row => configDB[row.clave] = row.valor);
-                if(configDB['ad_top']) document.getElementById('adTop').innerHTML = configDB['ad_top'];
-                if(configDB['ad_bottom']) document.getElementById('adBottom').innerHTML = configDB['ad_bottom'];
+            document.getElementById('mainList').style.display = 'none';
+            const pv = document.getElementById('productView');
+            pv.classList.add('active');
+            document.getElementById('pv-name').innerText = item.n;
 
-                // 2. CARGA DE PRODUCTOS
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
-                const rows = await res.json();
-                const d7 = new Date(); d7.setDate(d7.getDate() - 7);
-                const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
-                const hData = await resH.json();
-                
-                const usedTickers = new Set();
-                flatList = rows.map(r => {
-                    const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-                    let t = generateTicker(r.nombre);
-                    if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
-                    usedTickers.add(t);
-                    return {
-                        id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: t,
-                        p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
-                        h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
-                        u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
-                    }
-                });
-                document.getElementById('loader').style.display = 'none';
-                goHome();
-                
-                // DEEP LINKING
-                const urlParams = new URLSearchParams(window.location.search);
-                const sharedId = urlParams.get('p');
-                if (sharedId) {
-                    const prod = flatList.find(i => i.id == sharedId);
-                    if (prod) {
-                        currentTab = prod.cat.toLowerCase();
-                        renderView();
-                        setTimeout(() => toggleDetail(sharedId), 500);
-                    }
-                }
-            } catch (e) { console.error(e); }
-        }
+            // Render Market
+            document.getElementById('pv-market').innerHTML = renderMarket(item, 950);
 
-        function goHome() {
-            currentTab = 'home';
-            currentTrendFilter = null;
-            document.getElementById('tickerList').style.display = 'block';
-            document.getElementById('pageView').classList.remove('active');
-            document.getElementById('searchBarSection').style.display = 'block';
-            document.getElementById('heroSection').style.display = 'block';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            window.scrollTo(0,0);
-            renderView();
-        }
-
-            function toggleLegalDropdown(event) {
-            if (event) event.stopPropagation(); // Evita que el clic llegue al body inmediatamente
-            const dropdown = document.getElementById('legalDropdown');
-            dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
-         }
-        function openPage(clave, titulo) {
-            document.getElementById('legalDropdown').style.display = 'none';
-            document.getElementById('tickerList').style.display = 'none';
-            document.getElementById('searchBarSection').style.display = 'none';
-            document.getElementById('heroSection').style.display = 'none';
-            
-            const pageView = document.getElementById('pageView');
-            pageView.classList.add('active');
-            document.getElementById('pageTitle').innerText = titulo;
-            document.getElementById('pageContent').innerHTML = configDB[clave] || 'Contenido no disponible.';
+            // Cargar Gráfico con lógica de la VERSION 10
+            loadPvChart(7);
             window.scrollTo(0,0);
         }
 
-        function clearInput() { document.getElementById('searchInput').value = ''; document.getElementById('clearSearch').style.display = 'none'; renderView(); }
-
-        function renderView() {
-            const container = document.getElementById('tickerList');
-            const term = document.getElementById('searchInput').value.toUpperCase();
-            const hero = document.getElementById('heroSection');
-            const clearBtn = document.getElementById('clearSearch');
-            container.innerHTML = '';
-            clearBtn.style.display = term ? 'block' : 'none';
-
-            let dataToShow = flatList;
-            if (currentTab === 'home') {
-                hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
-                if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            } else if (currentTab === 'favs') {
-                hero.style.display = 'none';
-                dataToShow = flatList.filter(i => favorites.includes(i.id));
-                if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            } else {
-                hero.style.display = 'none';
-                const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-                dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
-                if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            }
-            
-            if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
-            
-            dataToShow.forEach(item => {
-                const stats = getStats(item.p, item.h7d);
-                if (stats.min === 0) return;
-                const card = document.createElement('div');
-                card.innerHTML = `
-                    <div class="ticker-card">
-                        <div class="ticker-info" onclick="toggleDetail('${item.id}')">
-                            <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
-                            <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
-                        </div>
-                        <div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="toggleFav(${item.id}, this)"><i class="${favorites.includes(item.id)?'fa-solid':'fa-regular'} fa-star"></i></div>
-                    </div>
-                    <div id="detail-${item.id}" class="order-book ${openId == item.id ?'open':''}">
-                        <div class="ob-header-row">
-                            <div class="ob-tabs">
-                                <button class="ob-tab active" id="tab-m-${item.id}" onclick="switchObTab('${item.id}', 'market')">Market</button>
-                                <button class="ob-tab" id="tab-g-${item.id}" onclick="switchObTab('${item.id}', 'graph')">Gráfico</button>
-                                <button class="share-btn" onclick="shareProd(${item.id}, '${item.n}')"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
-                            </div>
-                            <div class="range-filters" id="rf-${item.id}" style="display:none">
-                                <button class="range-btn active" id="rb-7-${item.id}" onclick="updateChart('${item.id}','${item.n}',7,this)">7D</button>
-                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',15,this)">15D</button>
-                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',30,this)">1M</button>
-                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',90,this)">3M</button>
-                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',180,this)">6M</button>
-                                <button class="range-btn" onclick="updateChart('${item.id}','${item.n}',365,this)">1Y</button>
-                            </div>
-                        </div>
-                        <div id="view-m-${item.id}" class="ob-market-view active">${renderMarket(item, stats.min)}</div>
-                        <div id="view-g-${item.id}" class="ob-graph-view"><span id="perf-${item.id}" class="chart-performance"></span><div class="chart-wrapper" id="wrap-${item.id}"><canvas id="canvas-${item.id}"></canvas></div></div>
-                    </div>`;
-                container.appendChild(card);
-            });
+        function closeProductView() {
+            document.getElementById('productView').classList.remove('active');
+            document.getElementById('mainList').style.display = 'block';
+            if(currentChart) currentChart.destroy();
+            openId = null;
         }
 
-        async function updateChart(id, name, days, btn) {
-            if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(name.trim())}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, {
-                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-            });
-            const data = await res.json();
-            const wrap = document.getElementById(`wrap-${id}`);
-            const perfEl = document.getElementById(`perf-${id}`);
-            if(!wrap) return;
-            wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
-
-            if(data.length < 2) {
-                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
-                wrap.appendChild(overlay); perfEl.innerText = ''; if(window['ch'+id]) window['ch'+id].destroy(); return;
+        // --- LÓGICA DE GRÁFICOS (VERSION 10 INTEGRADA) ---
+        async function loadPvChart(days, btn) {
+            if(btn) { 
+                btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
+                btn.classList.add('active'); 
             }
 
-            const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-            let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
-            perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
-            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
+            // Aquí iría tu fetch a Supabase como en la V10...
+            // Simulamos datos para el ejemplo:
+            const data = [
+                {fecha: '2023-12-15', precio_minimo: 900, supermercado: 'Coto'},
+                {fecha: '2023-12-18', precio_minimo: 950, supermercado: 'Dia'},
+                {fecha: '2023-12-22', precio_minimo: 1000, supermercado: 'Carrefour'}
+            ];
 
-            const ctx = document.getElementById(`canvas-${id}`).getContext('2d');
+            const wrap = document.getElementById('pv-wrap');
+            const perfEl = document.getElementById('pv-perf');
             const isDark = document.documentElement.classList.contains('dark-mode');
-            const color = isDark?'#fff':'#131722';
-            const tooltipBg = isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)';
+
+            if(currentChart) currentChart.destroy();
+
+            const ctx = document.getElementById('pv-canvas').getContext('2d');
             
-            if(window['ch'+id]) window['ch'+id].destroy();
-            window['ch'+id] = new Chart(ctx, {
+            // CONFIGURACIÓN EXACTA DE LA VERSIÓN 10
+            currentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; }),
-                    datasets: [{ data: data.map(d => d.precio_minimo), borderColor: color, borderWidth: 1.5, pointStyle: 'circle', pointRadius: 3, pointBorderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: color, fill: false, tension: 0.1 }]
+                    labels: data.map(d => { 
+                        const dt = new Date(d.fecha + 'T12:00:00'); 
+                        return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; 
+                    }),
+                    datasets: [{
+                        data: data.map(d => d.precio_minimo),
+                        borderColor: isDark ? '#fff' : '#131722',
+                        borderWidth: 1.5,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: isDark ? '#fff' : '#131722',
+                        fill: false,
+                        tension: 0.1
+                    }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
-                    plugins: { 
+                    plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: tooltipBg, padding: 10, cornerRadius: 4, displayColors: false,
-                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
-                            bodyFont: { size: 12, family: 'Roboto Mono' },
+                            backgroundColor: isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)',
+                            padding: 10,
+                            displayColors: false,
+                            titleFont: { size: 10 },
+                            bodyFont: { family: 'Roboto Mono', size: 12 },
                             callbacks: {
-                                title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
+                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${c.formattedValue}`
                             }
                         }
                     },
                     scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
-                        x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+                        y: { 
+                            grid: { color: isDark ? '#333' : '#eee', borderDash: [4,4] },
+                            ticks: { font: { family: 'Roboto Mono', size: 10 } }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     }
                 },
-                plugins: [{ beforeTooltipDraw: (chart) => { chart.tooltip.options.bodyFont.weight = 'bold'; },
+                plugins: [{
+                    // LINEA VERTICAL PUNTEADA DE LA VERSION 10
                     afterDraw: (chart) => {
                         if (chart.tooltip?._active?.length) {
-                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
-                            ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
-                            ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
-                            ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
+                            const x = chart.tooltip._active[0].element.x;
+                            const yAxis = chart.scales.y;
+                            const ctx = chart.ctx;
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(x, yAxis.top);
+                            ctx.lineTo(x, yAxis.bottom);
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+                            ctx.setLineDash([3, 3]);
+                            ctx.stroke();
+                            ctx.restore();
                         }
                     }
                 }]
             });
         }
 
-        function closeAllDetails() { document.querySelectorAll('.order-book.open').forEach(ob => ob.classList.remove('open')); openId = null; }
-        function toggleTheme() { closeAllDetails(); document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); }
-        function toggleDetail(id) { const el = document.getElementById(`detail-${id}`); const wasOpen = el.classList.contains('open'); closeAllDetails(); if (!wasOpen) { el.classList.add('open'); openId = id; switchObTab(id, 'market'); } }
-        function toggleFav(id, btn) { if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); localStorage.setItem('fav_tickers', JSON.stringify(favorites)); if(currentTab === 'favs') { renderView(); } else { btn.classList.toggle('active'); btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; } }
-        function getStats(p, h) { const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; }
-        
-        function switchObTab(id, type) {
-            const m = document.getElementById(`view-m-${id}`), g = document.getElementById(`view-g-${id}`), rf = document.getElementById(`rf-${id}`), btnM = document.getElementById(`tab-m-${id}`), btnG = document.getElementById(`tab-g-${id}`);
-            if(!m) return;
-            if(type === 'market') { m.classList.add('active'); g.classList.remove('active'); rf.style.display = 'none'; btnM.classList.add('active'); btnG.classList.remove('active'); } 
-            else { 
-                m.classList.remove('active'); g.classList.add('active'); rf.style.display = 'flex'; btnM.classList.remove('active'); btnG.classList.add('active'); 
-                const n = flatList.find(p => p.id == id).n; 
-                rf.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById(`rb-7-${id}`).classList.add('active');
-                updateChart(id, n, 7); 
-            }
-        }
         function renderMarket(item, min) {
-            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
+            // Lógica de renderizado de tiendas de tu código original...
+            return `<div class="ob-row"><span>Ejemplo Tienda</span><strong>$950</strong></div>`;
         }
-        function setTrendFilter(t) {
-        currentTrendFilter = (currentTrendFilter === t) ? null : t; 
-        document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
-        document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
-        renderView();
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            if(openId) loadPvChart(7);
         }
-        function setTab(t, btn) { goHome(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
-        function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
-        function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
-        function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
-        function shareProd(id, n) { const u = `${window.location.origin}${window.location.pathname}?p=${id}`; if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${n}`, url: u }); else { navigator.clipboard.writeText(u); alert("Vínculo copiado"); } }
-        document.getElementById('searchInput').addEventListener('input', renderView);
-        // Cerrar el menú legal si se toca fuera de él
-        document.addEventListener('click', function(event) {
-        const dropdown = document.getElementById('legalDropdown');
-        const button = document.querySelector('.user-btn[onclick*="toggleLegalDropdown"]');
-        
-        if (dropdown.style.display === 'flex') {
-            // Si el clic NO fue dentro del menú ni en el botón que lo abre, lo cerramos
-            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
-                dropdown.style.display = 'none';
-            }
-    }
-});
-        init();
     </script>
 </body>
 </html>
