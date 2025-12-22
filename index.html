@@ -144,7 +144,7 @@
                         <a onclick="openPage('terminos', 'Términos')">Términos</a>
                         <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
                     </div>
-                    <button class="user-btn"><i class="fa-regular fa-circle-user"></i></button>
+                 
                     <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
                 </div>
             </div>
@@ -267,9 +267,9 @@
             renderView();
         }
 
-        function toggleLegalDropdown() {
+            function toggleLegalDropdown() {
             const dropdown = document.getElementById('legalDropdown');
-            dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+            dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function openPage(clave, titulo) {
@@ -435,7 +435,12 @@
             const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
             return STORES.map((s, i) => { const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; }).join('');
         }
-        function setTrendFilter(t) { goHome(); currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
+        function setTrendFilter(t) {
+        currentTrendFilter = (currentTrendFilter === t) ? null : t; 
+        document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
+        document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
+        renderView();
+        }
         function setTab(t, btn) { goHome(); currentTab=t; localStorage.setItem('last_tab', t); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); if(btn) btn.classList.add('active'); renderView(); }
         function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
         function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
