@@ -134,6 +134,25 @@
         .page-view.active { display: block; }
         .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
         .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
+    
+    /* AJUSTE PARA ESCRITORIO (Pantallas mayores a 1024px) */
+@media (min-width: 1024px) {
+    .app-container, .pv-container, .bottom-nav {
+        max-width: 900px !important; /* Aumentamos el ancho en escritorio */
+    }
+
+    /* Optimizamos el espacio de las tarjetas en escritorio */
+    .ticker-info {
+        padding-right: 30px; 
+    }
+
+    /* Hacemos que la imagen del producto en la vista detalle sea un poco más grande */
+    .pv-img-container {
+        width: 180px;
+        height: 180px;
+    }
+}
+    
     </style>
 </head>
 <body>
