@@ -28,6 +28,36 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
+        /* Caja gris para precio promedio */
+.pv-avg-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    display: inline-block;
+}
+.pv-avg-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 2px; }
+.pv-avg-value { font-family: 'Roboto Mono'; font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+/* Botón de ir a la web */
+.btn-visit-store {
+    background: var(--accent);
+    color: var(--badge-text);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+        
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
@@ -204,19 +234,29 @@
             
             <div class="pv-content">
                 <div class="pv-top-info">
-                    <!-- MODIFICADO: Imagen ahora a la izquierda -->
-                    <div class="pv-img-container" id="pv-img-wrap">
-                        <img id="pv-img" src="" alt="Producto">
-                    </div>
-                    <!-- MODIFICADO: Datos ahora a la derecha -->
-                    <div class="pv-title-box">
-                        <h1 id="pv-name">Cargando...</h1>
-                        <div class="pv-best-store" id="pv-best-store">---</div>
-                        <div class="pv-price-big" id="pv-price-big">$ 0</div>
-                        <!-- NUEVO: Dato de precio promedio -->
-                        <div class="pv-avg-price">Precio promedio: <span id="pv-avg-price">$ 0</span></div>
-                    </div>
-                </div>
+    <!-- FOTO A LA IZQUIERDA -->
+    <div class="pv-img-container" id="pv-img-wrap" style="display: block;">
+        <img id="pv-img" src="" alt="Producto">
+    </div>
+
+    <!-- DATOS A LA DERECHA -->
+    <div class="pv-title-box">
+        <h1 id="pv-name">Cargando...</h1>
+        <div style="display: flex; align-items: center; margin-top: 8px;">
+            <div class="pv-best-store" id="pv-best-store">---</div>
+            <a id="pv-store-link" href="#" target="_blank" class="btn-visit-store">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> VER WEB
+            </a>
+        </div>
+        <div class="pv-price-big" id="pv-price-big">$ 0</div>
+        
+        <!-- PRECIO PROMEDIO EN CAJA GRIS -->
+        <div class="pv-avg-box">
+            <span class="pv-avg-label">Precio Promedio</span>
+            <span class="pv-avg-value" id="pv-avg-price">$ 0</span>
+        </div>
+    </div>
+</div>
 
                 <div class="pv-chart-section">
                     <div class="range-filters" id="pv-range-filters">
@@ -440,48 +480,52 @@
         renderView(); 
     }
 
-    function openProductView(id, pushState = true) {
-        const item = flatList.find(i => i.id == id);
-        if (!item) return;
-        openId = id;
-        
-        if (pushState) {
-            const slug = getSlug(item.n);
-            const categoria = (item.cat || 'varios').toLowerCase().trim();
-            history.pushState({p: id}, '', `/${categoria}/${slug}`);
-        }
+   function openProductView(id, pushState = true) {
+    const item = flatList.find(i => i.id == id);
+    if (!item) return;
+    openId = id;
+    
+    if (pushState) {
+        const slug = getSlug(item.n);
+        const categoria = (item.cat || 'varios').toLowerCase().trim();
+        history.pushState({p: id}, '', `/${categoria}/${slug}`);
+    }
 
-        const stats = getStats(item.p, item.h7d);
-        document.getElementById('pv-name').innerText = item.n;
-        
-        // Manejo de Imagen
-        const imgWrap = document.getElementById('pv-img-wrap');
-        const imgEl = document.getElementById('pv-img');
-        if (item.img) { imgEl.src = item.img; imgWrap.style.display = 'block'; }
-        else { imgWrap.style.display = 'none'; }
+    const stats = getStats(item.p, item.h7d);
+    document.getElementById('pv-name').innerText = item.n;
+    
+    // Imagen
+    const imgEl = document.getElementById('pv-img');
+    imgEl.src = item.img || 'URL_IMAGEN_POR_DEFECTO';
 
-        const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
-        document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
-        document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
-        
-        // MODIFICADO: Cálculo de Precio Promedio
-        const preciosDisponibles = item.p.filter(p => p > 0);
-        const promedio = preciosDisponibles.length > 0 ? (preciosDisponibles.reduce((a, b) => a + b, 0) / preciosDisponibles.length) : 0;
-        document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
+    // Mejor precio y tienda
+    const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
+    const bestStoreIdx = item.p.indexOf(stats.min);
+    document.getElementById('pv-best-store').innerText = `Mejor precio en ${stores[bestStoreIdx]}`;
+    document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
+    
+    // Botón de Link (Asume que tienes columnas url_coto, etc. o usa una búsqueda genérica)
+    // Si no tienes los links, esto los mandará a Google Shopping como ejemplo:
+    const storeUrls = [item.url_coto, item.url_carrefour, item.url_dia, item.url_jumbo];
+    const targetUrl = storeUrls[bestStoreIdx] || `https://www.google.com/search?q=${encodeURIComponent(item.n + ' ' + stores[bestStoreIdx])}`;
+    document.getElementById('pv-store-link').href = targetUrl;
 
-        const favBtn = document.getElementById('pv-fav-btn');
-        favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
-        favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id, false); };
-        
-        document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
-        document.getElementById('productFullView').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        document.querySelectorAll('#pv-range-filters .range-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('#pv-range-filters .range-btn:first-child').classList.add('active');
-        
-        loadPvChart(7);
+    // Cálculo de PRECIO PROMEDIO
+    const preciosValidos = item.p.filter(p => p > 0);
+    const promedio = preciosValidos.length > 0 ? (preciosValidos.reduce((a, b) => a + b, 0) / preciosValidos.length) : 0;
+    document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
 
+    const favBtn = document.getElementById('pv-fav-btn');
+    favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
+    favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id, false); };
+    
+    // Renderizado de lista EXCLUYENDO el mejor precio
+    document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
+    document.getElementById('productFullView').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    loadPvChart(7);
+}
         document.getElementById('pv-share-btn').onclick = async () => {
             const shareData = { title: 'TradingChango', text: `Mirá el precio de ${item.n}`, url: window.location.href };
             try {
@@ -636,12 +680,14 @@
     }
 
     function renderMarket(item, min) {
-        const STORES = [{name:"COTO",color:"#ff3b30"},{name:"CARREFOUR",color:"#2962ff"},{name:"DIA",color:"#ff3b30"},{name:"JUMBO",color:"#00c853"}];
-        return STORES.map((s, i) => { 
-            const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><span class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</span></div>`; 
-        }).join('');
-    }
-
+    const STORES = [{name:"COTO",color:"#ff3b30"},{name:"CARREFOUR",color:"#2962ff"},{name:"DIA",color:"#ff3b30"},{name:"JUMBO",color:"#00c853"}];
+    return STORES.map((s, i) => { 
+        const p = item.p[i];
+        // SI ES EL PRECIO MÍNIMO O ES 0, NO LO MUESTRA EN LA LISTA DE ABAJO
+        if (p === min || p === 0) return ''; 
+        return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${s.color}"></div>${s.name}</div><span class="price-link">$${format(p)}</span></div>`; 
+    }).join('');
+}
     function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
     function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
     function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
