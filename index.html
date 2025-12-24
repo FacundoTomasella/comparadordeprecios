@@ -28,6 +28,41 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
+
+function agruparVelas(data, dias) {
+    const result = [];
+    let bucket = [];
+    let start = null;
+
+    data.forEach(d => {
+        const fecha = new Date(d.fecha);
+        if (!start) start = fecha;
+
+        if ((fecha - start) / 864e5 < dias) {
+            bucket.push(d);
+        } else {
+            result.push(crearVela(bucket, start));
+            bucket = [d];
+            start = fecha;
+        }
+    });
+
+    if (bucket.length) result.push(crearVela(bucket, start));
+    return result;
+}
+
+function crearVela(bucket, fecha) {
+    const precios = bucket.map(b => b.precio_minimo);
+    return {
+        x: fecha.getTime(),
+        o: precios[0],
+        h: Math.max(...precios),
+        l: Math.min(...precios),
+        c: precios[precios.length - 1]
+    };
+}
+
+        
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
@@ -252,7 +287,13 @@
                         <button class="range-btn" onclick="loadPvChart(180, this)">6M</button>
                         <button class="range-btn" onclick="loadPvChart(365, this)">1Y</button>
                     </div>
-                    <span id="pv-perf" class="chart-performance"></span>
+                    <div class="chart-performance">
+                  <div style="font-weight:600;margin-bottom:4px;">
+                    Comportamiento del precio del producto
+                  </div>
+                  <span id="pv-perf"></span>
+                </div>
+
                     <div class="chart-wrapper" id="pv-wrap"><canvas id="pv-canvas"></canvas></div>
                 </div>
 
@@ -563,7 +604,7 @@
         perfEl.style.color = diffP <= 0 ? 'var(--color-good)' : 'var(--color-bad)';
         perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% en este periodo`;
 
-        const chartData = rawData.map((d, i) => {
+       const chartData = agruparVelas(rawData, days); => {
             const open = i === 0 ? d.precio_minimo : rawData[i-1].precio_minimo;
             return { x: new Date(d.fecha + 'T12:00:00').getTime(), o: open, h: Math.max(open, d.precio_minimo), l: Math.min(open, d.precio_minimo), c: d.precio_minimo };
         });
@@ -577,7 +618,14 @@
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { type: 'time', time: { unit: 'day' }, grid: { display: false }, ticks: { color: '#787b86', font: { size: 10 } } },
+                    x: {
+  type: 'time',
+  time: { unit: 'month' },
+  ticks: {
+    callback: (v) => MONTHS[new Date(v).getMonth()][0]
+  }
+}
+ grid: { display: false }, ticks: { color: '#787b86', font: { size: 10 } } },
                     y: { position: 'right', grid: { color: 'rgba(120,123,134,0.1)' }, ticks: { color: '#787b86', font: { family: 'Roboto Mono', size: 10 } } }
                 }
             }
