@@ -335,120 +335,104 @@
         }
 
         async function loadPvChart(days, btn) {
-    if(btn) { 
-        btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
-        btn.classList.add('active'); 
-    }
-    
-    const item = flatList.find(i => i.id == openId);
-    // Pedimos suficiente historial para poder agrupar (por ejemplo, si pedimos 1Y, traemos todo)
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&order=fecha.asc`, { 
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } 
-    });
-    const rawData = await res.json();
-    const perfEl = document.getElementById('pv-perf');
+            if(btn) { 
+                btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
+                btn.classList.add('active'); 
+            }
+            const item = flatList.find(i => i.id == openId);
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
+            const rawData = await res.json();
+            const perfEl = document.getElementById('pv-perf');
 
-    if(rawData.length < 2) {
-        if(currentChart) currentChart.destroy();
-        perfEl.innerText = 'Sin datos suficientes'; return;
-    }
+            if(rawData.length < 2) {
+                if(currentChart) currentChart.destroy();
+                perfEl.innerText = 'Sin datos suficientes'; return;
+            }
 
-    // 1. CÁLCULO DE RENDIMIENTO (Performance) para el color
-    const firstP = rawData[0].precio_minimo; 
-    const lastP = rawData[rawData.length-1].precio_minimo;
-    const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-    
-    // Definimos el color basado en la tendencia (En super: sube precio = rojo/malo, baja = verde/bueno)
-    const trendColor = diffP > 0 ? '#f23645' : '#00a650'; 
-    perfEl.style.color = trendColor;
-    perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% en este periodo`;
+            const firstP = rawData[0].precio_minimo; const lastP = rawData[rawData.length-1].precio_minimo;
+            const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+            perfEl.style.color = diffP <= 0 ? 'var(--color-good)' : 'var(--color-bad)';
+            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% en este periodo`;
 
-    // 2. LÓGICA DE AGRUPACIÓN POR TEMPORALIDAD
-    // Definimos el tamaño del "chunk" (vela) según el botón presionado
-    let groupDays = 1;
-    if (days === 7) groupDays = 7;
-    else if (days === 15) groupDays = 15;
-    else if (days === 30) groupDays = 30; // 1 mes aprox
-    else if (days === 90) groupDays = 90;
-    else if (days === 180) groupDays = 180;
-    else if (days === 365) groupDays = 365;
+            let chartData = [];
+            if (days <= 30) { 
+                chartData = rawData.map((d, i) => {
+                    const open = i === 0 ? d.precio_minimo : rawData[i-1].precio_minimo;
+                    return { x: new Date(d.fecha + 'T12:00:00').getTime(), o: open, h: Math.max(open, d.precio_minimo), l: Math.min(open, d.precio_minimo), c: d.precio_minimo };
+                });
+            } else {
+                const interval = days > 180 ? 'month' : 'week';
+                const grouped = {};
+                rawData.forEach(d => {
+                    const dt = new Date(d.fecha + 'T12:00:00');
+                    let key;
+                    if(interval === 'month') key = `${dt.getFullYear()}-${dt.getMonth()}`;
+                    else { const firstDay = new Date(dt.setDate(dt.getDate() - dt.getDay())); key = `${firstDay.getFullYear()}-${firstDay.getMonth()}-${firstDay.getDate()}`; }
+                    if(!grouped[key]) grouped[key] = []; grouped[key].push(d.precio_minimo);
+                });
+                const keys = Object.keys(grouped);
+                chartData = keys.map((key, i) => {
+                    const vals = grouped[key];
+                    const open = i === 0 ? vals[0] : grouped[keys[i-1]][grouped[keys[i-1]].length - 1];
+                    return {
+                        x: interval === 'month' ? new Date(key.split('-')[0], key.split('-')[1], 1).getTime() : new Date(key.split('-')[0], key.split('-')[1], key.split('-')[2]).getTime(),
+                        o: open, h: Math.max(...vals, open), l: Math.min(...vals, open), c: vals[vals.length - 1]
+                    };
+                });
+            }
 
-    let chartData = [];
-    for (let i = 0; i < rawData.length; i += groupDays) {
-        const chunk = rawData.slice(i, i + groupDays);
-        if (chunk.length === 0) break;
-
-        const prices = chunk.map(d => d.precio_minimo);
-        const open = prices[0];
-        const close = prices[prices.length - 1];
-        const high = Math.max(...prices);
-        const low = Math.min(...prices);
-        
-        chartData.push({
-            x: new Date(chunk[0].fecha + 'T12:00:00').getTime(),
-            o: open,
-            h: high,
-            l: low,
-            c: close
-        });
-    }
-
-    // 3. RENDERIZADO DEL GRÁFICO
-    const ctx = document.getElementById('pv-canvas').getContext('2d');
-    const isDark = document.documentElement.classList.contains('dark-mode');
-    
-    if(currentChart) currentChart.destroy();
-    currentChart = new Chart(ctx, {
-        type: 'candlestick',
-        data: { 
-            datasets: [{ 
-                data: chartData, 
-                // Aplicamos el color de la tendencia a todas las velas del periodo
-                color: { 
-                    up: trendColor, 
-                    down: trendColor, 
-                    unchanged: trendColor 
-                },
-                borderColor: trendColor,
-                wickColor: trendColor
-            }] 
-        },
-        options: {
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: isDark ? '#1e222d' : '#fff',
-                    titleColor: isDark ? '#d1d4dc' : '#131722',
-                    bodyColor: isDark ? '#d1d4dc' : '#131722',
-                    borderColor: isDark ? '#434651' : '#e0e3eb',
-                    borderWidth: 1,
-                    displayColors: false,
-                    callbacks: {
-                        label: (c) => `Precio: $${format(c.parsed.c)}`
+            const ctx = document.getElementById('pv-canvas').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            
+            if(currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'candlestick',
+                data: { datasets: [{ 
+                    data: chartData, 
+                    color: { up: '#f23645', down: '#00a650', unchanged: '#787b86' } 
+                }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e222d' : '#fff',
+                            titleColor: isDark ? '#d1d4dc' : '#131722',
+                            bodyColor: isDark ? '#d1d4dc' : '#131722',
+                            borderColor: isDark ? '#434651' : '#e0e3eb',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                title: (c) => {
+                                    const d = new Date(c[0].parsed.x);
+                                    return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                                },
+                                label: (c) => `$ ${format(c.parsed.c)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            type: 'time', 
+                            time: { unit: days > 180 ? 'month' : 'day' }, 
+                            grid: { display: false }, 
+                            ticks: { 
+                                color: '#787b86', 
+                                font: { size: 10 },
+                                autoSkip: true,
+                                maxTicksLimit: 8,
+                                callback: function(val, index, ticks) {
+                                    const d = new Date(val);
+                                    return MONTHS[d.getMonth()];
+                                }
+                            } 
+                        },
+                        y: { position: 'right', grid: { color: isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)' }, ticks: { color: '#787b86', font: { family: 'Roboto Mono', size: 10 } } }
                     }
                 }
-            },
-            scales: {
-                x: { 
-                    type: 'time', 
-                    time: { 
-                        unit: days >= 30 ? 'month' : 'day',
-                        displayFormats: { day: 'dd MMM', month: 'MMM yyyy' }
-                    }, 
-                    grid: { display: false }, 
-                    ticks: { color: '#787b86', font: { size: 10 } } 
-                },
-                y: { 
-                    position: 'right', 
-                    grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, 
-                    ticks: { color: '#787b86', font: { family: 'Roboto Mono', size: 10 } } 
-                }
-            }
+            });
         }
-    });
-}
+
         function toggleFav(id, btn) { 
             if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); 
             localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
