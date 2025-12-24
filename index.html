@@ -165,9 +165,28 @@
                     <div class="logo" style="font-size:16px;">TradingChango</div>
                 </div>
                 <div class="header-actions">
-                    <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-solid fa-cart-shopping"></i></button>
-                    <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
-                </div>
+    <!-- Estos enlaces solo se verán en PC -->
+    <div class="desktop-menu">
+        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
+        <a onclick="openPage('terminos', 'Términos')">Términos</a>
+        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
+    </div>
+
+    <!-- Este botón (el icono de info) solo se verá en móvil -->
+    <button class="user-btn" id="mobileInfoBtn" onclick="toggleLegalDropdown(event)">
+        <i class="fa-solid fa-circle-info"></i>
+    </button>
+
+    <div id="legalDropdown" class="legal-dropdown">
+        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
+        <a onclick="openPage('terminos', 'Términos')">Términos</a>
+        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
+    </div>
+
+    <button class="theme-btn" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+</div>
             </div>
             
             <div class="pv-content">
