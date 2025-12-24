@@ -139,24 +139,8 @@
         .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
         .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
     
-    /* AJUSTE PARA ESCRITORIO (Pantallas mayores a 1024px) */
-@media (min-width: 1024px) {
-    .app-container, .pv-container, .bottom-nav {
-        max-width: 900px !important; /* Aumentamos el ancho en escritorio */
-    }
-
-    /* Optimizamos el espacio de las tarjetas en escritorio */
-    .ticker-info {
-        padding-right: 30px; 
-    }
-
-    /* Hacemos que la imagen del producto en la vista detalle sea un poco más grande */
-    .pv-img-container {
-        width: 180px;
-        height: 180px;
-    }
-}
-    /* Primero ocultamos los links de PC para que no se vean en el celular */
+/* 1. ESTILOS GENERALES (Móvil primero / Base) */
+/* Primero ocultamos los links de PC para que no se vean en el celular */
 .desktop-links {
     display: none;
     gap: 20px;
@@ -172,18 +156,56 @@
     text-transform: uppercase;
 }
 
-/* Ahora le decimos que si la pantalla es grande (PC), haga el cambio */
+/* 2. AJUSTES PARA ESCRITORIO (Todo lo que pasa cuando la pantalla es mayor a 1024px) */
 @media (min-width: 1024px) {
+    
+    /* Estructura y Contenedores (Tu código) */
+    .app-container, .pv-container, .bottom-nav {
+        max-width: 900px !important;
+    }
+
+    /* Navegación y Visibilidad (Tu código) */
     .desktop-links {
-        display: flex; /* Muestra los links */
+        display: flex; /* Muestra los links en PC */
     }
     #info-celular {
-        display: none; /* Oculta el circulito de información */
+        display: none; /* Oculta el icono de info de móvil */
+    }
+
+    /* Detalles de Producto / Tarjetas (Tu código) */
+    .ticker-info {
+        padding-right: 30px; 
+    }
+    .pv-img-container {
+        width: 180px;
+        height: 180px;
+    }
+
+    /* --- Ajustes sugeridos por ChatGPT --- */
+    header {
+        padding: 10px 20px;
+    }
+
+    .ticker-card {
+        padding: 12px 16px;
+    }
+
+    .t-name {
+        max-width: 320px;
+    }
+
+    .hero-section {
+        padding-top: 10px;
+    }
+
+    .pv-content {
+        padding: 18px 20px;
+    }
+
+    .chart-wrapper {
+        height: 220px;
     }
 }
-
-
-
         
     </style>
 </head>
