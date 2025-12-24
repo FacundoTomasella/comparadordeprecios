@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
     
-    <!-- SEO & PWA -->
     <title>TradingChango | Tradeá los Precios, Maximizá el Carrito</title>
     <meta name="description" content="Comparador de precios de supermercados en tiempo real. Analizá tendencias y compará antes de comprar.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
@@ -14,8 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="TradingChango">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    <link rel="manifest" href="data:application/json,{'name':'TradingChango','short_name':'TradingChango','start_url':'/','display':'standalone','background_color':'#ffffff','theme_color':'#ffffff'}">
-
+    
     <script>
         if (typeof history.scrollRestoration !== 'undefined') { history.scrollRestoration = 'manual'; }
         if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark-mode'); }
@@ -23,32 +21,38 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Gráficos Pro -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
             --accent: #131722; --color-good: #00a650; --color-bad: #f23645; --star-gold: #f2a900;
+            --badge-bg: #131722; --badge-text: #ffffff;
         }
         .dark-mode {
             --bg-app: #000000; --bg-card: #121212; --bg-nav: #121212;
             --text-main: #ffffff; --text-muted: #888888; --border: #2a2a2a;
             --accent: #ffffff;
+            --badge-bg: #ffffff; --badge-text: #000000;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 160px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 80px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         
         header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
         .logo-link { text-decoration: none; color: inherit; cursor: pointer; }
         .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
         
+        .header-actions { display: flex; align-items: center; gap: 15px; }
         .theme-btn, .user-btn, .pv-back-btn, .pv-fav-btn, .pv-share-btn { background: none; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
         
         .search-container { position: relative; }
@@ -67,17 +71,18 @@
         .hero-title { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
         .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
-        /* PUBLICIDAD FIJA */
-        .ad-space { width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); text-align: center; padding: 10px; background: var(--bg-app); }
-        #adTop { position: sticky; top: 125px; z-index: 40; border-bottom: 1px dashed var(--border); }
-        #adBottom { position: fixed; bottom: 64px; width: 100%; max-width: 600px; z-index: 90; border-top: 1px dashed var(--border); background: var(--bg-app); }
-
-        /* VISTA PRODUCTO FULL PAGE (DE INDEX 4) */
+        /* PRODUCT VIEW */
         #productFullView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-app); z-index: 500; overflow-y: auto; }
         .pv-container { width: 100%; max-width: 600px; margin: 0 auto; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
         .pv-header { position: sticky; top: 0; background: var(--bg-app); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
         .pv-content { padding: 25px 20px; }
+        
+        .pv-top-info { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 10px; }
+        .pv-title-box { flex: 1; }
         .pv-title-box h1 { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+        .pv-img-container { width: 110px; height: 110px; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--border); display: none; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #pv-img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+
         .pv-best-store { font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 600; text-transform: uppercase; }
         .pv-price-big { font-family: 'Roboto Mono'; font-size: 32px; font-weight: 800; margin-top: 10px; color: var(--text-main); }
         
@@ -89,22 +94,11 @@
         .pv-market-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 25px; }
         .pv-market-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 1px; }
 
-        /* MARKET ITEMS */
         .ob-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
         .ob-store { font-weight: 600; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         .price-link { text-decoration: none; color: var(--text-main); font-family: 'Roboto Mono'; font-size: 15px; padding: 6px 10px; border-radius: 6px; background: rgba(0,0,0,0.03); }
         .best-val { color: var(--color-good); font-weight: 700; background: rgba(0, 230, 118, 0.1); } 
-
-        /* PAGINAS DINAMICAS */
-        .page-view { display: none; padding: 25px 20px; line-height: 1.6; font-size: 14px; }
-        .page-view.active { display: block; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .page-title { font-size: 22px; font-weight: 800; }
-        .back-link { font-size: 12px; font-weight: 700; color: var(--accent); cursor: pointer; text-transform: uppercase; }
-
-        .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
-        .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
 
         .ticker-list { padding: 0; }
         .ticker-card { border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; position: relative; background: var(--bg-app); transition: background 0.2s; }
@@ -116,25 +110,34 @@
         .t-price { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 16px; }
         .t-change { font-family: 'Roboto Mono'; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
         .trend-up { color: white; background: var(--color-bad); } .trend-down { color: white; background: var(--color-good); } .trend-neutral { color: var(--text-muted); background: rgba(128,128,128,0.1); }
-        .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 20px; color: var(--border); transition: 0.2s; }
+        
+        .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 18px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
         
         .app-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 25%; font-weight: 500; transition: 0.2s; position: relative; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
         .nav-item i { font-size: 18px; }
         
+        .cart-badge { position: absolute; top: 8px; right: 25%; background: var(--badge-bg); color: var(--badge-text); font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 4px; display: none; }
+
         .loader { text-align: center; padding: 50px; color: var(--text-muted); font-family: 'Roboto Mono'; font-size: 12px; }
         .chart-wrapper { width: 100%; height: 260px; padding-top: 5px; position: relative; }
-        .no-data-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0.9; }
-        .no-data-text { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
         .chart-performance { font-size: 11px; font-weight: 700; margin-bottom: 10px; display: block; }
+
+        .chango-summary { padding: 20px; background: var(--bg-card); margin: 10px 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .chango-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: 'Roboto Mono'; font-size: 14px; }
+        .chango-row.best { color: var(--color-good); font-weight: 800; }
+        
+        .page-view { display: none; padding: 25px 20px; line-height: 1.6; font-size: 14px; }
+        .page-view.active { display: block; }
+        .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
+        .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- VISTA PRODUCTO COMPLETA (MODAL) -->
     <div id="productFullView">
         <div class="pv-container">
             <div class="pv-header">
@@ -143,16 +146,21 @@
                     <div class="logo" style="font-size:16px;">TradingChango</div>
                 </div>
                 <div class="header-actions">
-                    <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-regular fa-star"></i></button>
+                    <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-solid fa-cart-shopping"></i></button>
                     <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
                 </div>
             </div>
             
             <div class="pv-content">
-                <div class="pv-title-box">
-                    <h1 id="pv-name">Cargando...</h1>
-                    <div class="pv-best-store" id="pv-best-store">---</div>
-                    <div class="pv-price-big" id="pv-price-big">$ 0</div>
+                <div class="pv-top-info">
+                    <div class="pv-title-box">
+                        <h1 id="pv-name">Cargando...</h1>
+                        <div class="pv-best-store" id="pv-best-store">---</div>
+                        <div class="pv-price-big" id="pv-price-big">$ 0</div>
+                    </div>
+                    <div class="pv-img-container" id="pv-img-wrap">
+                        <img id="pv-img" src="" alt="Producto">
+                    </div>
                 </div>
 
                 <div class="pv-chart-section">
@@ -179,7 +187,7 @@
     <div class="app-container">
         <header>
             <div class="top-row">
-                <a class="logo-link" onclick="goHome()"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
+                <a class="logo-link" onclick="setTab('home')"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
                 <div class="header-actions">
                     <button class="user-btn" onclick="toggleLegalDropdown(event)"><i class="fa-solid fa-circle-info"></i></button>
                     <div id="legalDropdown" class="legal-dropdown">
@@ -196,7 +204,7 @@
                     <input type="text" id="searchInput" placeholder="BUSCAR PRODUCTO...">
                     <i class="fa-solid fa-circle-xmark clear-search" id="clearSearch" onclick="clearInput()"></i>
                 </div>
-                <div class="trend-filters">
+                <div class="trend-filters" id="headerTrendFilters">
                     <button class="trend-btn" id="btnDown" onclick="setTrendFilter('down')"><i class="fa-solid fa-arrow-trend-down"></i> Precios Bajando</button>
                     <button class="trend-btn" id="btnUp" onclick="setTrendFilter('up')"><i class="fa-solid fa-arrow-trend-up"></i> Precios Subiendo</button>
                 </div>
@@ -208,21 +216,16 @@
             </div>
         </header>
 
-        <div id="adTop" class="ad-space">Google Adsense / Banner Superior</div>
-
         <div id="loader" class="loader">CONECTANDO A MERCADO...</div>
         <div id="tickerList" class="ticker-list"></div>
         
-        <!-- PÁGINAS LEGALES -->
         <div id="pageView" class="page-view">
             <div class="page-header">
                 <div id="pageTitle" class="page-title"></div>
-                <div class="back-link" onclick="goHome()">Volver <i class="fa-solid fa-chevron-right"></i></div>
+                <div class="back-link" onclick="setTab('home')">Volver <i class="fa-solid fa-chevron-right"></i></div>
             </div>
             <div id="pageContent"></div>
         </div>
-
-        <div id="adBottom" class="ad-space">Publicidad / Banner Miembro Pro</div>
 
         <footer class="app-footer">
             <div>Desarrollado por <a href="https://bento.me/facutom" target="_blank" style="color:var(--text-main); text-decoration:none; font-weight:800;">Facu Tom</a></div>
@@ -232,35 +235,30 @@
             <button class="nav-item" id="btn-carnes" onclick="setTab('carnes', this)"><i class="fa-solid fa-drumstick-bite"></i> Carnes</button>
             <button class="nav-item" id="btn-verdu" onclick="setTab('verdu', this)"><i class="fa-solid fa-carrot"></i> Verdu</button>
             <button class="nav-item" id="btn-varios" onclick="setTab('varios', this)"><i class="fa-solid fa-layer-group"></i> Varios</button>
-            <button class="nav-item" id="btn-favs" onclick="setTab('favs', this)"><i class="fa-solid fa-star"></i> Favoritos</button>
+            <button class="nav-item" id="btn-favs" onclick="setTab('favs', this)">
+                <i class="fa-solid fa-cart-shopping"></i> Chango
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
         </nav>
     </div>
 
     <script>
         const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
-        const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+        const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
         let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
 
         async function init() {
             try {
-                const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
+                const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
                 const configRows = await resC.json();
                 configRows.forEach(row => configDB[row.clave] = row.valor);
-                if(configDB['ad_top']) document.getElementById('adTop').innerHTML = configDB['ad_top'];
-                if(configDB['ad_bottom']) document.getElementById('adBottom').innerHTML = configDB['ad_bottom'];
 
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
                 const rows = await res.json();
                 const d7 = new Date(); d7.setDate(d7.getDate() - 7);
-                const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, {
-                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-                });
+                const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
                 const hData = await resH.json();
                 
                 const usedTickers = new Set();
@@ -273,183 +271,246 @@
                         id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: t,
                         p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
                         h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
-                        u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo]
+                        u: [r.u_coto, r.u_carrefour, r.u_dia, r.u_jumbo],
+                        img: r.imagen_url
                     }
                 });
                 document.getElementById('loader').style.display = 'none';
-                goHome();
-                
+                updateCartBadge();
                 const urlParams = new URLSearchParams(window.location.search);
-                const sharedId = urlParams.get('p');
-                if (sharedId) {
-                    openProductView(sharedId);
-                }
+                if (urlParams.get('p')) openProductView(urlParams.get('p'));
+                else if (urlParams.get('tab')) setTab(urlParams.get('tab'));
+                else goHome();
+
+                window.onpopstate = (e) => {
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('p')) openProductView(params.get('p'), false);
+                    else { closeProductView(false); setTab(params.get('tab') || 'home', null, false); }
+                };
             } catch (e) { console.error(e); }
         }
 
         function goHome() {
-            currentTab = 'home';
-            currentTrendFilter = null;
+            currentTab = 'home'; currentTrendFilter = null;
             document.getElementById('tickerList').style.display = 'block';
             document.getElementById('pageView').classList.remove('active');
             document.getElementById('searchBarSection').style.display = 'block';
             document.getElementById('heroSection').style.display = 'block';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('clearSearch').style.display = 'none';
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             window.scrollTo(0,0);
             renderView();
         }
 
-        // FUNCIONES DE VISTA DE PRODUCTO (DE INDEX 4)
-        function openProductView(id) {
+        function openProductView(id, pushState = true) {
             const item = flatList.find(i => i.id == id);
             if (!item) return;
             openId = id;
+            if (pushState) history.pushState({p: id}, '', `?p=${id}`);
             const stats = getStats(item.p, item.h7d);
-            
             document.getElementById('pv-name').innerText = item.n;
+            const imgWrap = document.getElementById('pv-img-wrap');
+            const imgEl = document.getElementById('pv-img');
+            if (item.img) { imgEl.src = item.img; imgWrap.style.display = 'block'; }
+            else { imgWrap.style.display = 'none'; }
             const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
-            const bestIdx = item.p.indexOf(stats.min);
-            document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[bestIdx]}`;
+            document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
             document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
-            
             const favBtn = document.getElementById('pv-fav-btn');
-            favBtn.innerHTML = favorites.includes(item.id) ? '<i class="fa-solid fa-star" style="color:var(--star-gold)"></i>' : '<i class="fa-regular fa-star"></i>';
-            favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id); };
-            
-            document.getElementById('pv-share-btn').onclick = () => shareProd(item.id, item.n);
+            favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
+            favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id, false); };
             document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
-            
             document.getElementById('productFullView').style.display = 'block';
             document.body.style.overflow = 'hidden';
-
-            // Resetear filtros de rango
             document.querySelectorAll('#pv-range-filters .range-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('#pv-range-filters .range-btn:first-child').classList.add('active');
-            
             loadPvChart(7);
         }
 
-        function closeProductView() {
+        function closeProductView(pushState = true) {
             document.getElementById('productFullView').style.display = 'none';
             document.body.style.overflow = 'auto';
+            if (pushState && openId) history.pushState(null, '', `?tab=${currentTab}`);
             openId = null;
+            renderView();
         }
 
         async function loadPvChart(days, btn) {
-            if(btn) { 
-                btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
-                btn.classList.add('active'); 
-            }
-            const item = flatList.find(i => i.id == openId);
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, { 
-                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } 
-            });
-            const data = await res.json();
-            const wrap = document.getElementById('pv-wrap');
-            const perfEl = document.getElementById('pv-perf');
-            wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
+    if(btn) { 
+        btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
+        btn.classList.add('active'); 
+    }
+    
+    const item = flatList.find(i => i.id == openId);
+    // Pedimos suficiente historial para poder agrupar (por ejemplo, si pedimos 1Y, traemos todo)
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&order=fecha.asc`, { 
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } 
+    });
+    const rawData = await res.json();
+    const perfEl = document.getElementById('pv-perf');
 
-            if(data.length < 2) {
-                const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
-                wrap.appendChild(overlay); perfEl.innerText = ''; if(currentChart) currentChart.destroy(); return;
-            }
+    if(rawData.length < 2) {
+        if(currentChart) currentChart.destroy();
+        perfEl.innerText = 'Sin datos suficientes'; return;
+    }
 
-            const firstP = data[0].precio_minimo; const lastP = data[data.length-1].precio_minimo; const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-            let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
-            perfEl.style.color = diffP >= 0 ? 'var(--color-bad)' : 'var(--color-good)';
-            perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
+    // 1. CÁLCULO DE RENDIMIENTO (Performance) para el color
+    const firstP = rawData[0].precio_minimo; 
+    const lastP = rawData[rawData.length-1].precio_minimo;
+    const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+    
+    // Definimos el color basado en la tendencia (En super: sube precio = rojo/malo, baja = verde/bueno)
+    const trendColor = diffP > 0 ? '#f23645' : '#00a650'; 
+    perfEl.style.color = trendColor;
+    perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% en este periodo`;
 
-            const ctx = document.getElementById('pv-canvas').getContext('2d');
-            const isDark = document.documentElement.classList.contains('dark-mode');
-            const color = isDark?'#fff':'#131722';
-            
-            if(currentChart) currentChart.destroy();
-            currentChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; }),
-                    datasets: [{ data: data.map(d => d.precio_minimo), borderColor: color, borderWidth: 1.5, pointStyle: 'circle', pointRadius: 3, pointBorderWidth: 2, pointBackgroundColor: '#fff', pointBorderColor: color, fill: false, tension: 0.1 }]
+    // 2. LÓGICA DE AGRUPACIÓN POR TEMPORALIDAD
+    // Definimos el tamaño del "chunk" (vela) según el botón presionado
+    let groupDays = 1;
+    if (days === 7) groupDays = 7;
+    else if (days === 15) groupDays = 15;
+    else if (days === 30) groupDays = 30; // 1 mes aprox
+    else if (days === 90) groupDays = 90;
+    else if (days === 180) groupDays = 180;
+    else if (days === 365) groupDays = 365;
+
+    let chartData = [];
+    for (let i = 0; i < rawData.length; i += groupDays) {
+        const chunk = rawData.slice(i, i + groupDays);
+        if (chunk.length === 0) break;
+
+        const prices = chunk.map(d => d.precio_minimo);
+        const open = prices[0];
+        const close = prices[prices.length - 1];
+        const high = Math.max(...prices);
+        const low = Math.min(...prices);
+        
+        chartData.push({
+            x: new Date(chunk[0].fecha + 'T12:00:00').getTime(),
+            o: open,
+            h: high,
+            l: low,
+            c: close
+        });
+    }
+
+    // 3. RENDERIZADO DEL GRÁFICO
+    const ctx = document.getElementById('pv-canvas').getContext('2d');
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    
+    if(currentChart) currentChart.destroy();
+    currentChart = new Chart(ctx, {
+        type: 'candlestick',
+        data: { 
+            datasets: [{ 
+                data: chartData, 
+                // Aplicamos el color de la tendencia a todas las velas del periodo
+                color: { 
+                    up: trendColor, 
+                    down: trendColor, 
+                    unchanged: trendColor 
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: isDark ? 'rgba(80, 80, 80, 0.95)' : 'rgba(50, 50, 50, 0.95)', padding: 10, cornerRadius: 4, displayColors: false,
-                            titleFont: { size: 10, family: 'Inter', weight: 'normal' },
-                            bodyFont: { size: 12, family: 'Roboto Mono', weight: 'bold' },
-                            callbacks: {
-                                title: (c) => { const d = data[c[0].dataIndex].fecha.split('-'); return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`; },
-                                label: (c) => `${data[c.dataIndex].supermercado}: $ ${format(data[c.dataIndex].precio_minimo)}`
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { grid: { color: isDark?'#222':'#eee', borderDash: [4,4] }, ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, callback: v => '$'+v } },
-                        x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+                borderColor: trendColor,
+                wickColor: trendColor
+            }] 
+        },
+        options: {
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: isDark ? '#1e222d' : '#fff',
+                    titleColor: isDark ? '#d1d4dc' : '#131722',
+                    bodyColor: isDark ? '#d1d4dc' : '#131722',
+                    borderColor: isDark ? '#434651' : '#e0e3eb',
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: (c) => `Precio: $${format(c.parsed.c)}`
                     }
+                }
+            },
+            scales: {
+                x: { 
+                    type: 'time', 
+                    time: { 
+                        unit: days >= 30 ? 'month' : 'day',
+                        displayFormats: { day: 'dd MMM', month: 'MMM yyyy' }
+                    }, 
+                    grid: { display: false }, 
+                    ticks: { color: '#787b86', font: { size: 10 } } 
                 },
-                plugins: [{
-                    afterDraw: (chart) => {
-                        if (chart.tooltip?._active?.length) {
-                            const x = chart.tooltip._active[0].element.x; const yAxis = chart.scales.y; const ctx = chart.ctx;
-                            ctx.save(); ctx.beginPath(); ctx.moveTo(x, yAxis.top); ctx.lineTo(x, yAxis.bottom);
-                            ctx.lineWidth = 1; ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
-                            ctx.setLineDash([3, 3]); ctx.stroke(); ctx.restore();
-                        }
-                    }
-                }]
-            });
+                y: { 
+                    position: 'right', 
+                    grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, 
+                    ticks: { color: '#787b86', font: { family: 'Roboto Mono', size: 10 } } 
+                }
+            }
+        }
+    });
+}
+        function toggleFav(id, btn) { 
+            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); else favorites.push(id); 
+            localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
+            updateCartBadge();
+            if(currentTab === 'favs') renderView(); else if(btn) btn.classList.toggle('active'); 
         }
 
-        function toggleLegalDropdown(event) {
-            if (event) event.stopPropagation();
-            const dropdown = document.getElementById('legalDropdown');
-            dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
+        function updateCartBadge() {
+            const b = document.getElementById('cartBadge');
+            if (favorites.length > 0) { b.style.display = 'flex'; b.innerText = favorites.length; }
+            else b.style.display = 'none';
         }
-
-        function openPage(clave, titulo) {
-            document.getElementById('legalDropdown').style.display = 'none';
-            document.getElementById('tickerList').style.display = 'none';
-            document.getElementById('searchBarSection').style.display = 'none';
-            document.getElementById('heroSection').style.display = 'none';
-            
-            const pageView = document.getElementById('pageView');
-            pageView.classList.add('active');
-            document.getElementById('pageTitle').innerText = titulo;
-            document.getElementById('pageContent').innerHTML = configDB[clave] || 'Contenido no disponible.';
-            window.scrollTo(0,0);
-        }
-
-        function clearInput() { document.getElementById('searchInput').value = ''; document.getElementById('clearSearch').style.display = 'none'; renderView(); }
 
         function renderView() {
             const container = document.getElementById('tickerList');
             const term = document.getElementById('searchInput').value.toUpperCase();
             const hero = document.getElementById('heroSection');
-            const clearBtn = document.getElementById('clearSearch');
+            const trendFilters = document.getElementById('headerTrendFilters');
+            
             container.innerHTML = '';
-            clearBtn.style.display = term ? 'block' : 'none';
+            document.getElementById('clearSearch').style.display = term ? 'block' : 'none';
 
             let dataToShow = flatList;
             if (currentTab === 'home') {
+                trendFilters.style.display = 'flex';
                 hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
                 if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             } else if (currentTab === 'favs') {
+                trendFilters.style.display = 'none';
                 hero.style.display = 'none';
                 dataToShow = flatList.filter(i => favorites.includes(i.id));
                 if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
+                if (dataToShow.length > 0) {
+                    const totals = [0, 0, 0, 0];
+                    dataToShow.forEach(item => { item.p.forEach((val, idx) => { if (val > 0) totals[idx] += val; }); });
+                    const minTotal = Math.min(...totals.filter(t => t > 0));
+                    const stores = ["Coto", "Carrefour", "Dia", "Jumbo"];
+                    const summaryDiv = document.createElement('div');
+                    summaryDiv.className = 'chango-summary';
+                    let summaryHtml = `<div class="pv-market-title" style="margin-bottom:15px">Comparativa de tu Chango</div>`;
+                    stores.forEach((name, i) => {
+                        const isBest = totals[i] === minTotal && minTotal > 0;
+                        summaryHtml += `<div class="chango-row ${isBest ? 'best' : ''}"><span>${name}</span><span>$ ${format(totals[i])}</span></div>`;
+                    });
+                    summaryDiv.innerHTML = summaryHtml;
+                    container.appendChild(summaryDiv);
+                } else container.innerHTML = '<div class="loader">TU CHANGO ESTÁ VACÍO.</div>';
             } else {
+                trendFilters.style.display = 'flex';
                 hero.style.display = 'none';
                 const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
                 dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
                 if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
             }
             
-            if (currentTrendFilter) dataToShow = dataToShow.filter(item => { const stats = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; });
+            // Aplicar filtro de tendencia si existe y si NO estamos en Chango
+            if (currentTrendFilter && currentTab !== 'favs') {
+                dataToShow = dataToShow.filter(item => { 
+                    const stats = getStats(item.p, item.h7d); 
+                    return currentTrendFilter === 'up' ? stats.isUp : stats.isDown; 
+                });
+            }
             
             dataToShow.forEach(item => {
                 const stats = getStats(item.p, item.h7d);
@@ -462,95 +523,42 @@
                         <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
                         <div class="t-right"><span class="t-price">$${format(stats.min)}</span><br><span class="t-change ${stats.trendClass}">${stats.icon} ${stats.spread}%</span></div>
                     </div>
-                    <div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="${favorites.includes(item.id)?'fa-solid':'fa-regular'} fa-star"></i></div>
+                    <div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="fa-solid fa-cart-shopping"></i></div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function toggleTheme() { 
-            document.documentElement.classList.toggle('dark-mode'); 
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); 
-            updateThemeIcon(); 
-            if(openId) loadPvChart(7);
-        }
-
-        function toggleFav(id, btn) { 
-            if(favorites.includes(id)) favorites = favorites.filter(f=>f!==id); 
-            else favorites.push(id); 
-            localStorage.setItem('fav_tickers', JSON.stringify(favorites)); 
-            if(currentTab === 'favs') { renderView(); } 
-            else if(btn) { 
-                btn.classList.toggle('active'); 
-                btn.querySelector('i').className = favorites.includes(id) ? 'fa-solid fa-star' : 'fa-regular fa-star'; 
-            } 
-        }
-
-        function getStats(p, h) { 
-            const valid = p.filter(v=>v>0); 
-            if(valid.length===0) return {min:0}; 
-            const min = Math.min(...valid); 
-            let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; 
-            if(h>0){ 
-                diff = ((min-h)/h)*100; 
-                if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } 
-                else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } 
-            } 
-            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; 
-        }
-        
-        function renderMarket(item, min) {
-            const STORES = [{name:"COTO",color:"#ff3b30",home:"https://www.cotodigital.com.ar"},{name:"CARREFOUR",color:"#2962ff",home:"https://www.carrefour.com.ar"},{name:"DIA",color:"#ff3b30",home:"https://diaonline.supermercadosdia.com.ar"},{name:"JUMBO",color:"#00c853",home:"https://www.jumbo.com.ar"}];
-            return STORES.map((s, i) => { 
-                const p = item.p[i]; 
-                return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><a href="${p>0?(item.u[i]||s.home):'#'}" target="_blank" class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</a></div>`; 
-            }).join('');
-        }
-
-        function setTrendFilter(t) {
-            currentTrendFilter = (currentTrendFilter === t) ? null : t; 
-            document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up');
-            document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down');
-            renderView();
-        }
-
-        function setTab(t, btn) { 
-            goHome(); 
-            currentTab=t; 
-            localStorage.setItem('last_tab', t); 
+        function setTab(t, btn, pushState = true) { 
+            goHome(); currentTab=t; 
+            if (pushState) history.pushState({tab: t}, '', `?tab=${t}`);
             document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); 
-            if(btn) btn.classList.add('active'); 
+            const target = btn || document.getElementById('btn-' + t) || document.getElementById('btn-favs');
+            if(target) target.classList.add('active'); 
             renderView(); 
         }
 
-        function updateThemeIcon() { 
-            document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; 
+        function getStats(p, h) { 
+            const valid = p.filter(v=>v>0); if(valid.length===0) return {min:0}; 
+            const min = Math.min(...valid); let diff=0, trendClass="trend-neutral", icon="-", isUp=false, isDown=false; 
+            if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ trendClass="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ trendClass="trend-down"; icon="▼"; isDown=true; } } 
+            return {min, spread:Math.abs(diff).toFixed(1), trendClass, icon, isUp, isDown}; 
         }
-
-        function generateTicker(n) { 
-            return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); 
+        function renderMarket(item, min) {
+            const STORES = [{name:"COTO",color:"#ff3b30"},{name:"CARREFOUR",color:"#2962ff"},{name:"DIA",color:"#ff3b30"},{name:"JUMBO",color:"#00c853"}];
+            return STORES.map((s, i) => { 
+                const p = item.p[i]; return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${p>0?s.color:'#444'}"></div>${s.name}</div><span class="price-link ${p===min?'best-val':''} ${p===0?'no-price':''}">$${format(p)}</span></div>`; 
+            }).join('');
         }
-
+        function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
+        function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
+        function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
+        function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
         function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
-
-        function shareProd(id, n) { 
-            const u = `${window.location.origin}${window.location.pathname}?p=${id}`; 
-            if (navigator.share) navigator.share({ title: 'TradingChango', text: `Mirá el precio de ${n}`, url: u }); 
-            else { navigator.clipboard.writeText(u); alert("Vínculo copiado"); } 
-        }
-
+        function openPage(c, t) { document.getElementById('tickerList').style.display = 'none'; document.getElementById('searchBarSection').style.display = 'none'; document.getElementById('heroSection').style.display = 'none'; const v = document.getElementById('pageView'); v.classList.add('active'); document.getElementById('pageTitle').innerText = t; document.getElementById('pageContent').innerHTML = configDB[c] || '...'; }
+        function toggleLegalDropdown(e) { e.stopPropagation(); const d = document.getElementById('legalDropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'; }
         document.getElementById('searchInput').addEventListener('input', renderView);
-
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('legalDropdown');
-            const button = document.querySelector('.user-btn');
-            if (dropdown.style.display === 'flex') {
-                if (!dropdown.contains(event.target) && !button.contains(event.target)) {
-                    dropdown.style.display = 'none';
-                }
-            }
-        });
-
+        document.addEventListener('click', () => document.getElementById('legalDropdown').style.display = 'none');
         init();
     </script>
 </body>
