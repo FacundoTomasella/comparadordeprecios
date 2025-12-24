@@ -345,19 +345,35 @@
                 });
                 document.getElementById('loader').style.display = 'none';
                 updateCartBadge();
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.get('p')) openProductView(urlParams.get('p'));
-                else if (urlParams.get('tab')) setTab(urlParams.get('tab'));
-                else goHome();
+        // LÓGICA PARA LEER /CATEGORIA/PRODUCTO
+                const path = window.location.pathname.split('/').filter(p => p !== "");
+                
+                // Caso A: Hay 2 partes (Ej: /carnes/asado-123) -> Es un PRODUCTO
+                if (path.length >= 2) {
+                    const parts = path[1].split('-');
+                    const id = parts[parts.length - 1]; // Saca el ID del final
+                    openProductView(id, false);
+                } 
+                // Caso B: Hay 1 parte (Ej: /carnes) -> Es una CATEGORÍA
+                else if (path.length === 1 && path[0] !== 'index.html') {
+                    setTab(path[0], null, false);
+                } 
+                // Caso C: No hay nada -> HOME
+                else {
+                    goHome();
+                }
 
+                // Manejo del botón "Atrás"
                 window.onpopstate = (e) => {
-                    const params = new URLSearchParams(window.location.search);
-                    if (params.get('p')) openProductView(params.get('p'), false);
-                    else { closeProductView(false); setTab(params.get('tab') || 'home', null, false); }
+                    const p = window.location.pathname.split('/').filter(x => x !== "");
+                    if (p.length >= 2) {
+                        const id = p[1].split('-').pop();
+                        openProductView(id, false);
+                    } else {
+                        closeProductView(false);
+                        setTab(p[0] || 'home', null, false);
+                    }
                 };
-            } catch (e) { console.error(e); }
-        }
-
         function goHome() {
             currentTab = 'home'; currentTrendFilter = null;
             document.getElementById('tickerList').style.display = 'block';
@@ -377,11 +393,17 @@ function clearInput() {
 }
 
         
-        function openProductView(id, pushState = true) {
-            const item = flatList.find(i => i.id == id);
-            if (!item) return;
-            openId = id;
-            if (pushState) history.pushState({p: id}, '', `?p=${id}`);
+       function openProductView(id, pushState = true) {
+    const item = flatList.find(i => i.id == id);
+    if (!item) return;
+    openId = id;
+    
+    if (pushState) {
+        const slug = item.n.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        const categoria = item.cat.toLowerCase().trim();
+        // Esto crea la URL: /carnes/nombre-del-asado-123
+        history.pushState({p: id}, '', `/${categoria}/${slug}-${id}`);
+    }
             const stats = getStats(item.p, item.h7d);
             document.getElementById('pv-name').innerText = item.n;
             const imgWrap = document.getElementById('pv-img-wrap');
@@ -615,15 +637,14 @@ function clearInput() {
    function setTab(t, btn, pushState = true) { 
     goHome(); 
     currentTab = t; 
-    if (pushState) history.pushState({tab: t}, '', `?tab=${t}`);
-    
-    // Quitamos la clase active de todos
+    if (pushState) {
+        // Si es home va a /, si no va a /carnes, /verdu, etc.
+        const nuevaUrl = t === 'home' ? '/' : `/${t.toLowerCase()}`;
+        history.pushState({tab: t}, '', nuevaUrl);
+    }
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
-    
-    // Buscamos cuál activar: el botón presionado OR por ID
     const target = btn || document.getElementById('btn-' + t);
     if(target) target.classList.add('active'); 
-    
     renderView(); 
 }
         function getStats(p, h) { 
