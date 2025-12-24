@@ -42,6 +42,8 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-app); color: var(--text-main); font-family: '-apple-system', 'BlinkMacSystemFont', 'Inter', sans-serif; padding-bottom: 80px; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; width: 100%; }
+        
+        /* Contenedor principal adaptable */
         .app-container { width: 100%; max-width: 600px; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); position: relative; }
         
         header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
@@ -72,12 +74,11 @@
         .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
         /* PRODUCT VIEW */
-        #productFullView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-app); z-index: 500; overflow-y: auto; }
+        #productFullView { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 500; overflow-y: auto; backdrop-filter: blur(4px); }
         .pv-container { width: 100%; max-width: 600px; margin: 0 auto; min-height: 100vh; background: var(--bg-app); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
         .pv-header { position: sticky; top: 0; background: var(--bg-app); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
         .pv-content { padding: 25px 20px; }
         
-        /* MODIFICADO: Layout de imagen a la izquierda */
         .pv-top-info { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 10px; }
         .pv-title-box { flex: 1; }
         .pv-title-box h1 { font-size: 24px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
@@ -86,7 +87,6 @@
 
         .pv-best-store { font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 600; text-transform: uppercase; }
         .pv-price-big { font-family: 'Roboto Mono'; font-size: 32px; font-weight: 800; margin-top: 5px; color: var(--text-main); }
-        /* NUEVO: Estilo para precio promedio */
         .pv-avg-price { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
         .pv-avg-price span { color: var(--text-main); font-weight: 700; font-family: 'Roboto Mono'; }
         
@@ -118,7 +118,7 @@
         .fav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: flex-end; font-size: 18px; color: var(--border); transition: 0.2s; }
         .fav-btn.active { color: var(--star-gold); }
         
-        .app-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+        .app-footer { text-align: center; padding: 40px 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
         .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 600px; background: var(--bg-nav); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 5px; cursor: pointer; width: 20%; font-weight: 500; transition: 0.2s; position: relative; }
         .nav-item.active { color: var(--text-main); font-weight: 800; }
@@ -138,53 +138,107 @@
         .page-view.active { display: block; }
         .legal-dropdown { position: absolute; top: 50px; right: 20px; background: var(--bg-app); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 200; width: 180px; }
         .legal-dropdown a { padding: 12px 15px; font-size: 12px; font-weight: 700; color: var(--text-main); text-decoration: none; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
-    
-    /* AJUSTE PARA ESCRITORIO (Pantallas mayores a 1024px) */
-@media (min-width: 1024px) {
-    .app-container, .pv-container, .bottom-nav {
-        max-width: 900px !important; /* Aumentamos el ancho en escritorio */
-    }
 
-    /* Optimizamos el espacio de las tarjetas en escritorio */
-    .ticker-info {
-        padding-right: 30px; 
-    }
+        .desktop-links { display: none; gap: 20px; margin-right: 10px; }
+        .desktop-links a { text-decoration: none; color: var(--text-main); font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
 
-    /* Hacemos que la imagen del producto en la vista detalle sea un poco más grande */
-    .pv-img-container {
-        width: 180px;
-        height: 180px;
-    }
-}
-    /* Primero ocultamos los links de PC para que no se vean en el celular */
-.desktop-links {
-    display: none;
-    gap: 20px;
-    margin-right: 10px;
-}
+        /* ============================================================
+           AJUSTES PARA ESCRITORIO (PANTALLAS GRANDES)
+           ============================================================ */
+        @media (min-width: 1024px) {
+            .app-container { max-width: 1200px !important; border: none; }
+            
+            /* Encabezado centrado */
+            header .top-row, #searchBarSection { max-width: 900px; margin-left: auto; margin-right: auto; }
+            #searchInput { height: 50px; font-size: 16px; border-radius: 25px; padding-left: 55px; }
+            .search-icon { left: 24px; font-size: 18px; }
 
-.desktop-links a {
-    text-decoration: none;
-    color: var(--text-main);
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-}
+            /* Grilla de productos */
+            .ticker-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 20px;
+                padding: 30px !important;
+            }
+            .ticker-card {
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 20px;
+                background: var(--bg-card);
+                transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            }
+            .ticker-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+                border-color: var(--text-main);
+                background: var(--bg-app);
+            }
+            .ticker-card::after { display: none; } /* Quitar línea de separación */
 
-/* Ahora le decimos que si la pantalla es grande (PC), haga el cambio */
-@media (min-width: 1024px) {
-    .desktop-links {
-        display: flex; /* Muestra los links */
-    }
-    #info-celular {
-        display: none; /* Oculta el circulito de información */
-    }
-}
+            /* Vista de Producto Pro (Dos columnas) */
+            .pv-container {
+                max-width: 1000px !important;
+                margin: 60px auto;
+                min-height: auto;
+                border-radius: 24px;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+                overflow: hidden;
+            }
+            .pv-content {
+                display: grid;
+                grid-template-columns: 350px 1fr;
+                gap: 40px;
+                padding: 40px;
+                align-items: start;
+            }
+            .pv-top-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 25px;
+                margin-bottom: 0;
+            }
+            .pv-img-container { width: 220px; height: 220px; margin-bottom: 20px; }
+            .pv-title-box h1 { font-size: 28px; }
 
+            .pv-chart-section {
+                grid-column: 2;
+                grid-row: 1 / 3;
+                margin-top: 0;
+                border-top: none;
+                padding-top: 0;
+            }
+            .chart-wrapper { height: 400px; }
 
+            .pv-market-section {
+                grid-column: 1;
+                margin-top: 25px;
+                border-top: none;
+                padding-top: 0;
+            }
 
-        
+            /* Navegación flotante */
+            .bottom-nav {
+                max-width: 500px !important;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 25px;
+                border-radius: 50px;
+                border: 1px solid var(--border);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                padding: 15px 10px;
+            }
+
+            .desktop-links { display: flex; }
+            #info-celular { display: none; }
+            
+            .chango-summary {
+                grid-column: 1 / -1;
+                max-width: 900px;
+                margin: 20px auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -204,16 +258,13 @@
             
             <div class="pv-content">
                 <div class="pv-top-info">
-                    <!-- MODIFICADO: Imagen ahora a la izquierda -->
                     <div class="pv-img-container" id="pv-img-wrap">
                         <img id="pv-img" src="" alt="Producto">
                     </div>
-                    <!-- MODIFICADO: Datos ahora a la derecha -->
                     <div class="pv-title-box">
                         <h1 id="pv-name">Cargando...</h1>
                         <div class="pv-best-store" id="pv-best-store">---</div>
                         <div class="pv-price-big" id="pv-price-big">$ 0</div>
-                        <!-- NUEVO: Dato de precio promedio -->
                         <div class="pv-avg-price">Precio promedio: <span id="pv-avg-price">$ 0</span></div>
                     </div>
                 </div>
@@ -244,26 +295,21 @@
             <div class="top-row">
                 <a class="logo-link" onclick="setTab('home')"><div class="logo"><div class="logo-icon-wrapper"><i class="fa-solid fa-cart-shopping"></i><i class="fa-solid fa-arrow-trend-up"></i></div>TradingChango</div></a>
                 <div class="header-actions">
-    <!-- Estos links se verán solo en computadora -->
-    <div class="desktop-links">
-        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
-        <a onclick="openPage('terminos', 'Términos')">Términos</a>
-        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
-    </div>
-
-    <!-- Este es el botón de información para celular (ahora con ID) -->
-    <button class="user-btn" id="info-celular" onclick="toggleLegalDropdown(event)">
-        <i class="fa-solid fa-circle-info"></i>
-    </button>
-
-    <div id="legalDropdown" class="legal-dropdown">
-        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
-        <a onclick="openPage('terminos', 'Términos')">Términos</a>
-        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
-    </div>
-    
-    <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-</div>
+                    <div class="desktop-links">
+                        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
+                        <a onclick="openPage('terminos', 'Términos')">Términos</a>
+                        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
+                    </div>
+                    <button class="user-btn" id="info-celular" onclick="toggleLegalDropdown(event)">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                    <div id="legalDropdown" class="legal-dropdown">
+                        <a onclick="openPage('acerca_de', 'Acerca de')">Acerca de</a>
+                        <a onclick="openPage('terminos', 'Términos')">Términos</a>
+                        <a onclick="openPage('contacto', 'Contacto')">Contacto</a>
+                    </div>
+                    <button class="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+                </div>
             </div>
             <div id="searchBarSection">
                 <div class="search-container">
@@ -299,54 +345,43 @@
         </footer>
 
         <nav class="bottom-nav">
-    <button class="nav-item active" id="btn-home" onclick="setTab('home', this)">
-        <i class="fa-solid fa-house"></i> Inicio
-    </button>
-    <button class="nav-item" id="btn-carnes" onclick="setTab('carnes', this)">
-        <i class="fa-solid fa-drumstick-bite"></i> Carnes
-    </button>
-    <button class="nav-item" id="btn-verdu" onclick="setTab('verdu', this)">
-        <i class="fa-solid fa-carrot"></i> Verdu
-    </button>
-    <button class="nav-item" id="btn-varios" onclick="setTab('varios', this)">
-        <i class="fa-solid fa-layer-group"></i> Varios
-    </button>
-    <button class="nav-item" id="btn-favs" onclick="setTab('favs', this)">
-        <i class="fa-solid fa-cart-shopping"></i> Chango
-        <span class="cart-badge" id="cartBadge">0</span>
-    </button>
-</nav>
+            <button class="nav-item active" id="btn-home" onclick="setTab('home', this)">
+                <i class="fa-solid fa-house"></i> Inicio
+            </button>
+            <button class="nav-item" id="btn-carnes" onclick="setTab('carnes', this)">
+                <i class="fa-solid fa-drumstick-bite"></i> Carnes
+            </button>
+            <button class="nav-item" id="btn-verdu" onclick="setTab('verdu', this)">
+                <i class="fa-solid fa-carrot"></i> Verdu
+            </button>
+            <button class="nav-item" id="btn-varios" onclick="setTab('varios', this)">
+                <i class="fa-solid fa-layer-group"></i> Varios
+            </button>
+            <button class="nav-item" id="btn-favs" onclick="setTab('favs', this)">
+                <i class="fa-solid fa-cart-shopping"></i> Chango
+                <span class="cart-badge" id="cartBadge">0</span>
+            </button>
+        </nav>
     </div>
 
    <script>
     const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
-    const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-
+    
     let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
 
-    // Diccionario de páginas estáticas para reconocerlas en la URL
-    const paginasEstaticas = {
-        'acerca_de': 'Acerca de',
-        'terminos': 'Términos',
-        'contacto': 'Contacto'
-    };
-
-    // Función para generar URLs limpias
+    const paginasEstaticas = { 'acerca_de': 'Acerca de', 'terminos': 'Términos', 'contacto': 'Contacto' };
     const getSlug = (name) => name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
     async function init() {
         try {
-            // 1. Cargar Configuración (Legales, etc)
             const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
             const configRows = await resC.json();
             configRows.forEach(row => configDB[row.clave] = row.valor);
 
-            // 2. Cargar Productos
             const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
             const rows = await res.json();
             
-            // 3. Cargar Historial (últimos 7 días)
             const d7 = new Date(); d7.setDate(d7.getDate() - 7);
             const resH = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?fecha=gte.${d7.toISOString().split('T')[0]}`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
             const hData = await resH.json();
@@ -368,30 +403,19 @@
             document.getElementById('loader').style.display = 'none';
             updateCartBadge();
 
-            // --- LÓGICA DE RUTAS AL CARGAR ---
             const path = window.location.pathname.split('/').filter(p => p !== "");
-
-            if (paginasEstaticas[path[0]]) {
-                openPage(path[0], paginasEstaticas[path[0]], false);
-            } 
+            if (paginasEstaticas[path[0]]) { openPage(path[0], paginasEstaticas[path[0]], false); } 
             else if (path.length >= 2) {
                 const itemEncontrado = flatList.find(i => getSlug(i.n) === path[1]);
                 if (itemEncontrado) openProductView(itemEncontrado.id, false);
                 else goHome();
             } 
-            else if (path.length === 1 && path[0] !== 'index.html') {
-                setTab(path[0], null, false);
-            } 
-            else {
-                goHome();
-            }
+            else if (path.length === 1 && path[0] !== 'index.html') { setTab(path[0], null, false); } 
+            else { goHome(); }
 
-            // --- MANEJO DEL BOTÓN ATRÁS ---
             window.onpopstate = (e) => {
                 const p = window.location.pathname.split('/').filter(x => x !== "");
-                if (paginasEstaticas[p[0]]) {
-                    openPage(p[0], paginasEstaticas[p[0]], false);
-                } 
+                if (paginasEstaticas[p[0]]) { openPage(p[0], paginasEstaticas[p[0]], false); } 
                 else if (p.length >= 2) {
                     const itemPop = flatList.find(i => getSlug(i.n) === p[1]);
                     if (itemPop) openProductView(itemPop.id, false);
@@ -403,13 +427,12 @@
                     setTab(p[0] || 'home', null, false);
                 }
             };
-
         } catch (e) { console.error(e); }
     }
 
     function goHome() {
         currentTab = 'home'; currentTrendFilter = null;
-        document.getElementById('tickerList').style.display = 'block';
+        document.getElementById('tickerList').style.display = 'grid';
         document.getElementById('pageView').classList.remove('active');
         document.getElementById('searchBarSection').style.display = 'block';
         document.getElementById('heroSection').style.display = 'block';
@@ -420,20 +443,12 @@
         renderView();
     }
 
-    function clearInput() {
-        const input = document.getElementById('searchInput');
-        input.value = '';
-        input.focus();
-        renderView();
-    }
+    function clearInput() { const input = document.getElementById('searchInput'); input.value = ''; input.focus(); renderView(); }
 
     function setTab(t, btn, pushState = true) { 
         goHome(); 
         currentTab = t; 
-        if (pushState) {
-            const nuevaUrl = t === 'home' ? '/' : `/${t.toLowerCase()}`;
-            history.pushState({tab: t}, '', nuevaUrl);
-        }
+        if (pushState) { const nuevaUrl = t === 'home' ? '/' : `/${t.toLowerCase()}`; history.pushState({tab: t}, '', nuevaUrl); }
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
         const target = btn || document.getElementById('btn-' + t);
         if(target) target.classList.add('active'); 
@@ -454,7 +469,6 @@
         const stats = getStats(item.p, item.h7d);
         document.getElementById('pv-name').innerText = item.n;
         
-        // Manejo de Imagen
         const imgWrap = document.getElementById('pv-img-wrap');
         const imgEl = document.getElementById('pv-img');
         if (item.img) { imgEl.src = item.img; imgWrap.style.display = 'block'; }
@@ -464,7 +478,6 @@
         document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
         document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
         
-        // MODIFICADO: Cálculo de Precio Promedio
         const preciosDisponibles = item.p.filter(p => p > 0);
         const promedio = preciosDisponibles.length > 0 ? (preciosDisponibles.reduce((a, b) => a + b, 0) / preciosDisponibles.length) : 0;
         document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
@@ -486,10 +499,7 @@
             const shareData = { title: 'TradingChango', text: `Mirá el precio de ${item.n}`, url: window.location.href };
             try {
                 if (navigator.share) { await navigator.share(shareData); } 
-                else {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert('¡Link copiado!');
-                }
+                else { await navigator.clipboard.writeText(window.location.href); alert('¡Link copiado!'); }
             } catch (err) { console.log(err); }
         };
     }
@@ -652,7 +662,6 @@
     document.getElementById('searchInput').addEventListener('input', renderView);
     document.addEventListener('click', () => document.getElementById('legalDropdown').style.display = 'none');
     
-    // Iniciar la app
     init();
 </script>
 </body>
