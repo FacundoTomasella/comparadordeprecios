@@ -782,6 +782,24 @@
         });
     }
 
+ // CASO: Chango vacío
+            else {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.textAlign = 'center';
+                emptyMsg.style.padding = '80px 20px';
+                emptyMsg.style.color = 'var(--text-muted)';
+                emptyMsg.innerHTML = `
+                    <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 20px; opacity: 0.2;"></i>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Tu chango está vacío</div>
+                    <div style="font-size: 14px; opacity: 0.8;">Agregá productos para comparar el total en los distintos supermercados.</div>
+                `;
+                container.appendChild(emptyMsg);
+                return; // Salimos de la función para que no intente renderizar tarjetas vacías
+            }
+        } else {
+
+
+       
     function getStats(p, h) { 
         const v = p.filter(x=>x>0); if(v.length===0) return {min:0}; 
         const min = Math.min(...v); let diff=0, tc="trend-neutral", icon="-", isUp=false, isDown=false; 
