@@ -722,84 +722,136 @@
         else b.style.display = 'none';
     }
 
-    function renderView() {
-        const container = document.getElementById('tickerList');
-        const term = document.getElementById('searchInput').value.toUpperCase();
-        const hero = document.getElementById('heroSection');
-        const trendFilters = document.getElementById('headerTrendFilters');
-        
-        container.innerHTML = '';
-        document.getElementById('clearSearch').style.display = term ? 'block' : 'none';
+  function renderView() {
+    // 1. Referencias a elementos (Cachear si es posible fuera de la función)
+    const container = document.getElementById('tickerList');
+    const term = document.getElementById('searchInput').value.toUpperCase();
+    const hero = document.getElementById('heroSection');
+    const trendFilters = document.getElementById('headerTrendFilters');
+    const clearBtn = document.getElementById('clearSearch');
 
-        let dataToShow = flatList;
-        if (currentTab === 'home') {
-            trendFilters.style.display = 'flex';
-            hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
-            if (term) dataToShow = flatList.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-        } else if (currentTab === 'favs') {
-            trendFilters.style.display = 'none'; hero.style.display = 'none';
-            dataToShow = flatList.filter(i => favorites.includes(i.id));
-            if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
-            if (dataToShow.length > 0) {
-                const totals = [0, 0, 0, 0];
-                dataToShow.forEach(item => { item.p.forEach((val, idx) => { if (val > 0) totals[idx] += val; }); });
-                const minTotal = Math.min(...totals.filter(t => t > 0));
-                const summaryDiv = document.createElement('div');
-                summaryDiv.className = 'chango-summary';
-                let html = `<div class="pv-market-title">Tu Chango</div>`;
-                ["Coto", "Carrefour", "Dia", "Jumbo"].forEach((n, i) => {
-                    html += `<div class="chango-row ${totals[i] === minTotal && minTotal > 0 ? 'best' : ''}"><span>${n}</span><span>$ ${format(totals[i])}</span></div>`;
-                });
-                summaryDiv.innerHTML = html; container.appendChild(summaryDiv);
-            }
-        } else {
-            trendFilters.style.display = 'flex'; hero.style.display = 'none';
-            const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-            dataToShow = flatList.filter(i => i.cat.toLowerCase().trim() === catMap[currentTab].toLowerCase());
-            if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.includes(term));
+    // Inicialización
+    container.innerHTML = '';
+    clearBtn.style.display = term ? 'block' : 'none';
+
+    // 2. Filtrado Inicial por Tab
+    let dataToShow = [];
+
+    if (currentTab === 'home') {
+        trendFilters.style.display = 'flex';
+        hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
+        dataToShow = [...flatList];
+    } 
+    else if (currentTab === 'favs') {
+        trendFilters.style.display = 'none';
+        hero.style.display = 'none';
+        dataToShow = flatList.filter(i => favorites.includes(i.id));
+
+        // Manejo de Chango Vacío
+        if (dataToShow.length === 0) {
+            renderEmptyCart(container);
+            return;
         }
         
-        if (currentTrendFilter && currentTab !== 'favs') {
-            dataToShow = dataToShow.filter(item => { 
-                const s = getStats(item.p, item.h7d); return currentTrendFilter === 'up' ? s.isUp : s.isDown; 
-            });
-        }
-        
-        dataToShow.forEach(item => {
+        // Renderizar resumen de totales (Chango)
+        renderChangoSummary(container, dataToShow);
+    } 
+    else {
+        // Categorías (carnes, verdu, varios)
+        trendFilters.style.display = 'flex';
+        hero.style.display = 'none';
+        const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
+        const categoryName = catMap[currentTab];
+        dataToShow = flatList.filter(i => i.cat.trim().toLowerCase() === categoryName.toLowerCase());
+    }
+
+    // 3. Aplicar Filtro de Búsqueda (Global)
+    if (term) {
+        dataToShow = dataToShow.filter(i => 
+            i.n.toUpperCase().includes(term) || i.ticker.toUpperCase().includes(term)
+        );
+    }
+
+    // 4. Aplicar Filtro de Tendencia (Subida/Bajada)
+    if (currentTrendFilter && currentTab !== 'favs') {
+        dataToShow = dataToShow.filter(item => {
             const s = getStats(item.p, item.h7d);
-            if (s.min === 0) return;
-            const card = document.createElement('div');
-            card.className = 'ticker-card';
-            card.onclick = () => openProductView(item.id);
-            card.innerHTML = `
-                <div class="ticker-info">
-                    <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
-                    <div class="t-right"><span class="t-price">$${format(s.min)}</span><br><span class="t-change ${s.trendClass}">${s.icon} ${s.spread}%</span></div>
-                </div>
-                <div class="fav-btn ${favorites.includes(item.id)?'active':''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="fa-solid fa-cart-shopping"></i></div>
-            `;
-            container.appendChild(card);
+            return currentTrendFilter === 'up' ? s.isUp : s.isDown;
         });
     }
 
- // CASO: Chango vacío
-            else {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.style.textAlign = 'center';
-                emptyMsg.style.padding = '80px 20px';
-                emptyMsg.style.color = 'var(--text-muted)';
-                emptyMsg.innerHTML = `
-                    <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 20px; opacity: 0.2;"></i>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Tu chango está vacío</div>
-                    <div style="font-size: 14px; opacity: 0.8;">Agregá productos para comparar el total en los distintos supermercados.</div>
-                `;
-                container.appendChild(emptyMsg);
-                return; // Salimos de la función para que no intente renderizar tarjetas vacías
-            }
-        } else {
+    // 5. Renderizar Tarjetas
+    dataToShow.forEach(item => {
+        const s = getStats(item.p, item.h7d);
+        if (s.min === 0) return; // Omitir si no hay precios
 
-    }
+        const card = document.createElement('div');
+        card.className = 'ticker-card';
+        card.onclick = () => openProductView(item.id);
+        card.innerHTML = `
+            <div class="ticker-info">
+                <div class="t-left">
+                    <span class="t-symbol">${item.ticker}</span>
+                    <span class="t-name">${item.n}</span>
+                </div>
+                <div class="t-right">
+                    <span class="t-price">$${format(s.min)}</span><br>
+                    <span class="t-change ${s.trendClass}">${s.icon} ${s.spread}%</span>
+                </div>
+            </div>
+            <div class="fav-btn ${favorites.includes(item.id) ? 'active' : ''}" 
+                 onclick="event.stopPropagation(); toggleFav(${item.id}, this)">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// --- Funciones de apoyo para limpiar el código principal ---
+
+function renderChangoSummary(container, items) {
+    const totals = [0, 0, 0, 0]; // Coto, Carrefour, Dia, Jumbo
+    items.forEach(item => {
+        item.p.forEach((val, idx) => {
+            if (val > 0) totals[idx] += val;
+        });
+    });
+
+    const validTotals = totals.filter(t => t > 0);
+    const minTotal = validTotals.length > 0 ? Math.min(...validTotals) : 0;
+
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'chango-summary';
     
+    let html = `<div class="pv-market-title">Tu Chango (Total)</div>`;
+    const markets = ["Coto", "Carrefour", "Dia", "Jumbo"];
+    
+    markets.forEach((name, i) => {
+        const isBest = totals[i] === minTotal && minTotal > 0;
+        html += `
+            <div class="chango-row ${isBest ? 'best' : ''}">
+                <span>${name}</span>
+                <span>$ ${format(totals[i])}</span>
+            </div>`;
+    });
+    
+    summaryDiv.innerHTML = html;
+    container.appendChild(summaryDiv);
+}
+
+function renderEmptyCart(container) {
+    const emptyMsg = document.createElement('div');
+    emptyMsg.className = 'empty-cart-message'; // Mejor usar clases CSS
+    emptyMsg.style.textAlign = 'center';
+    emptyMsg.style.padding = '80px 20px';
+    emptyMsg.innerHTML = `
+        <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 20px; opacity: 0.2;"></i>
+        <div style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Tu chango está vacío</div>
+        <div style="font-size: 14px; opacity: 0.8;">Agregá productos para comparar el total en los distintos supermercados.</div>
+    `;
+    container.appendChild(emptyMsg);
+}  
     function getStats(p, h) { 
         const v = p.filter(x=>x>0); if(v.length===0) return {min:0}; 
         const min = Math.min(...v); let diff=0, tc="trend-neutral", icon="-", isUp=false, isDown=false; 
