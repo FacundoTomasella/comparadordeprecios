@@ -1,6 +1,6 @@
 {
   "name": "TradingChango",
-  "short_name": "T-Chango",
+  "short_name": "TradingChango",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
