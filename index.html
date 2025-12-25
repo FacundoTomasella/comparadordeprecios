@@ -37,6 +37,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
+        /* Si la app ya está en modo "standalone" (instalada), escondemos el banner siempre */
+@media (display-mode: standalone) {
+    #pwaInstallBanner {
+        display: none !important;
+    }
+}
         .pv-chart-label {
             font-size: 11px;
             font-weight: 800;
@@ -295,7 +301,16 @@
     </style>
 </head>
 <body>
-
+  <div id="pwaInstallBanner" style="display: none; background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="font-size: 20px;">🛒</div>
+        <div>
+            <div style="font-size: 13px; font-weight: 800;">Instalar TradingChango</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Acceso rápido y mejor experiencia</div>
+        </div>
+    </div>
+    <button id="installBtn" style="background: var(--accent); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">INSTALAR</button>
+</div>
     <div id="productFullView">
         <div class="pv-container">
             <div class="pv-header">
@@ -967,26 +982,43 @@ function renderEmptyCart(container) {
     document.getElementById('searchInput').addEventListener('input', renderView);
     document.addEventListener('click', () => document.getElementById('legalDropdown').style.display = 'none');
 
-      let deferredPrompt;
-      
-      window.addEventListener('beforeinstallprompt', (e) => {
-        // Evita que Chrome muestre el mini-infobar automático
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        // Aquí podrías mostrar un botón propio que diga "Descargar App"
-        console.log("La app es lista para ser instalada");
-      });
-      
-      // Ejemplo: Si tenés un botón con id="btnInstalar"
-      // document.getElementById('btnInstalar').addEventListener('click', async () => {
-      //   if (deferredPrompt) {
-      //     deferredPrompt.prompt();
-      //     const { outcome } = await deferredPrompt.userChoice;
-      //     deferredPrompt = null;
-      //   }
-      // });
+        let deferredPrompt;
+const installBanner = document.getElementById('pwaInstallBanner');
+const installBtn = document.getElementById('installBtn');
 
+// 1. Escuchar el evento de instalación de Chrome/Android
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Evita que aparezca la barrita gris por defecto de Chrome
+    e.preventDefault();
+    // Guarda el evento para usarlo después
+    deferredPrompt = e;
+    // Muestra nuestro banner personalizado (solo si no está instalada)
+    if (window.innerWidth < 1024) { // Opcional: solo mostrar en móviles
+        installBanner.style.display = 'flex';
+    }
+});
+
+// 2. Lógica del botón de instalar
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        // Muestra el cartel nativo de "Quieres instalar esta app?"
+        deferredPrompt.prompt();
+        
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('El usuario aceptó la instalación');
+            installBanner.style.display = 'none';
+        }
+        deferredPrompt = null;
+    }
+});
+
+// 3. Esconder el banner si el usuario ya la tiene instalada o la instaló recién
+window.addEventListener('appinstalled', () => {
+    installBanner.style.display = 'none';
+    deferredPrompt = null;
+    console.log('TradingChango instalada correctamente');
+});
      
     // Iniciar la app
     init();
