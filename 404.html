@@ -87,7 +87,7 @@
         header { position: sticky; top: 0; z-index: 100; background: var(--bg-app); border-bottom: 1px solid var(--border); padding: 15px 20px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .logo-link { text-decoration: none; color: inherit; cursor: pointer; }
-        .logo { font-weight: 600; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
+        /* Buscá .logo y dejalo así: */ .logo { font-weight: 800; /* Antes 600 */ font-size: 22px; /* Subimos un puntito el tamaño */ letter-spacing: -1px; /* Letras más juntas para un look más moderno y bold */ display: flex; align-items: center; gap: 8px; color: var(--text-main); }
         .logo-icon-wrapper { position: relative; display: flex; align-items: center; justify-content: center; height: 24px; width: 30px; }
         .logo-icon-wrapper .fa-cart-shopping { font-size: 18px; color: var(--text-main); }
         .logo-icon-wrapper .fa-arrow-trend-up { font-size: 12px; color: var(--color-good); position: absolute; top: -4px; right: -2px; background: var(--bg-app); padding: 1px; border-radius: 50%; }
@@ -108,7 +108,7 @@
         .trend-btn.active-up { background: var(--color-bad) !important; color: white !important; border-color: var(--color-bad); }
 
         .hero-section { text-align: center; padding: 25px 20px 0px 20px; display: none; }
-        .hero-title { font-size: 20px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        /* Buscá .hero-title y dejalo así: */ .hero-title { font-size: 22px; font-weight: 800; /* Antes 600 */ color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px; /* Ajuste sutil de espacio */ line-height: 1.2; /* Asegura que si se quiebra en dos líneas no se encime */ }
         .hero-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
         /* PRODUCT VIEW */
@@ -127,8 +127,39 @@
         .pv-best-store { font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 600; text-transform: uppercase; }
         .pv-price-big { font-family: 'Roboto Mono'; font-size: 32px; font-weight: 600; margin-top: 5px; color: var(--text-main); }
         /* NUEVO: Estilo para precio promedio */
-        .pv-avg-price { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-top: 4px; }
-        .pv-avg-price span { color: var(--text-main); font-weight: 700; font-family: 'Roboto Mono'; }
+        /* Estilo del contenedor de Precio Promedio */
+.pv-avg-price {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 12px;
+    
+    /* Fondo gris y bordes */
+    background: #f1f3f6; 
+    padding: 8px 12px;
+    border-radius: 8px;
+    
+    /* Para que no ocupe todo el ancho, solo lo necesario */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Ajuste para Modo Oscuro */
+.dark-mode .pv-avg-price {
+    background: #1e222d; /* Gris oscuro tipo TradingView */
+    color: #b2b5be;
+    border-color: #2a2e39;
+}
+
+/* El número adentro del promedio */
+.pv-avg-price span {
+    color: var(--text-main);
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 13px;
+}
         
         .pv-chart-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px; }
         .range-filters { display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 10px; }
@@ -549,7 +580,21 @@ flatList = rows.map(r => {
 
         const favBtn = document.getElementById('pv-fav-btn');
         favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
-        favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id, false); };
+// Dentro de openProductView...
+favBtn.onclick = () => { 
+    toggleFav(item.id, null); // Ejecuta la lógica base
+
+    // Solo actualizamos el color del ícono en el modal manualmente
+    const isFav = favorites.includes(item.id);
+    favBtn.style.color = isFav ? 'var(--star-gold)' : 'var(--text-main)';
+
+    // IMPORTANTE: Si estamos en la pestaña 'favs', ejecutamos renderView 
+    // para que la lista de atrás se actualice, pero NO llamamos a openProductView
+    // para que el gráfico actual no se reinicie.
+    if (currentTab === 'favs') {
+        renderView(); 
+    }
+};
         
         document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
         document.getElementById('productFullView').style.display = 'block';
@@ -831,7 +876,7 @@ function renderChangoSummary(container, items) {
     const summaryDiv = document.createElement('div');
     summaryDiv.className = 'chango-summary';
     
-    let html = `<div class="pv-market-title">Tu Chango (Total)</div>`;
+    let html = `<div class="pv-market-title" style="font-weight:800; color:var(--text-main);">Tu Chango (Total)</div>`;
     const markets = ["Coto", "Carrefour", "Dia", "Jumbo"];
     
     markets.forEach((name, i) => {
