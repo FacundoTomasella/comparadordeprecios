@@ -28,6 +28,26 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
+        .pv-chart-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 20px;   /* Espacio respecto a los botones */
+            margin-bottom: 5px;  /* Espacio pegado al porcentaje */
+            display: block;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Ajuste opcional para el porcentaje para que no quede tan separado del gráfico */
+        .chart-performance {
+            font-size: 13px; /* Un poquito más grande para que se note */
+            margin-bottom: 10px;
+            display: block;
+        }
+
+
+        
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
             --text-main: #131722; --text-muted: #787b86; --border: #e0e3eb;
@@ -254,6 +274,10 @@
                         <button class="range-btn" onclick="loadPvChart(180, this)">6M</button>
                         <button class="range-btn" onclick="loadPvChart(365, this)">1Y</button>
                     </div>
+                    
+                    <!-- AGREGAR ESTA LÍNEA AQUÍ -->
+                    <div class="pv-chart-label">Gráfico de tendencias</div> 
+                    
                     <span id="pv-perf" class="chart-performance"></span>
                     <div class="chart-wrapper" id="pv-wrap"><canvas id="pv-canvas"></canvas></div>
                 </div>
