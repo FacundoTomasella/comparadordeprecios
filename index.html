@@ -46,7 +46,27 @@
             display: block;
         }
 
-
+        /* El cartel que tapa el canvas cuando no hay datos */
+            .no-data-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: var(--bg-app); /* Fondo dinámico */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+            }
+            /* El texto del cartel */
+            .no-data-text {
+                color: var(--text-muted);
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
         
         :root {
             --bg-app: #ffffff; --bg-card: #f9f9f9; --bg-nav: #ffffff;
