@@ -580,13 +580,21 @@ flatList = rows.map(r => {
 
         const favBtn = document.getElementById('pv-fav-btn');
         favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
-        // Dentro de openProductView...
-        favBtn.onclick = () => { 
-            toggleFav(item.id, null); // Ejecuta la lógica base
+// Dentro de openProductView...
+favBtn.onclick = () => { 
+    toggleFav(item.id, null); // Ejecuta la lógica base
 
     // Solo actualizamos el color del ícono en el modal manualmente
     const isFav = favorites.includes(item.id);
     favBtn.style.color = isFav ? 'var(--star-gold)' : 'var(--text-main)';
+
+    // IMPORTANTE: Si estamos en la pestaña 'favs', ejecutamos renderView 
+    // para que la lista de atrás se actualice, pero NO llamamos a openProductView
+    // para que el gráfico actual no se reinicie.
+    if (currentTab === 'favs') {
+        renderView(); 
+    }
+};
         
         document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
         document.getElementById('productFullView').style.display = 'block';
