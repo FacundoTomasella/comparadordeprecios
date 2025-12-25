@@ -93,35 +93,35 @@
         .pv-chart-section { margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px; }
         .range-filters { display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 10px; }
         .range-btn {
-    background: #fff;
-    border: 1px solid #e0e3eb;
-    color: #787b86;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
-    transition: 0.2s;
-}
+            background: #fff;
+            border: 1px solid #e0e3eb;
+            color: #787b86;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            }
+            
+            .range-btn.active {
+                background: #131722; /* Fondo oscuro para el activo */
+                color: #fff;
+                border-color: #131722;
+            }
+            
+            .dark-mode .range-btn {
+                background: #1e222d;
+                border-color: #363a45;
+                color: #b2b5be;
+            }
 
-.range-btn.active {
-    background: #131722; /* Fondo oscuro para el activo */
-    color: #fff;
-    border-color: #131722;
-}
-
-.dark-mode .range-btn {
-    background: #1e222d;
-    border-color: #363a45;
-    color: #b2b5be;
-}
-
-.dark-mode .range-btn.active {
-    background: #2962ff;
-    border-color: #2962ff;
-    color: #fff;
-}
-        
+            /* Activo en Modo Oscuro (Blanco con texto negro) */
+            .dark-mode .range-btn.active {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border-color: #ffffff !important;
+            }        
         .pv-market-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 25px; }
         .pv-market-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 1px; }
 
@@ -566,14 +566,11 @@
     
     let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
 
-    // Color del texto de performance (Rojo si sube, Verde si baja)
     perfEl.style.color = diffP >= 0 ? '#f23645' : '#00a650';
     perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
 
     const ctx = document.getElementById('pv-canvas').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark-mode');
-    
-    // Color de la línea y bordes (Negro en modo claro, Blanco en modo oscuro)
     const mainColor = isDark ? '#ffffff' : '#131722';
 
     if(currentChart) currentChart.destroy();
@@ -590,19 +587,23 @@
                 borderWidth: 2,
                 backgroundColor: 'transparent',
                 fill: false,
-                tension: 0, // Líneas rectas como en la imagen
+                tension: 0, 
                 pointStyle: 'circle',
                 pointRadius: 5,
                 pointHoverRadius: 7,
-                pointBackgroundColor: '#ffffff', // Fondo blanco del punto
-                pointBorderColor: mainColor,     // Borde negro del punto
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: mainColor,
                 pointBorderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
+            // INTERACCIÓN: Se activa en cualquier parte del eje X (línea vertical)
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
             plugins: { 
                 legend: { display: false },
                 tooltip: {
@@ -610,41 +611,58 @@
                     backgroundColor: isDark ? '#1e222d' : '#fff',
                     titleColor: isDark ? '#fff' : '#131722',
                     bodyColor: isDark ? '#fff' : '#131722',
-                    borderColor: '#e0e3eb',
+                    borderColor: isDark ? '#444' : '#e0e3eb',
                     borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 6,
                     displayColors: false,
+                    titleFont: { size: 11, weight: 'normal' },
+                    bodyFont: { size: 13, weight: 'bold', family: 'Roboto Mono' },
                     callbacks: {
-                        label: (c) => `$ ${format(c.raw)}`
+                        title: (context) => {
+                            const d = data[context[0].dataIndex].fecha.split('-');
+                            return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`;
+                        },
+                        // MOSTRAR EMPRESA + PRECIO
+                        label: (context) => {
+                            const entry = data[context.dataIndex];
+                            return `${entry.supermercado}: $${format(entry.precio_minimo)}`;
+                        }
                     }
                 }
             },
             scales: {
                 y: {
                     border: { display: false },
-                    grid: { 
-                        color: isDark ? '#2a2a2a' : '#f0f0f0',
-                        drawTicks: false
-                    },
-                    ticks: { 
-                        color: '#999', 
-                        font: { family: 'Inter', size: 11 },
-                        callback: v => '$' + v,
-                        padding: 10
-                    }
+                    grid: { color: isDark ? '#2a2a2a' : '#f0f0f0', drawTicks: false },
+                    ticks: { color: '#999', font: { size: 11 }, callback: v => '$' + v, padding: 10 }
                 },
                 x: {
                     border: { display: false },
                     grid: { display: false },
-                    ticks: { 
-                        color: '#999', 
-                        font: { size: 11 },
-                        maxRotation: 0,
-                        autoSkip: true,
-                        maxTicksLimit: 5 
-                    }
+                    ticks: { color: '#999', font: { size: 11 }, maxTicksLimit: 6 }
                 }
             }
-        }
+        },
+        // PLUGIN PARA LA LÍNEA VERTICAL (CROSSHAIR)
+        plugins: [{
+            afterDraw: (chart) => {
+                if (chart.tooltip?._active?.length) {
+                    const x = chart.tooltip._active[0].element.x;
+                    const yAxis = chart.scales.y;
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, yAxis.top);
+                    ctx.lineTo(x, yAxis.bottom);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)';
+                    ctx.setLineDash([4, 4]); // Línea punteada
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }]
     });
 }
     function toggleFav(id, btn) { 
