@@ -580,7 +580,13 @@ flatList = rows.map(r => {
 
         const favBtn = document.getElementById('pv-fav-btn');
         favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
-        favBtn.onclick = () => { toggleFav(item.id, null); openProductView(item.id, false); };
+        // Dentro de openProductView...
+        favBtn.onclick = () => { 
+            toggleFav(item.id, null); // Ejecuta la lógica base
+
+    // Solo actualizamos el color del ícono en el modal manualmente
+    const isFav = favorites.includes(item.id);
+    favBtn.style.color = isFav ? 'var(--star-gold)' : 'var(--text-main)';
         
         document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
         document.getElementById('productFullView').style.display = 'block';
