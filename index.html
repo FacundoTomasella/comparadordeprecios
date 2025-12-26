@@ -524,13 +524,11 @@
     // 1. Reemplazá tu línea de declaración por estas:
 let flatList = [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
 
-// Cargamos los favoritos y nos aseguramos de que sea un OBJETO {} y no un ARRAY []
+// Inicialización limpia de favoritos como OBJETO
 let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || {};
-if (Array.isArray(favorites)) {
-    // Si el usuario tenía datos viejos en formato lista [1, 2], los convertimos a objeto {1:1, 2:1}
-    let newFavs = {};
-    favorites.forEach(id => newFavs[id] = 1);
-    favorites = newFavs;
+if (Array.isArray(favorites)) { 
+    favorites = {}; // Si era un array viejo, lo reseteamos a objeto vacío
+    localStorage.setItem('fav_tickers', JSON.stringify(favorites));
 }
     // Diccionario de páginas estáticas para reconocerlas en la URL
     const paginasEstaticas = {
@@ -932,10 +930,11 @@ flatList = rows.map(r => {
     const clearBtn = document.getElementById('clearSearch');
 
     container.innerHTML = '';
-    clearBtn.style.display = term ? 'block' : 'none';
+    if (clearBtn) clearBtn.style.display = term ? 'block' : 'none';
 
     let dataToShow = [];
 
+    // Lógica de pestañas
     if (currentTab === 'home') {
         trendFilters.style.display = 'flex';
         hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
@@ -944,8 +943,7 @@ flatList = rows.map(r => {
     else if (currentTab === 'favs') {
         trendFilters.style.display = 'none';
         hero.style.display = 'none';
-        
-        // --- CAMBIO AQUÍ: Filtrado para objetos ---
+        // Filtramos buscando llaves en el objeto
         dataToShow = flatList.filter(i => favorites[i.id] !== undefined);
 
         if (dataToShow.length === 0) {
@@ -958,16 +956,14 @@ flatList = rows.map(r => {
         trendFilters.style.display = 'flex';
         hero.style.display = 'none';
         const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
-        const categoryName = catMap[currentTab];
+        const categoryName = catMap[currentTab] || 'Varios';
         dataToShow = flatList.filter(i => i.cat.trim().toLowerCase() === categoryName.toLowerCase());
     }
 
+    // Filtros de búsqueda y tendencia
     if (term) {
-        dataToShow = dataToShow.filter(i => 
-            i.n.toUpperCase().includes(term) || i.ticker.toUpperCase().includes(term)
-        );
+        dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.toUpperCase().includes(term));
     }
-
     if (currentTrendFilter && currentTab !== 'favs') {
         dataToShow = dataToShow.filter(item => {
             const s = getStats(item.p, item.h7d);
@@ -975,18 +971,14 @@ flatList = rows.map(r => {
         });
     }
 
-   dataToShow.forEach(item => {
+    // Dibujar tarjetas
+    dataToShow.forEach(item => {
         const s = getStats(item.p, item.h7d);
         if (s.min === 0) return;
 
-        const card = document.createElement('div');
-        card.className = 'ticker-card';
-        card.onclick = () => openProductView(item.id);
-        
         const isAdded = favorites[item.id] !== undefined;
         const currentQty = favorites[item.id] || 1;
 
-        // --- Lógica de controles de cantidad (Solo en pestaña Chango) ---
         let qtyHtml = '';
         if (currentTab === 'favs') {
             qtyHtml = `
@@ -994,10 +986,12 @@ flatList = rows.map(r => {
                     <button class="qty-btn" onclick="changeQty(${item.id}, -1, event)">-</button>
                     <span class="qty-num">${currentQty}</span>
                     <button class="qty-btn" onclick="changeQty(${item.id}, 1, event)">+</button>
-                </div>
-            `;
+                </div>`;
         }
 
+        const card = document.createElement('div');
+        card.className = 'ticker-card';
+        card.onclick = () => openProductView(item.id);
         card.innerHTML = `
             <div class="ticker-info">
                 <div class="t-left">
@@ -1019,8 +1013,7 @@ flatList = rows.map(r => {
         `;
         container.appendChild(card);
     });
-// --- Funciones de apoyo para limpiar el código principal ---
-
+}
 function renderChangoSummary(container, items) {
     const totals = [0, 0, 0, 0];
     items.forEach(item => {
