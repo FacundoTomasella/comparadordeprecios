@@ -970,12 +970,42 @@ async function loadPvChart(days, btn) {
 }
 
 function getStats(p, h) { 
-    const v = p.filter(x=>x>0); if(v.length===0) return {min:0}; 
-    const min = Math.min(...v); let diff=0, tc="trend-neutral", icon="-", isUp=false, isDown=false; 
-    if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ tc="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ tc="trend-down"; icon="▼"; isDown=true; } } 
-    return {min, spread:Math.abs(diff).toFixed(1), trendClass:tc, icon, isUp, isDown}; 
+    const v = p.filter(x => x > 0); 
+    if (v.length === 0) return {
+        min: 0, 
+        spread: 0, 
+        trendClass: "trend-neutral", 
+        icon: "-", 
+        isUp: false, 
+        isDown: false
+    }; 
+    
+    const min = Math.min(...v); 
+    let diff = 0, tc = "trend-neutral", icon = "-", isUp = false, isDown = false; 
+    
+    // Añade verificación para evitar división por cero
+    if (h && h > 0) { 
+        diff = ((min - h) / h) * 100;
+        if (diff > 0.1) { 
+            tc = "trend-up"; 
+            icon = "▲"; 
+            isUp = true; 
+        } else if (diff < -0.1) { 
+            tc = "trend-down"; 
+            icon = "▼"; 
+            isDown = true; 
+        }
+    } 
+    
+    return {
+        min, 
+        spread: Math.abs(diff).toFixed(1), 
+        trendClass: tc, 
+        icon, 
+        isUp, 
+        isDown
+    }; 
 }
-
 function renderMarket(item, min) {
     const STORES = [{name:"COTO",color:"#ff3b30"},{name:"CARREFOUR",color:"#2962ff"},{name:"DIA",color:"#ff3b30"},{name:"JUMBO",color:"#00c853"}];
     return STORES.map((s, i) => { 
