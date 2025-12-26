@@ -2,7 +2,24 @@
 <html lang="es">
 <head>
   <link rel="manifest" href="manifest.json">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RVLYJ69FYD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
+  gtag('config', 'G-RVLYJ69FYD');
+</script>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "urnhtyw6dr");
+</script>
+  
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js') // Asegúrate que diga .js
@@ -1114,10 +1131,14 @@ function renderEmptyCart(container) {
                     <div class="dot" style="background:${s.color}"></div>
                     ${s.name}
                 </div>
-                <a href="${url}" target="_blank" rel="noopener noreferrer" class="price-link ${p === min ? 'best-val' : ''}">
-                    $${format(p)}
-                </a>
-            </div>`; 
+               <a href="${url}" 
+               target="_blank" 
+               rel="noopener" 
+               onclick="trackMarketClick('${s.name}', '${item.n}')" 
+               class="price-link ${p===min?'best-val':''}">
+               $${format(p)}
+            </a>
+        </div>`;
     }).join('');
 }
     function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
@@ -1172,6 +1193,29 @@ document.getElementById('productFullView').addEventListener('click', function(e)
         closeProductView();
     }
 });  
+
+// 1. Medir cuando alguien instala la App
+window.addEventListener('appinstalled', () => {
+  if (typeof gtag === 'function') {
+    gtag('event', 'pwa_install', {
+      'event_category': 'App',
+      'event_label': 'PWA Installed'
+    });
+  }
+  console.log('App instalada con éxito');
+});
+
+// 2. Función para medir clics en los links de los supermercados
+function trackMarketClick(superName, productName) {
+  if (typeof gtag === 'function') {
+    gtag('event', 'click_supermercado', {
+      'supermercado': superName,
+      'producto': productName
+    });
+  }
+}
+
+     
     // Iniciar la app
     init();
 </script>
