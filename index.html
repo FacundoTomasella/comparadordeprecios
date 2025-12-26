@@ -487,8 +487,17 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-    let flatList = [], favorites = JSON.parse(localStorage.getItem('fav_tickers')) || [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
+    // 1. Reemplazá tu línea de declaración por estas:
+let flatList = [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
 
+// Cargamos los favoritos y nos aseguramos de que sea un OBJETO {} y no un ARRAY []
+let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || {};
+if (Array.isArray(favorites)) {
+    // Si el usuario tenía datos viejos en formato lista [1, 2], los convertimos a objeto {1:1, 2:1}
+    let newFavs = {};
+    favorites.forEach(id => newFavs[id] = 1);
+    favorites = newFavs;
+}
     // Diccionario de páginas estáticas para reconocerlas en la URL
     const paginasEstaticas = {
         'acerca_de': 'Acerca de',
@@ -852,10 +861,16 @@ flatList = rows.map(r => {
  }
 
     function updateCartBadge() {
-        const b = document.getElementById('cartBadge');
-        if (favorites.length > 0) { b.style.display = 'flex'; b.innerText = favorites.length; }
-        else b.style.display = 'none';
+    const b = document.getElementById('cartBadge');
+    const count = Object.keys(favorites).length; // Contamos las propiedades del objeto
+    
+    if (count > 0) {
+        b.style.display = 'flex';
+        b.innerText = count;
+    } else {
+        b.style.display = 'none';
     }
+}
 
   function renderView() {
     // 1. Referencias a elementos (Cachear si es posible fuera de la función)
@@ -880,8 +895,7 @@ flatList = rows.map(r => {
     else if (currentTab === 'favs') {
         trendFilters.style.display = 'none';
         hero.style.display = 'none';
-        dataToShow = flatList.filter(i => favorites.includes(i.id));
-
+dataToShow = flatList.filter(i => favorites[i.id] !== undefined);
         // Manejo de Chango Vacío
         if (dataToShow.length === 0) {
             renderEmptyCart(container);
@@ -948,14 +962,9 @@ flatList = rows.map(r => {
 function renderChangoSummary(container, items) {
     const totals = [0, 0, 0, 0];
     items.forEach(item => {
-        // Obtenemos la cantidad del producto (mínimo 1)
-        const quantity = favorites[item.id] || 1;
-        
+        const qty = favorites[item.id] || 1; // Obtenemos la cantidad
         item.p.forEach((val, idx) => {
-            if (val > 0) {
-                // Multiplicamos el precio por la cantidad seleccionada
-                totals[idx] += (val * quantity);
-            }
+            if (val > 0) totals[idx] += (val * qty); // Multiplicamos por cantidad
         });
     });
 
@@ -980,7 +989,6 @@ function renderChangoSummary(container, items) {
     summaryDiv.innerHTML = html;
     container.appendChild(summaryDiv);
 }
-
 function renderEmptyCart(container) {
     const emptyMsg = document.createElement('div');
     emptyMsg.className = 'empty-cart-message'; // Mejor usar clases CSS
