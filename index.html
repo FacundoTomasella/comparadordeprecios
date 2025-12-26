@@ -612,78 +612,81 @@ flatList = rows.map(r => {
     }
 
     function openProductView(id, pushState = true) {
-        const item = flatList.find(i => i.id == id);
-        if (!item) return;
-        openId = id;
-        
-        if (pushState) {
-            const slug = getSlug(item.n);
-            const categoria = (item.cat || 'varios').toLowerCase().trim();
-            history.pushState({p: id}, '', `/${categoria}/${slug}`);
-        }
+    const item = flatList.find(i => i.id == id);
+    if (!item) return;
+    openId = id;
 
-        const stats = getStats(item.p, item.h7d);
-        document.getElementById('pv-name').innerText = item.n;
-        
-        // Manejo de Imagen
-        const imgWrap = document.getElementById('pv-img-wrap');
-        const imgEl = document.getElementById('pv-img');
-        if (item.img) { imgEl.src = item.img; imgWrap.style.display = 'block'; }
-        else { imgWrap.style.display = 'none'; }
+    // 1. Manejo de Historial/URL
+    if (pushState) {
+        const slug = getSlug(item.n);
+        const categoria = (item.cat || 'varios').toLowerCase().trim();
+        history.pushState({ p: id }, '', `/${categoria}/${slug}`);
+    }
 
-        const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
-        document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
-        document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
-        
-        // MODIFICADO: Cálculo de Precio Promedio
-        const preciosDisponibles = item.p.filter(p => p > 0);
-        const promedio = preciosDisponibles.length > 0 ? (preciosDisponibles.reduce((a, b) => a + b, 0) / preciosDisponibles.length) : 0;
-        document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
+    // 2. Cálculo de estadísticas
+    const stats = getStats(item.p, item.h7d);
+    document.getElementById('pv-name').innerText = item.n;
 
-        const favBtn = document.getElementById('pv-fav-btn');
-        favBtn.style.color = favorites.includes(item.id) ? 'var(--star-gold)' : 'var(--text-main)';
-// Dentro de openProductView...
-favBtn.onclick = () => { 
-    toggleFav(item.id, null); // Ejecuta la lógica base
+    // 3. Imagen del producto
+    const imgWrap = document.getElementById('pv-img-wrap');
+    const imgEl = document.getElementById('pv-img');
+    if (item.img) {
+        imgEl.src = item.img;
+        imgWrap.style.display = 'block';
+    } else {
+        imgWrap.style.display = 'none';
+    }
 
-    // Solo actualizamos el color del ícono en el modal manualmente
-    const isFav = favorites.includes(item.id);
+    // 4. Mejores Precios y Promedio
+    const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
+    document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
+    document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
+
+    const preciosDisponibles = item.p.filter(p => p > 0);
+    const promedio = preciosDisponibles.length > 0 ? (preciosDisponibles.reduce((a, b) => a + b, 0) / preciosDisponibles.length) : 0;
+    document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
+
+    // 5. Lógica del Botón Favoritos (Ahora chequea si la propiedad existe en el objeto)
+    const favBtn = document.getElementById('pv-fav-btn');
+    const isFav = !!favorites[item.id]; // Doble negación para convertir a booleano
     favBtn.style.color = isFav ? 'var(--star-gold)' : 'var(--text-main)';
 
-    // IMPORTANTE: Si estamos en la pestaña 'favs', ejecutamos renderView 
-    // para que la lista de atrás se actualice, pero NO llamamos a openProductView
-    // para que el gráfico actual no se reinicie.
-    if (currentTab === 'favs') {
-        renderView(); 
-    }
-};
-        
-        document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
-        // Detecta si es escritorio para centrar el modal con flex
-if (window.innerWidth >= 1024) {
-    document.getElementById('productFullView').style.display = 'flex';
-} else {
-    document.getElementById('productFullView').style.display = 'block';
+    favBtn.onclick = () => {
+        toggleFav(item.id, null);
+        // Actualizamos solo el icono para que el gráfico no se reinicie
+        const nowFav = !!favorites[item.id];
+        favBtn.style.color = nowFav ? 'var(--star-gold)' : 'var(--text-main)';
+        if (currentTab === 'favs') renderView();
+    };
+
+    // 6. Render de la lista de mercados
+    document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
+
+    // 7. Mostrar el Modal (Flex en PC para centrar, Block en Móvil)
+    const view = document.getElementById('productFullView');
+    view.style.display = (window.innerWidth >= 1024) ? 'flex' : 'block';
+    document.body.style.overflow = 'hidden';
+
+    // 8. Reiniciar filtros de gráfico y cargar datos
+    document.querySelectorAll('#pv-range-filters .range-btn').forEach(b => b.classList.remove('active'));
+    const firstBtn = document.querySelector('#pv-range-filters .range-btn:first-child');
+    if (firstBtn) firstBtn.classList.add('active');
+    
+    loadPvChart(7);
+
+    // 9. Botón compartir
+    document.getElementById('pv-share-btn').onclick = async () => {
+        const shareData = { title: 'TradingChango', text: `Mirá el precio de ${item.n}`, url: window.location.href };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('¡Link copiado!');
+            }
+        } catch (err) { console.log(err); }
+    };
 }
-        document.body.style.overflow = 'hidden';
-        
-        document.querySelectorAll('#pv-range-filters .range-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('#pv-range-filters .range-btn:first-child').classList.add('active');
-        
-        loadPvChart(7);
-
-        document.getElementById('pv-share-btn').onclick = async () => {
-            const shareData = { title: 'TradingChango', text: `Mirá el precio de ${item.n}`, url: window.location.href };
-            try {
-                if (navigator.share) { await navigator.share(shareData); } 
-                else {
-                    await navigator.clipboard.writeText(window.location.href);
-                    alert('¡Link copiado!');
-                }
-            } catch (err) { console.log(err); }
-        };
-    }
-
     function closeProductView(pushState = true) {
         document.getElementById('productFullView').style.display = 'none';
         document.body.style.overflow = 'auto';
@@ -1080,7 +1083,12 @@ if (isIOS && !isStandalone && !sessionStorage.getItem('pwaPillClosed')) {
     pwaPill.style.display = 'flex';
     document.getElementById('pwaText').innerText = 'Agregá la App a tu inicio ↑';
 }
-     
+   // Cerrar al hacer clic fuera del contenido (Solo en Escritorio)
+document.getElementById('productFullView').addEventListener('click', function(e) {
+    if (window.innerWidth >= 1024 && e.target === this) {
+        closeProductView();
+    }
+});  
     // Iniciar la app
     init();
 </script>
