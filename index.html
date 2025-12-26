@@ -21,8 +21,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="TradingChango">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
-    
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>"> 
+
     <script>
         if (typeof history.scrollRestoration !== 'undefined') { history.scrollRestoration = 'manual'; }
         if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark-mode'); }
@@ -365,7 +365,20 @@
     .pv-content {
         padding: 30px 25px !important;
     }
-}        
+}
+.pv-alert-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.pv-alert-btn.active {
+    color: #3182ce; /* Un azul para las alertas */
+}
+
+      
     </style>
 </head>
 <body>
@@ -395,7 +408,11 @@
                     <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
                 </div>
             </div>
-            
+            <div class="header-actions">
+            <button class="pv-alert-btn" id="pv-alert-btn" onclick="toggleAlertUI()"><i class="fa-regular fa-bell"></i></button>
+            <button class="pv-fav-btn" id="pv-fav-btn"><i class="fa-solid fa-cart-shopping"></i></button>
+            <button class="pv-share-btn" id="pv-share-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+        </div>
             <div class="pv-content">
                 <div class="pv-top-info">
                     <!-- MODIFICADO: Imagen ahora a la izquierda -->
@@ -517,6 +534,58 @@
     </div>
 
    <script>
+     // Variable global para el usuario
+let currentUser = null;
+
+async function checkUser() {
+    // Esto verifica si hay una sesión activa
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user;
+    if (user) {
+        console.log("Usuario logueado:", user.email);
+        // Aquí podrías cambiar el icono de "user-btn" por la inicial del nombre
+    }
+}
+
+// Función para registrarse/loguearse (Paso básico)
+async function signIn() {
+    const email = prompt("Ingresá tu email:");
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    if (error) alert("Error: " + error.message);
+    else alert("¡Checkeá tu email para el link de acceso!");
+}
+  async function toggleAlertUI() {
+    if (!currentUser) {
+        if (confirm("Necesitás una cuenta para activar alertas. ¿Querés iniciar sesión?")) {
+            signIn();
+        }
+        return;
+    }
+
+    const item = flatList.find(i => i.id == openId);
+    const targetPrice = prompt(`Avisame cuando "${item.n}" baje de $:`, (getStats(item.p, item.h7d).min * 0.9).toFixed(0));
+
+    if (targetPrice) {
+        const { error } = await supabase
+            .from('alertas')
+            .insert([
+                { user_id: currentUser.id, product_id: item.id, precio_objetivo: parseFloat(targetPrice) }
+            ]);
+
+        if (error) console.error(error);
+        else {
+            alert("¡Alerta configurada! Te avisaremos cuando llegue a ese precio.");
+            document.getElementById('pv-alert-btn').classList.add('active');
+            document.getElementById('pv-alert-btn').innerHTML = '<i class="fa-solid fa-bell"></i>';
+        }
+    }
+}
+     
     const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
     const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
