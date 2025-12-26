@@ -259,14 +259,34 @@
         max-width: 900px !important;
     }
 
-    /* 2. Links del Header (Lo que tenías al final) */
-    .desktop-links {
-        display: flex; /* Muestra los links de PC */
-    }
-    #info-celular {
-        display: none; /* Oculta el icono de info de móvil */
-    }
+/* --- ESTILOS PARA MÓVIL (Por defecto) --- */
 
+/* Escondemos los links de PC en el celular */
+.desktop-links {
+    display: none;
+}
+
+/* Mostramos el botón de información (el círculo con la 'i') en el celular */
+#info-celular {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* El desplegable legal en el celular */
+.legal-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background: var(--bg-app);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none; /* Se activa con JS */
+    flex-direction: column;
+    z-index: 200;
+    width: 180px;
+}
     /* 3. Vista de Producto como Modal Compacto */
     #productFullView {
         background-color: rgba(0, 0, 0, 0.6) !important; /* Fondo más oscuro */
