@@ -37,6 +37,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
     <style>
+      /* Controles de cantidad en el Chango */
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card);
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-right: 10px;
+}
+.qty-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.qty-btn:active { transform: scale(0.8); }
+.qty-num {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 20px;
+    text-align: center;
+}
+      
         /* Si la app ya está en modo "standalone" (instalada), escondemos el banner siempre */
 @media (display-mode: standalone) {
     #pwaInstallBanner {
@@ -840,7 +874,25 @@ flatList = rows.map(r => {
         }]
     });
 }
-   function toggleFav(id, btn) {
+   
+     function changeQty(id, delta, event) {
+    if (event) event.stopPropagation(); // Evita que se abra la vista de producto al tocar el botón
+    
+    if (favorites[id]) {
+        favorites[id] += delta;
+        
+        // No permitimos que la cantidad sea menor a 1
+        if (favorites[id] < 1) favorites[id] = 1;
+        
+        localStorage.setItem('fav_tickers', JSON.stringify(favorites));
+        renderView(); // Refrescamos para actualizar el total y los números
+    }
+}
+     
+     
+     
+     
+     function toggleFav(id, btn) {
     // Si ya existe, lo borramos (sacar del chango)
     if (favorites[id]) {
         delete favorites[id];
@@ -923,7 +975,7 @@ flatList = rows.map(r => {
         });
     }
 
-    dataToShow.forEach(item => {
+   dataToShow.forEach(item => {
         const s = getStats(item.p, item.h7d);
         if (s.min === 0) return;
 
@@ -931,8 +983,20 @@ flatList = rows.map(r => {
         card.className = 'ticker-card';
         card.onclick = () => openProductView(item.id);
         
-        // --- CAMBIO AQUÍ: Clase 'active' para objetos ---
         const isAdded = favorites[item.id] !== undefined;
+        const currentQty = favorites[item.id] || 1;
+
+        // --- Lógica de controles de cantidad (Solo en pestaña Chango) ---
+        let qtyHtml = '';
+        if (currentTab === 'favs') {
+            qtyHtml = `
+                <div class="qty-control" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty(${item.id}, -1, event)">-</button>
+                    <span class="qty-num">${currentQty}</span>
+                    <button class="qty-btn" onclick="changeQty(${item.id}, 1, event)">+</button>
+                </div>
+            `;
+        }
 
         card.innerHTML = `
             <div class="ticker-info">
@@ -945,14 +1009,16 @@ flatList = rows.map(r => {
                     <span class="t-change ${s.trendClass}">${s.icon} ${s.spread}%</span>
                 </div>
             </div>
-            <div class="fav-btn ${isAdded ? 'active' : ''}" 
-                 onclick="event.stopPropagation(); toggleFav(${item.id}, this)">
-                <i class="fa-solid fa-cart-shopping"></i>
+            <div style="display:flex; align-items:center;">
+                ${qtyHtml}
+                <div class="fav-btn ${isAdded ? 'active' : ''}" 
+                     onclick="event.stopPropagation(); toggleFav(${item.id}, this)">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
             </div>
         `;
         container.appendChild(card);
     });
-}
 // --- Funciones de apoyo para limpiar el código principal ---
 
 function renderChangoSummary(container, items) {
