@@ -571,95 +571,42 @@
     </div>
 
    <script>
-     // Variable global para el usuario
-let currentUser = null;
-
-async function checkUser() {
-    // Esto verifica si hay una sesión activa
-    const { data: { user } } = await supabase.auth.getUser();
-    currentUser = user;
-    if (user) {
-        console.log("Usuario logueado:", user.email);
-        // Aquí podrías cambiar el icono de "user-btn" por la inicial del nombre
-    }
-}
-
-// Función para registrarse/loguearse (Paso básico)
-async function signIn() {
-    const email = prompt("Ingresá tu email:");
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    if (error) alert("Error: " + error.message);
-    else alert("¡Checkeá tu email para el link de acceso!");
-}
- async function toggleAlertUI() {
-    if (!currentUser) {
-        if (confirm("Necesitás una cuenta para recibir alertas de precio. ¿Querés crear una ahora?")) {
-            openAuth();
-        }
-        return;
-    }
-    
-    // Si está logueado, abrir el prompt de precio (como ya tenías)
-    const item = flatList.find(i => i.id == openId);
-    const targetPrice = prompt(`Avisame cuando "${item.n}" baje de $:`, (getStats(item.p, item.h7d).min * 0.9).toFixed(0));
-
-    if (targetPrice) {
-        const { error } = await supabase
-            .from('alertas')
-            .insert([
-                { user_id: currentUser.id, product_id: item.id, precio_objetivo: parseFloat(targetPrice) }
-            ]);
-
-        if (error) console.error(error);
-        else {
-            alert("¡Alerta configurada! Te avisaremos cuando llegue a ese precio.");
-            document.getElementById('pv-alert-btn').classList.add('active');
-            document.getElementById('pv-alert-btn').innerHTML = '<i class="fa-solid fa-bell"></i>';
-        }
-    }
-}
-     
- // 1. CONFIGURACIÓN Y CLIENTE SUPABASE
+    // 1. CONFIGURACIÓN INICIAL
 const SUPABASE_URL = 'https://uginrayldvkhgodvfhta.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaW5yYXlsZHZraGdvZHZmaHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwODEzMzcsImV4cCI6MjA4MTY1NzMzN30.hRp7YjVymPnsqbwh8dJjfgKFg77cdd0A5o-ETWYgeiw';
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-// CORRECCIÓN: Usar el objeto global 'supabase' de la librería CDN para crear el cliente
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+// Inicialización del cliente Supabase (Nombre unificado a 'supabase')
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-// 2. VARIABLES GLOBALES
-let flatList = [], currentTab = 'home', currentTrendFilter = null, openId = null, configDB = {}, currentChart = null;
-let currentUser = null; 
+// 2. VARIABLES DE ESTADO
+let flatList = [], 
+    currentTab = 'home', 
+    currentTrendFilter = null, 
+    openId = null, 
+    configDB = {}, 
+    currentChart = null,
+    currentUser = null,
+    userProfile = null;
 
-// 3. INICIALIZACIÓN DE FAVORITOS (OBJETO PARA CANTIDADES)
+// Inicialización de Favoritos (Objeto para cantidades)
 let favorites = JSON.parse(localStorage.getItem('fav_tickers')) || {};
 if (Array.isArray(favorites)) { 
-    // Conversión de formato viejo (Array) a nuevo (Objeto)
     let newFavs = {};
     favorites.forEach(id => newFavs[id] = 1);
     favorites = newFavs;
     localStorage.setItem('fav_tickers', JSON.stringify(favorites));
 }
 
-const paginasEstaticas = {
-    'acerca_de': 'Acerca de',
-    'terminos': 'Términos',
-    'contacto': 'Contacto'
-};
-
+const paginasEstaticas = { 'acerca_de': 'Acerca de', 'terminos': 'Términos', 'contacto': 'Contacto' };
 const getSlug = (name) => name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
-// 4. FUNCIÓN INIT (CARGA DE DATOS)
+// 3. FUNCIONES DE INICIO (INIT)
 async function init() {
     console.log("Iniciando TradingChango...");
     try {
-        // Iniciar Autenticación (Si existe la función)
-        if (typeof initAuth === 'function') await initAuth();
+        // Inicializar Auth primero
+        await initAuth();
 
         // Cargar Configuración
         const resC = await fetch(`${SUPABASE_URL}/rest/v1/configuracion?select=*`, { 
@@ -687,12 +634,8 @@ async function init() {
             let t = generateTicker(r.nombre);
             if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
             usedTickers.add(t);
-            
             return {
-                id: r.id, 
-                n: r.nombre.trim(), 
-                cat: r.categoria, 
-                ticker: t,
+                id: r.id, n: r.nombre.trim(), cat: r.categoria, ticker: t,
                 p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
                 urls: [r.url_coto || '#', r.url_carrefour || '#', r.url_dia || '#', r.url_jumbo || '#'],
                 h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
@@ -703,7 +646,7 @@ async function init() {
         document.getElementById('loader').style.display = 'none';
         updateCartBadge();
 
-        // Manejo de Rutas
+        // Lógica de rutas
         const path = window.location.pathname.split('/').filter(p => p !== "");
         if (paginasEstaticas[path[0]]) {
             openPage(path[0], paginasEstaticas[path[0]], false);
@@ -719,31 +662,102 @@ async function init() {
 
     } catch (e) { 
         console.error("Error crítico en init:", e);
-        const loader = document.getElementById('loader');
-        if (loader) loader.innerText = "ERROR DE CONEXIÓN";
+        if(document.getElementById('loader')) document.getElementById('loader').innerText = "ERROR AL CARGAR DATOS";
     }
 }
 
-// 5. NAVEGACIÓN
+function handlePopState() {
+    const p = window.location.pathname.split('/').filter(x => x !== "");
+    if (paginasEstaticas[p[0]]) {
+        openPage(p[0], paginasEstaticas[p[0]], false);
+    } else if (p.length >= 2) {
+        const itemPop = flatList.find(i => getSlug(i.n) === p[1]);
+        if (itemPop) openProductView(itemPop.id, false);
+    } else {
+        document.getElementById('pageView').classList.remove('active');
+        document.getElementById('productFullView').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        setTab(p[0] || 'home', null, false);
+    }
+}
+
+// 4. AUTENTICACIÓN
+async function initAuth() {
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    await handleAuthState(session);
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+        handleAuthState(session);
+    });
+}
+
+async function handleAuthState(session) {
+    const userBtn = document.getElementById('userBtn');
+    if (session) {
+        currentUser = session.user;
+        const { data } = await supabase.from('perfiles').select('*').eq('id', currentUser.id).single();
+        userProfile = data;
+        if (userBtn) userBtn.innerHTML = '<i class="fa-solid fa-circle-user" style="color:var(--color-good)"></i>';
+        document.getElementById('authModal').style.display = 'none';
+    } else {
+        currentUser = null;
+        userProfile = null;
+        if (userBtn) userBtn.innerHTML = '<i class="fa-solid fa-circle-user"></i>';
+    }
+}
+
+async function handleSignUp(event) {
+    event.preventDefault();
+    const nombre = document.getElementById('regNombre').value;
+    const apellido = document.getElementById('regApellido').value;
+    const fecha = document.getElementById('regFecha').value;
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+
+    const { data, error } = await supabase.auth.signUp({ email, password: pass });
+    if (error) { alert(error.message); return; }
+
+    if (data.user) {
+        await supabase.from('perfiles').insert([{ id: data.user.id, nombre, apellido, fecha_nacimiento: fecha, email }]);
+        alert("¡Cuenta creada! Revisa tu email.");
+        location.reload();
+    }
+}
+
+function openAuth() { document.getElementById('authModal').style.display = 'block'; }
+function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
+function showLogin() { 
+    document.getElementById('authTitle').innerText = "Iniciar Sesión";
+    // Podrías alternar un campo de nombre/apellido aquí para login simple
+}
+
+// 5. NAVEGACIÓN Y VISTAS
 function goHome() {
-    currentTab = 'home'; 
-    currentTrendFilter = null;
-    const tickerList = document.getElementById('tickerList');
-    if (tickerList) tickerList.style.display = 'block';
-    
+    currentTab = 'home'; currentTrendFilter = null;
+    document.getElementById('tickerList').style.display = 'block';
     document.getElementById('pageView').classList.remove('active');
     document.getElementById('searchBarSection').style.display = 'block';
     document.getElementById('heroSection').style.display = 'block';
-    
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     const btnHome = document.getElementById('btn-home');
     if(btnHome) btnHome.classList.add('active');
-    
     window.scrollTo(0,0);
     renderView();
 }
 
-// 6. VISTA DE PRODUCTO (MODAL)
+function setTab(t, btn, pushState = true) { 
+    currentTab = t; 
+    if (pushState) {
+        const nuevaUrl = t === 'home' ? '/' : `/${t.toLowerCase()}`;
+        history.pushState({tab: t}, '', nuevaUrl);
+    }
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+    const target = btn || document.getElementById('btn-' + t);
+    if(target) target.classList.add('active'); 
+    renderView(); 
+}
+
 function openProductView(id, pushState = true) {
     const item = flatList.find(i => i.id == id);
     if (!item) return;
@@ -758,17 +772,10 @@ function openProductView(id, pushState = true) {
     const stats = getStats(item.p, item.h7d);
     document.getElementById('pv-name').innerText = item.n;
 
-    // Imagen
     const imgWrap = document.getElementById('pv-img-wrap');
-    const imgEl = document.getElementById('pv-img');
-    if (item.img) {
-        imgEl.src = item.img;
-        imgWrap.style.display = 'block';
-    } else {
-        imgWrap.style.display = 'none';
-    }
+    if (item.img) { document.getElementById('pv-img').src = item.img; imgWrap.style.display = 'block'; }
+    else { imgWrap.style.display = 'none'; }
 
-    // Precios
     const stores = ["COTO", "CARREFOUR", "DIA", "JUMBO"];
     document.getElementById('pv-best-store').innerText = `Mejor precio hoy en ${stores[item.p.indexOf(stats.min)]}`;
     document.getElementById('pv-price-big').innerText = `$ ${format(stats.min)}`;
@@ -777,280 +784,97 @@ function openProductView(id, pushState = true) {
     const promedio = preciosDisponibles.length > 0 ? (preciosDisponibles.reduce((a, b) => a + b, 0) / preciosDisponibles.length) : 0;
     document.getElementById('pv-avg-price').innerText = `$ ${format(Math.round(promedio))}`;
 
-    // Botón Favoritos (Check Objeto)
     const favBtn = document.getElementById('pv-fav-btn');
-    const isFav = favorites[item.id] !== undefined;
-    favBtn.style.color = isFav ? 'var(--star-gold)' : 'var(--text-main)';
-
+    favBtn.style.color = favorites[item.id] ? 'var(--star-gold)' : 'var(--text-main)';
     favBtn.onclick = () => {
         toggleFav(item.id, null);
-        const nowFav = favorites[item.id] !== undefined;
-        favBtn.style.color = nowFav ? 'var(--star-gold)' : 'var(--text-main)';
-        if (currentTab === 'favs') renderView();
+        favBtn.style.color = favorites[item.id] ? 'var(--star-gold)' : 'var(--text-main)';
     };
 
     document.getElementById('pv-market-list').innerHTML = renderMarket(item, stats.min);
-
-    // Modal UI (PC vs Móvil)
     const view = document.getElementById('productFullView');
     view.style.display = (window.innerWidth >= 1024) ? 'flex' : 'block';
     document.body.style.overflow = 'hidden';
-
-    // Gráfico
-    document.querySelectorAll('#pv-range-filters .range-btn').forEach(b => b.classList.remove('active'));
-    const firstRange = document.querySelector('#pv-range-filters .range-btn:first-child');
-    if (firstRange) firstRange.classList.add('active');
-    
     loadPvChart(7);
-
-    // Compartir
-    document.getElementById('pv-share-btn').onclick = async () => {
-        const shareData = { title: 'TradingChango', text: `Mirá el precio de ${item.n}`, url: window.location.href };
-        try {
-            if (navigator.share) await navigator.share(shareData);
-            else {
-                await navigator.clipboard.writeText(window.location.href);
-                alert('¡Link copiado!');
-            }
-        } catch (err) { console.log(err); }
-    };
 }
-    function closeProductView(pushState = true) {
-        document.getElementById('productFullView').style.display = 'none';
-        document.body.style.overflow = 'auto';
-        if (pushState) history.pushState(null, '', `/${currentTab === 'home' ? '' : currentTab}`);
-        openId = null;
-        renderView();
-    }
 
-    function openPage(c, t, pushState = true) {
-        if (pushState) history.pushState({page: c}, '', `/${c}`);
-        document.getElementById('tickerList').style.display = 'none';
-        document.getElementById('searchBarSection').style.display = 'none';
-        document.getElementById('heroSection').style.display = 'none';
-        const v = document.getElementById('pageView');
-        v.classList.add('active');
-        document.getElementById('pageTitle').innerText = t;
-        document.getElementById('pageContent').innerHTML = configDB[c] || 'Cargando...';
-        window.scrollTo(0,0);
-    }
+function closeProductView() {
+    document.getElementById('productFullView').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    history.pushState(null, '', `/${currentTab === 'home' ? '' : currentTab}`);
+    openId = null;
+    renderView();
+}
 
-    async function loadPvChart(days, btn) {
-    if(btn) { 
-        btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); 
-        btn.classList.add('active'); 
+// 6. ALERTAS
+async function toggleAlertUI() {
+    if (!currentUser) {
+        if (confirm("Necesitás una cuenta para recibir alertas. ¿Querés crear una?")) openAuth();
+        return;
     }
     const item = flatList.find(i => i.id == openId);
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, { 
-        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } 
-    });
-    const data = await res.json();
-    const wrap = document.getElementById('pv-wrap');
-    const perfEl = document.getElementById('pv-perf');
-    wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
-
-    if(data.length < 2) {
-        const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
-        wrap.appendChild(overlay); perfEl.innerText = ''; if(currentChart) currentChart.destroy(); return;
-    }
-
-    const firstP = data[0].precio_minimo; 
-    const lastP = data[data.length-1].precio_minimo; 
-    const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
-    
-    let label = days === 7 ? 'últimos 7 días' : days === 15 ? 'últimos 15 días' : days === 30 ? 'último mes' : days === 90 ? 'últimos 3 meses' : days === 180 ? 'últimos 6 meses' : 'último año';
-
-    perfEl.style.color = diffP >= 0 ? '#f23645' : '#00a650';
-    perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% ${label}`;
-
-    const ctx = document.getElementById('pv-canvas').getContext('2d');
-    const isDark = document.documentElement.classList.contains('dark-mode');
-    const mainColor = isDark ? '#ffffff' : '#131722';
-
-    if(currentChart) currentChart.destroy();
-    currentChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(d => { 
-                const dt = new Date(d.fecha + 'T12:00:00'); 
-                return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; 
-            }),
-            datasets: [{ 
-                data: data.map(d => d.precio_minimo), 
-                borderColor: mainColor, 
-                borderWidth: 2,
-                backgroundColor: 'transparent',
-                fill: false,
-                tension: 0, 
-                pointStyle: 'circle',
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointBackgroundColor: '#ffffff',
-                pointBorderColor: mainColor,
-                pointBorderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            // INTERACCIÓN: Se activa en cualquier parte del eje X (línea vertical)
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    enabled: true,
-                    backgroundColor: isDark ? '#1e222d' : '#fff',
-                    titleColor: isDark ? '#fff' : '#131722',
-                    bodyColor: isDark ? '#fff' : '#131722',
-                    borderColor: isDark ? '#444' : '#e0e3eb',
-                    borderWidth: 1,
-                    padding: 12,
-                    cornerRadius: 6,
-                    displayColors: false,
-                    titleFont: { size: 11, weight: 'normal' },
-                    bodyFont: { size: 13, weight: 'bold', family: 'Roboto Mono' },
-                    callbacks: {
-                        title: (context) => {
-                            const d = data[context[0].dataIndex].fecha.split('-');
-                            return `${parseInt(d[2])} ${MONTHS[parseInt(d[1])-1]} ${d[0]}`;
-                        },
-                        // MOSTRAR EMPRESA + PRECIO
-                        label: (context) => {
-                            const entry = data[context.dataIndex];
-                            return `${entry.supermercado}: $${format(entry.precio_minimo)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    border: { display: false },
-                    grid: { color: isDark ? '#2a2a2a' : '#f0f0f0', drawTicks: false },
-                    ticks: { color: '#999', font: { size: 11 }, callback: v => '$' + v, padding: 10 }
-                },
-                x: {
-                    border: { display: false },
-                    grid: { display: false },
-                    ticks: { color: '#999', font: { size: 11 }, maxTicksLimit: 6 }
-                }
-            }
-        },
-        // PLUGIN PARA LA LÍNEA VERTICAL (CROSSHAIR)
-        plugins: [{
-            afterDraw: (chart) => {
-                if (chart.tooltip?._active?.length) {
-                    const x = chart.tooltip._active[0].element.x;
-                    const yAxis = chart.scales.y;
-                    const ctx = chart.ctx;
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(x, yAxis.top);
-                    ctx.lineTo(x, yAxis.bottom);
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)';
-                    ctx.setLineDash([4, 4]); // Línea punteada
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-        }]
-    });
-}
-   
-     function changeQty(id, delta, event) {
-    if (event) event.stopPropagation(); // Evita que se abra la vista de producto al tocar el botón
-    
-    if (favorites[id]) {
-        favorites[id] += delta;
-        
-        // No permitimos que la cantidad sea menor a 1
-        if (favorites[id] < 1) favorites[id] = 1;
-        
-        localStorage.setItem('fav_tickers', JSON.stringify(favorites));
-        renderView(); // Refrescamos para actualizar el total y los números
+    const targetPrice = prompt(`Avisame cuando "${item.n}" baje de $:`, (getStats(item.p, item.h7d).min * 0.9).toFixed(0));
+    if (targetPrice) {
+        await supabase.from('alertas').insert([{ user_id: currentUser.id, product_id: item.id, precio_objetivo: parseFloat(targetPrice) }]);
+        alert("¡Alerta configurada!");
+        document.getElementById('pv-alert-btn').classList.add('active');
+        document.getElementById('pv-alert-btn').innerHTML = '<i class="fa-solid fa-bell"></i>';
     }
 }
-     
-     
-     
-     
-     function toggleFav(id, btn) {
-    // Si ya existe, lo borramos (sacar del chango)
-    if (favorites[id]) {
-        delete favorites[id];
-    } else {
-        // Si no existe, lo agregamos con cantidad 1
-        favorites[id] = 1;
-    }
-    
+
+// 7. LÓGICA DE FAVORITOS Y CHANGO
+function toggleFav(id, btn) {
+    if (favorites[id]) delete favorites[id];
+    else favorites[id] = 1;
     localStorage.setItem('fav_tickers', JSON.stringify(favorites));
     updateCartBadge();
-    
-    if (currentTab === 'favs') {
-        renderView(); 
-    } else if (btn) {
-        // Cambiamos 'active' según si el ID existe como llave en el objeto
-        btn.classList.toggle('active', !!favorites[id]);
-    }
- }
+    if (currentTab === 'favs') renderView();
+    else if (btn) btn.classList.toggle('active', !!favorites[id]);
+}
 
-    function updateCartBadge() {
-    const b = document.getElementById('cartBadge');
-    const count = Object.keys(favorites).length; // Contamos las propiedades del objeto
-    
-    if (count > 0) {
-        b.style.display = 'flex';
-        b.innerText = count;
-    } else {
-        b.style.display = 'none';
+function changeQty(id, delta, event) {
+    if (event) event.stopPropagation();
+    if (favorites[id]) {
+        favorites[id] += delta;
+        if (favorites[id] < 1) favorites[id] = 1;
+        localStorage.setItem('fav_tickers', JSON.stringify(favorites));
+        renderView();
     }
 }
 
- function renderView() {
+function updateCartBadge() {
+    const b = document.getElementById('cartBadge');
+    const count = Object.keys(favorites).length;
+    if (b) { b.style.display = count > 0 ? 'flex' : 'none'; b.innerText = count; }
+}
+
+// 8. RENDERIZADO
+function renderView() {
     const container = document.getElementById('tickerList');
     const term = document.getElementById('searchInput').value.toUpperCase();
     const hero = document.getElementById('heroSection');
     const trendFilters = document.getElementById('headerTrendFilters');
-    const clearBtn = document.getElementById('clearSearch');
-
+    
     container.innerHTML = '';
-    if (clearBtn) clearBtn.style.display = term ? 'block' : 'none';
-
     let dataToShow = [];
 
-    // Lógica de pestañas
     if (currentTab === 'home') {
         trendFilters.style.display = 'flex';
         hero.style.display = (term || currentTrendFilter) ? 'none' : 'block';
         dataToShow = [...flatList];
-    } 
-    else if (currentTab === 'favs') {
-        trendFilters.style.display = 'none';
-        hero.style.display = 'none';
-        // Filtramos buscando llaves en el objeto
+    } else if (currentTab === 'favs') {
+        trendFilters.style.display = 'none'; hero.style.display = 'none';
         dataToShow = flatList.filter(i => favorites[i.id] !== undefined);
-
-        if (dataToShow.length === 0) {
-            renderEmptyCart(container);
-            return;
-        }
+        if (dataToShow.length === 0) { renderEmptyCart(container); return; }
         renderChangoSummary(container, dataToShow);
-    } 
-    else {
-        trendFilters.style.display = 'flex';
-        hero.style.display = 'none';
+    } else {
+        trendFilters.style.display = 'flex'; hero.style.display = 'none';
         const catMap = { 'carnes': 'Carnes', 'verdu': 'Verdu', 'varios': 'Varios' };
         const categoryName = catMap[currentTab] || 'Varios';
         dataToShow = flatList.filter(i => i.cat.trim().toLowerCase() === categoryName.toLowerCase());
     }
 
-    // Filtros de búsqueda y tendencia
-    if (term) {
-        dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.toUpperCase().includes(term));
-    }
+    if (term) dataToShow = dataToShow.filter(i => i.n.toUpperCase().includes(term) || i.ticker.toUpperCase().includes(term));
     if (currentTrendFilter && currentTab !== 'favs') {
         dataToShow = dataToShow.filter(item => {
             const s = getStats(item.p, item.h7d);
@@ -1058,265 +882,124 @@ function openProductView(id, pushState = true) {
         });
     }
 
-    // Dibujar tarjetas
     dataToShow.forEach(item => {
         const s = getStats(item.p, item.h7d);
         if (s.min === 0) return;
-
-        const isAdded = favorites[item.id] !== undefined;
         const currentQty = favorites[item.id] || 1;
-
-        let qtyHtml = '';
-        if (currentTab === 'favs') {
-            qtyHtml = `
-                <div class="qty-control" onclick="event.stopPropagation()">
-                    <button class="qty-btn" onclick="changeQty(${item.id}, -1, event)">-</button>
-                    <span class="qty-num">${currentQty}</span>
-                    <button class="qty-btn" onclick="changeQty(${item.id}, 1, event)">+</button>
-                </div>`;
-        }
+        let qtyHtml = currentTab === 'favs' ? `
+            <div class="qty-control" onclick="event.stopPropagation()">
+                <button class="qty-btn" onclick="changeQty(${item.id}, -1, event)">-</button>
+                <span class="qty-num">${currentQty}</span>
+                <button class="qty-btn" onclick="changeQty(${item.id}, 1, event)">+</button>
+            </div>` : '';
 
         const card = document.createElement('div');
         card.className = 'ticker-card';
         card.onclick = () => openProductView(item.id);
         card.innerHTML = `
             <div class="ticker-info">
-                <div class="t-left">
-                    <span class="t-symbol">${item.ticker}</span>
-                    <span class="t-name">${item.n}</span>
-                </div>
-                <div class="t-right">
-                    <span class="t-price">$${format(s.min)}</span><br>
-                    <span class="t-change ${s.trendClass}">${s.icon} ${s.spread}%</span>
-                </div>
+                <div class="t-left"><span class="t-symbol">${item.ticker}</span><span class="t-name">${item.n}</span></div>
+                <div class="t-right"><span class="t-price">$${format(s.min)}</span><br><span class="t-change ${s.trendClass}">${s.icon} ${s.spread}%</span></div>
             </div>
             <div style="display:flex; align-items:center;">
                 ${qtyHtml}
-                <div class="fav-btn ${isAdded ? 'active' : ''}" 
-                     onclick="event.stopPropagation(); toggleFav(${item.id}, this)">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                </div>
-            </div>
-        `;
+                <div class="fav-btn ${favorites[item.id] ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav(${item.id}, this)"><i class="fa-solid fa-cart-shopping"></i></div>
+            </div>`;
         container.appendChild(card);
     });
 }
+
+// 9. HELPERS (Resto de funciones)
 function renderChangoSummary(container, items) {
     const totals = [0, 0, 0, 0];
     items.forEach(item => {
-        const qty = favorites[item.id] || 1; // Obtenemos la cantidad
-        item.p.forEach((val, idx) => {
-            if (val > 0) totals[idx] += (val * qty); // Multiplicamos por cantidad
-        });
+        const qty = favorites[item.id] || 1;
+        item.p.forEach((val, idx) => { if (val > 0) totals[idx] += (val * qty); });
     });
-
     const validTotals = totals.filter(t => t > 0);
     const minTotal = validTotals.length > 0 ? Math.min(...validTotals) : 0;
-
     const summaryDiv = document.createElement('div');
     summaryDiv.className = 'chango-summary';
-    
     let html = `<div class="pv-market-title" style="font-weight:800; color:var(--text-main);">Tu Chango (Total)</div>`;
-    const markets = ["Coto", "Carrefour", "Dia", "Jumbo"];
-    
-    markets.forEach((name, i) => {
+    ["Coto", "Carrefour", "Dia", "Jumbo"].forEach((n, i) => {
         const isBest = totals[i] === minTotal && minTotal > 0;
-        html += `
-            <div class="chango-row ${isBest ? 'best' : ''}">
-                <span>${name}</span>
-                <span>$ ${format(totals[i])}</span>
-            </div>`;
+        html += `<div class="chango-row ${isBest ? 'best' : ''}"><span>${n}</span><span>$ ${format(totals[i])}</span></div>`;
     });
-    
     summaryDiv.innerHTML = html;
     container.appendChild(summaryDiv);
 }
+
 function renderEmptyCart(container) {
     const emptyMsg = document.createElement('div');
-    emptyMsg.className = 'empty-cart-message'; // Mejor usar clases CSS
-    emptyMsg.style.textAlign = 'center';
-    emptyMsg.style.padding = '80px 20px';
-    emptyMsg.innerHTML = `
-        <i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 20px; opacity: 0.2;"></i>
+    emptyMsg.className = 'empty-cart-message';
+    emptyMsg.style.textAlign = 'center'; emptyMsg.style.padding = '80px 20px';
+    emptyMsg.innerHTML = `<i class="fa-solid fa-cart-shopping" style="font-size: 50px; margin-bottom: 20px; opacity: 0.2;"></i>
         <div style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Tu chango está vacío</div>
-        <div style="font-size: 14px; opacity: 0.8;">Agregá productos para comparar el total en los distintos supermercados.</div>
-    `;
+        <div style="font-size: 14px; opacity: 0.8;">Agregá productos para comparar el total.</div>`;
     container.appendChild(emptyMsg);
-}  
-    function getStats(p, h) { 
-        const v = p.filter(x=>x>0); if(v.length===0) return {min:0}; 
-        const min = Math.min(...v); let diff=0, tc="trend-neutral", icon="-", isUp=false, isDown=false; 
-        if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ tc="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ tc="trend-down"; icon="▼"; isDown=true; } } 
-        return {min, spread:Math.abs(diff).toFixed(1), trendClass:tc, icon, isUp, isDown}; 
+}
+
+async function loadPvChart(days, btn) {
+    if(btn) { btn.parentElement.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+    const item = flatList.find(i => i.id == openId);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/historial_precios?nombre_producto=eq.${encodeURIComponent(item.n)}&fecha=gte.${(new Date(Date.now() - days*864e5)).toISOString().split('T')[0]}&order=fecha.asc`, { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } });
+    const data = await res.json();
+    const wrap = document.getElementById('pv-wrap');
+    const perfEl = document.getElementById('pv-perf');
+    wrap.querySelectorAll('.no-data-overlay').forEach(ov => ov.remove());
+    if(data.length < 2) {
+        const overlay = document.createElement('div'); overlay.className = 'no-data-overlay'; overlay.innerHTML = '<span class="no-data-text">Sin datos suficientes</span>';
+        wrap.appendChild(overlay); perfEl.innerText = ''; if(currentChart) currentChart.destroy(); return;
     }
+    const firstP = data[0].precio_minimo, lastP = data[data.length-1].precio_minimo;
+    const diffP = (((lastP - firstP) / firstP) * 100).toFixed(1);
+    perfEl.style.color = diffP >= 0 ? '#f23645' : '#00a650';
+    perfEl.innerText = `${diffP > 0 ? '+' : ''}${diffP}% últimos días`;
 
-    function renderMarket(item, min) {
-    const STORES = [
-        {name: "COTO", color: "#ff3b30"},
-        {name: "CARREFOUR", color: "#2962ff"},
-        {name: "DIA", color: "#ff3b30"},
-        {name: "JUMBO", color: "#00c853"}
-    ];
+    const ctx = document.getElementById('pv-canvas').getContext('2d');
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    if(currentChart) currentChart.destroy();
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => { const dt = new Date(d.fecha + 'T12:00:00'); return `${dt.getDate()} ${MONTHS[dt.getMonth()]}.`; }),
+            datasets: [{ data: data.map(d => d.precio_minimo), borderColor: isDark ? '#fff' : '#131722', borderWidth: 2, tension: 0, pointRadius: 5 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+}
 
+function getStats(p, h) { 
+    const v = p.filter(x=>x>0); if(v.length===0) return {min:0}; 
+    const min = Math.min(...v); let diff=0, tc="trend-neutral", icon="-", isUp=false, isDown=false; 
+    if(h>0){ diff = ((min-h)/h)*100; if(diff>0.1){ tc="trend-up"; icon="▲"; isUp=true; } else if(diff<-0.1){ tc="trend-down"; icon="▼"; isDown=true; } } 
+    return {min, spread:Math.abs(diff).toFixed(1), trendClass:tc, icon, isUp, isDown}; 
+}
+
+function renderMarket(item, min) {
+    const STORES = [{name:"COTO",color:"#ff3b30"},{name:"CARREFOUR",color:"#2962ff"},{name:"DIA",color:"#ff3b30"},{name:"JUMBO",color:"#00c853"}];
     return STORES.map((s, i) => { 
-        const p = item.p[i];
-        const url = item.urls ? item.urls[i] : '#'; // Obtenemos la URL guardada
-        
-        // Si no hay precio, mostramos un estado desactivado
-        if (p === 0) {
-            return `
-                <div class="ob-row" style="opacity: 0.5;">
-                    <div class="ob-store">
-                        <div class="dot" style="background:#444"></div>
-                        ${s.name}
-                    </div>
-                    <span class="price-link no-price">N/A</span>
-                </div>`;
-        }
-
-        // Si hay precio, creamos el link real
-        return `
-            <div class="ob-row">
-                <div class="ob-store">
-                    <div class="dot" style="background:${s.color}"></div>
-                    ${s.name}
-                </div>
-                <a href="${url}" target="_blank" rel="noopener noreferrer" class="price-link ${p === min ? 'best-val' : ''}">
-                    $${format(p)}
-                </a>
-            </div>`; 
+        const p = item.p[i]; const url = item.urls ? item.urls[i] : '#';
+        if (p === 0) return `<div class="ob-row" style="opacity:0.5;"><div class="ob-store"><div class="dot" style="background:#444"></div>${s.name}</div><span class="price-link no-price">N/A</span></div>`;
+        return `<div class="ob-row"><div class="ob-store"><div class="dot" style="background:${s.color}"></div>${s.name}</div><a href="${url}" target="_blank" rel="noopener" class="price-link ${p===min?'best-val':''}">$${format(p)}</a></div>`; 
     }).join('');
 }
-    function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
-    function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
-    function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
-    function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
-    function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
-    function toggleLegalDropdown(e) { e.stopPropagation(); const d = document.getElementById('legalDropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'; }
-    
-    document.getElementById('searchInput').addEventListener('input', renderView);
-    document.addEventListener('click', () => document.getElementById('legalDropdown').style.display = 'none');
 
-        let deferredPrompt;
-const pwaPill = document.getElementById('pwaPill');
+function setTrendFilter(t) { currentTrendFilter = (currentTrendFilter === t) ? null : t; document.getElementById('btnUp').classList.toggle('active-up', currentTrendFilter === 'up'); document.getElementById('btnDown').classList.toggle('active-down', currentTrendFilter === 'down'); renderView(); }
+function toggleTheme() { document.documentElement.classList.toggle('dark-mode'); localStorage.setItem('theme', document.documentElement.classList.contains('dark-mode')?'dark':'light'); updateThemeIcon(); if(openId) loadPvChart(7); }
+function updateThemeIcon() { document.getElementById('themeIcon').className = document.documentElement.classList.contains('dark-mode')?'fa-solid fa-sun':'fa-solid fa-moon'; }
+function generateTicker(n) { return n.toUpperCase().replace(/DE|EL|LA|CON|SIN|KG|GRS|ML|\W/g, "").substring(0, 4); }
+function format(n) { return new Intl.NumberFormat('es-AR').format(n); }
+function toggleLegalDropdown(e) { e.stopPropagation(); const d = document.getElementById('legalDropdown'); d.style.display = d.style.display === 'flex' ? 'none' : 'flex'; }
+function clearInput() { document.getElementById('searchInput').value = ''; renderView(); }
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Solo mostrar si es móvil y si no la cerró antes en esta sesión
-    const wasClosed = sessionStorage.getItem('pwaPillClosed');
-    if (window.innerWidth < 1024 && !wasClosed) {
-        pwaPill.style.display = 'flex';
-    }
-});
+// Eventos Finales
+document.getElementById('searchInput').addEventListener('input', renderView);
+document.addEventListener('click', () => { if(document.getElementById('legalDropdown')) document.getElementById('legalDropdown').style.display = 'none'; });
+document.getElementById('productFullView').addEventListener('click', function(e) { if (window.innerWidth >= 1024 && e.target === this) closeProductView(); });
 
-async function installPwa() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') pwaPill.style.display = 'none';
-        deferredPrompt = null;
-    }
-}
-
-function closePwaPill() {
-    pwaPill.style.display = 'none';
-    // Guardamos en la sesión que el usuario la cerró para no molestar más
-    sessionStorage.setItem('pwaPillClosed', 'true');
-}
-
-// Lógica para iPhone (opcional, muestra un texto diferente)
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-if (isIOS && !isStandalone && !sessionStorage.getItem('pwaPillClosed')) {
-    pwaPill.style.display = 'flex';
-    document.getElementById('pwaText').innerText = 'Agregá la App a tu inicio ↑';
-}
-   // Cerrar al hacer clic fuera del contenido (Solo en Escritorio)
-document.getElementById('productFullView').addEventListener('click', function(e) {
-    if (window.innerWidth >= 1024 && e.target === this) {
-        closeProductView();
-    }
-}); 
-
-let currentUser = null;
-let userProfile = null;
-
-// 1. Verificar sesión al iniciar
-async function initAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    handleAuthState(session);
-
-    // Escuchar cambios de estado (Login/Logout)
-    supabase.auth.onAuthStateChange((_event, session) => {
-        handleAuthState(session);
-    });
-}
-
-async function handleAuthState(session) {
-    if (session) {
-        currentUser = session.user;
-        // Cargar datos del perfil desde la tabla 'perfiles'
-        const { data } = await supabase.from('perfiles').select('*').eq('id', currentUser.id).single();
-        userProfile = data;
-        console.log("Bienvenido", userProfile?.nombre);
-        document.getElementById('authModal').style.display = 'none';
-        // Aquí podrías actualizar el icono del usuario en el header
-    } else {
-        currentUser = null;
-        userProfile = null;
-    }
-}
-
-// 2. Función de Registro
-async function handleSignUp(event) {
-    event.preventDefault();
-    const nombre = document.getElementById('regNombre').value;
-    const apellido = document.getElementById('regApellido').value;
-    const fecha = document.getElementById('regFecha').value;
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPass').value;
-
-    // A. Crear usuario en Auth
-    const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: pass
-    });
-
-    if (error) {
-        alert("Error: " + error.message);
-        return;
-    }
-
-    if (data.user) {
-        // B. Crear perfil en la tabla 'perfiles'
-        const { error: profileError } = await supabase.from('perfiles').insert([
-            { 
-                id: data.user.id, 
-                nombre: nombre, 
-                apellido: apellido, 
-                fecha_nacimiento: fecha, 
-                email: email 
-            }
-        ]);
-
-        if (profileError) {
-            console.error(profileError);
-            alert("Cuenta creada, pero hubo un error al guardar tus datos.");
-        } else {
-            alert("¡Cuenta creada con éxito! Revisá tu email si se requiere confirmación.");
-            location.reload(); // Recargamos para refrescar el estado
-        }
-    }
-}
-
-// 3. Funciones de UI
-function openAuth() { document.getElementById('authModal').style.display = 'block'; }
-function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
-     
-    // Iniciar la app
-    init();
+// Iniciar App
+init();
 </script>
 
 <!-- Modal o Sección de Registro/Login -->
