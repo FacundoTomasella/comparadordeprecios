@@ -597,23 +597,21 @@ if (Array.isArray(favorites)) {
            // Dentro de la función async function init()
 flatList = rows.map(r => {
     const h7 = hData.filter(h => h.nombre_producto === r.nombre).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-    let t = generateTicker(r.nombre);
-    if(usedTickers.has(t)) t = (t.substring(0,3) + r.id.toString().slice(-1)).toUpperCase();
-    usedTickers.add(t);
+    let t = r.ticker || generateTicker(r.nombre);
     
     return {
         id: r.id, 
         n: r.nombre.trim(), 
         cat: r.categoria, 
         ticker: t,
-        p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0],
-        // AGREGAMOS ESTA LÍNEA (Asegúrate que los nombres url_coto, etc., coincidan con Supabase)
-        urls: [r.url_coto || '#', r.url_carrefour || '#', r.url_dia || '#', r.url_jumbo || '#'],
+        // Agregamos p_masonline al final del array de precios (posición 4)
+        p: [r.p_coto||0, r.p_carrefour||0, r.p_dia||0, r.p_jumbo||0, r.p_masonline||0],
+        // Agregamos url_masonline al final del array de URLs (posición 4)
+        urls: [r.url_coto||'#', r.url_carrefour||'#', r.url_dia||'#', r.url_jumbo||'#', r.url_masonline||'#'],
         h7d: h7.length > 0 ? h7[0].precio_minimo : 0,
         img: r.imagen_url
     }
 });
-
             document.getElementById('loader').style.display = 'none';
             updateCartBadge();
 
@@ -1052,7 +1050,7 @@ flatList = rows.map(r => {
     });
 }
 function renderChangoSummary(container, items) {
-    const totals = [0, 0, 0, 0];
+    const totals = [0, 0, 0, 0, 0];
     items.forEach(item => {
         const qty = favorites[item.id] || 1; // Obtenemos la cantidad
         item.p.forEach((val, idx) => {
@@ -1067,7 +1065,7 @@ function renderChangoSummary(container, items) {
     summaryDiv.className = 'chango-summary';
     
     let html = `<div class="pv-market-title" style="font-weight:800; color:var(--text-main);">Tu Chango (Total)</div>`;
-    const markets = ["Coto", "Carrefour", "Dia", "Jumbo"];
+    const markets = ["Coto", "Carrefour", "Dia", "Jumbo", "MasOnline"];
     
     markets.forEach((name, i) => {
         const isBest = totals[i] === minTotal && minTotal > 0;
@@ -1106,6 +1104,7 @@ function renderEmptyCart(container) {
         {name: "CARREFOUR", color: "#2962ff"},
         {name: "DIA", color: "#ff3b30"},
         {name: "JUMBO", color: "#00c853"}
+        {name: "MAS ONLINE", color: "#00c853"}
     ];
 
     return STORES.map((s, i) => { 
